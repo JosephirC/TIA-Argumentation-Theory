@@ -12,7 +12,7 @@ class Rules:
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        self.literalReference = "r" + str(Rules.ruleCount)
+        self.name = "r" + str(Rules.ruleCount)
 
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
@@ -23,32 +23,65 @@ class Rules:
 
     # handle print of the class
     def __str__(self):
-        ruleLiteralReference = "[" + self.literalReference + "] "
+        ruleName = "[" + self.name + "] "
         rulePremises = ""
         ruleImplication = ""
-        ruleConclusion = str(self.conclusion)
+        ruleConclusion = ""
 
         for premise in self.premises:
             rulePremises = rulePremises + str(premise) + ","
 
+        for conclusion in self.conclusion:
+            ruleConclusion = ruleConclusion + str(conclusion) + ","
+
         rulePremises = rulePremises[:-1] + " "
+        ruleConclusion = ruleConclusion[:-1] + " "
 
         if(self.isDefeasible):
             ruleImplication = "=> "
         else :
             ruleImplication = "->"
         
-        return ruleLiteralReference + rulePremises + ruleImplication + ruleConclusion
+        return ruleName + rulePremises + ruleImplication + ruleConclusion
         
     # handle hash of the class
     def __hash__(self):
-        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.literalReference))
+        return hash((tuple(self.premises), tuple(self.conclusion), self.isDefeasible, self.name))
 
     # set rule literal reference
-    def setLiteralReference(self, literalReference):
-        self.literalReference = literalReference
+    def setLiteralReference(self, name):
+        self.name = name
 
 
+    # Write a function that creates contraposition rules for strict rules. Create the following rules and display them. 
+    # You should obtain a prompt similar to what is displayed below.
+
+    # Example : a,d -> b becomes d, ¬b -> ¬a    
+        
+
+    #### Prof : 
+            # je cree un literal qui a la negation du premise courant -->   o  
+            # je dois creer un ensemble de literal qui contient le nv literal 
+            # tous les autres literaux de self.premise sauf premise   --> ensemble qui contient "o" qui contient tous les 
+    
+    
+    ### ME : 
+        # a,b ->d becomes { {a, ¬d -> ¬b}, {b, ¬d -> ¬a}} 
+
+    def contraposition(self):
+        newPremise = set()
+        newConclusion = set()
+
+        print("Self?" , self)
+
+
+        if len(self.premises) == 1 and len(self.conclusion) == 1 :
+            literal = next(iter(self.conclusion))
+            newPremise.add(literal.negate())
+            literal = next(iter(self.premises))
+            newConclusion.add(literal.negate())
+
+            return Rules(newPremise, newConclusion, self.isDefeasible)
 
 
         

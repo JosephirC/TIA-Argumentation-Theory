@@ -27,4 +27,5 @@ class Literals:
     
     # negate the class instance through the isNeg attribute
     def negate(self):
-        self.isNeg = not self.isNeg
+        return Literals(self.name, not self.isNeg)
+    

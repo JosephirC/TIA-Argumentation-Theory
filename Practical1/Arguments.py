@@ -24,6 +24,7 @@ class Arguments:
         argumentSubArguments = ""
         argumentTopRule = self.topRule
         argumentImplication = ""
+        argumentTopRuleConclusion = ""
 
         # Extracting all sub arguments and putting them in a list
         for subArgument in self.subArguments:
@@ -41,8 +42,12 @@ class Arguments:
             argumentImplication = "=> "
         else :
             argumentImplication = "->"
+
+        # Extracting the literals from the conclusion set
+        for conclusion in argumentTopRule.conclusion:
+            argumentTopRuleConclusion = argumentTopRuleConclusion + str(conclusion)
             
-        return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRule.conclusion)
+        return argumentName + argumentSubArguments + argumentImplication + argumentTopRuleConclusion
 
     def __hash__(self):
         return hash((self.topRule, tuple(self.subArguments), self.name))
