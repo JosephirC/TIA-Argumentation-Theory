@@ -12,6 +12,9 @@ class Literals :
     
     def __eq__(self, other):
         return (self.name == other.name and self.neg == other.neg)
+    
+    def op(self):
+        return Literals(self.name, not self.neg)
         
 class Rules:
     compt = 0
@@ -34,6 +37,13 @@ class Rules:
         
     def __eq__(self, other):
         return (self.setLit == other.setLit and self.concl == other.concl and self.defeasible == other.defeasible)
+    
+    def contraposition(self):
+        if(len(self.setLit) == 1):
+            setList = Literals.op(self.concl)
+            concl = Literals.op(self.setLit)
+            print(setList)
+            return Rules(setList, self.defeasible, concl)
 
 class Arguments:
 
@@ -60,8 +70,6 @@ class Arguments:
     def __eq__(self, other):
         return (self.topRule == other.topRule and self.subArg == other.subArg)
 
-
-
 def main():
     a = Literals("a", True)
     b = Literals("b", False)
@@ -82,6 +90,10 @@ def main():
     arguement4 = Arguments(rule2, [arguement3], "A4")
     arguement5 = Arguments(rule, [arguement4, arguement3], "A5")
     print(arguement5)
+
+    rule3 = Rules([a], False, c)
+    rule4 = Rules.contraposition(rule3)
+    print(rule4)
 
 main()
 
