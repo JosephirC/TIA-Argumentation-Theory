@@ -43,6 +43,7 @@ class Rules:
             ruleImplication = "->"
 
         return ruleName + rulePremises + ruleImplication + ruleConclusion
+    
     # handle hash of the class
     def __hash__(self):
         return hash((tuple(self.premises), tuple(self.conclusion), self.isDefeasible, self.name))
@@ -67,13 +68,14 @@ class Rules:
     ### ME : 
         # a,b ->d becomes { {a, ¬d -> ¬b}, {b, ¬d -> ¬a}, {¬d -> ¬a, ¬b} } 
 
-    def contraposition2(self):
+    def contraposition(self):
         newRules = set()
         newPremise = set()
         newConclusion = set()
 
         if len(self.premises) == 1:
             conclusion = next(iter(self.conclusion))
+            print("len1, new premise : ", newPremise)
             newPremise.add(conclusion.negate())
 
             literal = next(iter(self.premises))
@@ -82,19 +84,15 @@ class Rules:
 
             return newRules
         
-        elif len(self.premises) > 1:
-            # currentLiteral = next(iter(self.premises))
-            # newPremise.add(currentLiteral.negate())
-            # conclusion = next(iter(self.conclusion))
-            # newConclusion.add(conclusion.negate())
-            
+        else:
+            conclusion = next(iter(self.conclusion))
             for premise in self.premises:
-                currentLiteral = next(iter(self.premises))
-                newPremise = self.premises.remove(premise)
-                newConclusion.add(currentLiteral.negate())
-
-                conclusion = next(iter(self.conclusion))
+                currentLiteral = premise.negate()
+                newConclusion.add(currentLiteral)
+                newPremise = self.premises.copy()
+                newPremise.remove(premise)
                 newPremise.add(conclusion.negate())
                 newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
-                return Rules(newPremise, newConclusion, self.isDefeasible)
+                newConclusion = set()
+            return newRules
     
