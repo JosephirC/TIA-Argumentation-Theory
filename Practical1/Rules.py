@@ -29,21 +29,20 @@ class Rules:
         ruleConclusion = ""
 
         for premise in self.premises:
-            rulePremises = rulePremises + str(premise) + ","
+            rulePremises += str(premise) + ","
 
         for conclusion in self.conclusion:
-            ruleConclusion = ruleConclusion + str(conclusion) + ","
+            ruleConclusion += str(conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
         ruleConclusion = ruleConclusion[:-1] + " "
 
-        if(self.isDefeasible):
+        if self.isDefeasible:
             ruleImplication = "=> "
-        else :
+        else:
             ruleImplication = "->"
-        
+
         return ruleName + rulePremises + ruleImplication + ruleConclusion
-        
     # handle hash of the class
     def __hash__(self):
         return hash((tuple(self.premises), tuple(self.conclusion), self.isDefeasible, self.name))
