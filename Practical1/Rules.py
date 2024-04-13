@@ -55,7 +55,6 @@ class Rules:
 
         if len(self.premises) == 1:
             conclusion = next(iter(self.conclusion))
-            print("len1, new premise : ", newPremise)
             newPremise.add(conclusion.negate())
 
             literal = next(iter(self.premises))

@@ -14,7 +14,7 @@ class Literals:
 
         literalName = str(self.name)
 
-        if(self.isNeg):
+        if(not self.isNeg):
             literalName = literalName
         else:
             literalName = "¬" + literalName
