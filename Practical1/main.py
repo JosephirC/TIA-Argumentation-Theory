@@ -47,7 +47,9 @@ def main():
     contrapositionRules = rule1.contraposition()
     print("TESTING CONTRAPOSITION, LEN 1")
     print("Rule 1 before contraposition " , rule1)
-    print("Rule 1 after contraposition " , contrapositionRules)
+    print("Rule 1 after contraposition ")
+    for rule in contrapositionRules:
+        print(rule)
 
     print("\n")
     print("TESTING CONTRAPOSITION, LEN > 1")
