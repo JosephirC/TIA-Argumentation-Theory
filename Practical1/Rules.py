@@ -48,26 +48,6 @@ class Rules:
     def __hash__(self):
         return hash((tuple(self.premises), tuple(self.conclusion), self.isDefeasible, self.name))
 
-    # set rule literal reference
-    def setLiteralReference(self, name):
-        self.name = name
-
-
-    # Write a function that creates contraposition rules for strict rules. Create the following rules and display them. 
-    # You should obtain a prompt similar to what is displayed below.
-
-    # Example : a,d -> b becomes d, ¬b -> ¬a    
-        
-
-    #### Prof : 
-            # je cree un literal qui a la negation du premise courant --> o  
-            # je dois creer un ensemble de literal qui contient le nv literal 
-            # tous les autres literaux de self.premise sauf premise   --> ensemble qui contient "o" qui contient tous les 
-    
-    
-    ### ME : 
-        # a,b ->d becomes { {a, ¬d -> ¬b}, {b, ¬d -> ¬a}, {¬d -> ¬a, ¬b} } 
-
     def contraposition(self):
         newRules = set()
         newPremise = set()
