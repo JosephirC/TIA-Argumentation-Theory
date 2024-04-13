@@ -68,7 +68,7 @@ class Rules:
     ### ME : 
         # a,b ->d becomes { {a, ¬d -> ¬b}, {b, ¬d -> ¬a}, {¬d -> ¬a, ¬b} } 
 
-    def contraposition(self):
+    def contraposition2(self):
         newRules = set()
         newPremise = set()
         newConclusion = set()
@@ -84,16 +84,18 @@ class Rules:
             return newRules
         
         elif len(self.premises) > 1:
-            currentLiteral = next(iter(self.premises))
-            newPremise.add(currentLiteral.negate())
-            conclusion = next(iter(self.conclusion))
-            newConclusion.add(conclusion.negate())
+            # currentLiteral = next(iter(self.premises))
+            # newPremise.add(currentLiteral.negate())
+            # conclusion = next(iter(self.conclusion))
+            # newConclusion.add(conclusion.negate())
             
-            # for premise in self.premises:
-            #     currentLiteral = premise.negate()
-            #     newPremise = self.premises.remove(premise)
-            #     newConclusion.add(currentLiteral)
-            #     newPremise.add(self.conclusion.negate())
+            for premise in self.premises:
+                currentLiteral = next(iter(self.premises))
+                newPremise = self.premises.remove(premise)
+                newConclusion.add(currentLiteral.negate())
 
-            return Rules(newPremise, newConclusion, self.isDefeasible)
+                conclusion = next(iter(self.conclusion))
+                newPremise.add(conclusion.negate())
+                newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
+                return Rules(newPremise, newConclusion, self.isDefeasible)
     
