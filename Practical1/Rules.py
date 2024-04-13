@@ -60,31 +60,40 @@ class Rules:
         
 
     #### Prof : 
-            # je cree un literal qui a la negation du premise courant -->   o  
+            # je cree un literal qui a la negation du premise courant --> o  
             # je dois creer un ensemble de literal qui contient le nv literal 
             # tous les autres literaux de self.premise sauf premise   --> ensemble qui contient "o" qui contient tous les 
     
     
     ### ME : 
-        # a,b ->d becomes { {a, ¬d -> ¬b}, {b, ¬d -> ¬a}} 
+        # a,b ->d becomes { {a, ¬d -> ¬b}, {b, ¬d -> ¬a}, {¬d -> ¬a, ¬b} } 
 
     def contraposition(self):
+        newRules = set()
         newPremise = set()
         newConclusion = set()
 
-        print("Self?" , self)
+        if len(self.premises) == 1:
+            conclusion = next(iter(self.conclusion))
+            newPremise.add(conclusion.negate())
 
-
-        if len(self.premises) == 1 and len(self.conclusion) == 1 :
-            literal = next(iter(self.conclusion))
-            newPremise.add(literal.negate())
             literal = next(iter(self.premises))
             newConclusion.add(literal.negate())
+            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
+
+            return newRules
+        
+        elif len(self.premises) > 1:
+            currentLiteral = next(iter(self.premises))
+            newPremise.add(currentLiteral.negate())
+            conclusion = next(iter(self.conclusion))
+            newConclusion.add(conclusion.negate())
+            
+            # for premise in self.premises:
+            #     currentLiteral = premise.negate()
+            #     newPremise = self.premises.remove(premise)
+            #     newConclusion.add(currentLiteral)
+            #     newPremise.add(self.conclusion.negate())
 
             return Rules(newPremise, newConclusion, self.isDefeasible)
-
-
-        
-    
-
     

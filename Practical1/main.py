@@ -45,10 +45,16 @@ def main():
 
     # Testing contraposition
     contrapositionRules = rule1.contraposition()
-    print("TESTING CONTRAPOSITION")
+    print("TESTING CONTRAPOSITION, LEN 1")
     print("Rule 1 before contraposition " , rule1)
     print("Rule 1 after contraposition " , contrapositionRules)
 
+    print("\n")
+    print("TESTING CONTRAPOSITION, LEN > 1")
+    rule4 = Rules.Rules({a, d}, {b}, True)
+    contrapositionRules = rule4.contraposition()
+    print("Rule 4 before contraposition " , rule4)
+    print("Rule 4 after contraposition " , contrapositionRules)
 
 
 if __name__ == "__main__":
