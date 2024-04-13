@@ -83,16 +83,18 @@ class Rules:
             return newRules
         
         elif len(self.premises) > 1:
-            currentLiteral = next(iter(self.premises))
-            newPremise.add(currentLiteral.negate())
             conclusion = next(iter(self.conclusion))
-            newConclusion.add(conclusion.negate())
             
-            # for premise in self.premises:
-            #     currentLiteral = premise.negate()
-            #     newPremise = self.premises.remove(premise)
-            #     newConclusion.add(currentLiteral)
-            #     newPremise.add(self.conclusion.negate())
+            for premise in self.premises:
+                currentLiteral = premise.negate()
+                newConclusion.add(currentLiteral)
 
-            return Rules(newPremise, newConclusion, self.isDefeasible)
+                newPremise = self.premises.copy()
+                newPremise.remove(premise)
+                newPremise.add(conclusion.negate())
+
+                newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
+                newConclusion = set() 
+
+        return newRules
     

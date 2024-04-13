@@ -56,8 +56,9 @@ def main():
     rule4 = Rules.Rules({a, d}, {b}, True)
     contrapositionRules = rule4.contraposition()
     print("Rule 4 before contraposition " , rule4)
-    print("Rule 4 after contraposition " , contrapositionRules)
-
+    print("Rule 4 after contraposition ")
+    for rule in contrapositionRules:
+        print(rule)
 
 if __name__ == "__main__":
     main()
