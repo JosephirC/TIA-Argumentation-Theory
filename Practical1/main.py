@@ -60,6 +60,5 @@ def main():
     for rule in contrapositionRules:
         print(rule)
 
-
 if __name__ == "__main__":
     main()

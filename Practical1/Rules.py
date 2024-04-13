@@ -86,13 +86,17 @@ class Rules:
         
         else:
             conclusion = next(iter(self.conclusion))
+            
             for premise in self.premises:
                 currentLiteral = premise.negate()
                 newConclusion.add(currentLiteral)
+
                 newPremise = self.premises.copy()
                 newPremise.remove(premise)
                 newPremise.add(conclusion.negate())
+
                 newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
-                newConclusion = set()
+                newConclusion = set() 
+
             return newRules
     
