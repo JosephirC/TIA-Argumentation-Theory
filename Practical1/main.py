@@ -22,8 +22,6 @@ def addArgsToBF(setOfArguments):
         if isinstance(arg, Arguments):
             bf.add(arg)
          
-    return bf
-        
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
@@ -35,21 +33,39 @@ def generateInitialArguments(rules):
     return rulesCopy
 
 def generateArgsFromRules(rules):
-    subArguments = set()
+    argToAdd = set()
     for rule in rules:
-        premiseCount = 0
+        subArguments = set()
         for premise in rule.premises:
-            premiseCount += 1
-            bfCopy = bf.copy()
-            for arg in bfCopy:
+            for arg in bf:
                 if premise in arg.topRule.conclusion:
                     subArguments.add(arg)
 
-        if len(subArguments) == premiseCount:
+        if len(subArguments) == len(rule.premises):
             newArg = Arguments.Arguments(rule, subArguments)
-            bf.add(newArg)
-        
-    return bf
+            argToAdd.add(newArg)
+    
+    bf.update(argToAdd)
+    return len(argToAdd)
+
+def generateContrapositonRules(rules):
+    rulesToAdd = set()
+    for rule in rules:
+        if not rule.isDefeasible :
+            rulesToAdd.add(rule.contraposition())
+
+    rules.update(rulesToAdd)
+    return rules
+
+
+def generateArgs(rules):
+    rulesWithContraposition = generateContrapositonRules(rules)
+    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    
+    countArg = generateArgsFromRules(rulesWithNoArgs)
+
+    while countArg > 0:
+        countArg = generateArgsFromRules(rulesWithNoArgs)
 
 def main():
     # a = Literals.Literals("a", False)
@@ -141,13 +157,6 @@ def main():
     # Testing the generation of arguments
     print("\n")
     # rules = {rule2, rule5, rule6, rule7}
-    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    rCopy = generateInitialArguments(rules)
-    print(len(rCopy))
-    
-    generateArgsFromRules(rCopy)
-    for arg in bf:
-        print(arg)
 
 
 if __name__ == "__main__":
