@@ -43,16 +43,26 @@ def generateArgsFromRules(rules):
 
         if len(subArguments) == len(rule.premises):
             newArg = Arguments.Arguments(rule, subArguments)
-            argToAdd.add(newArg)
+            if newArg not in bf:
+                argToAdd.update(newArg)
     
     bf.update(argToAdd)
+
+    print("\n")
+    for b in bf:
+        print("current bf : ", b)
+    
+    for arg in argToAdd:
+        print("current arg : ", arg)
+
+    print("\n")
     return len(argToAdd)
 
 def generateContrapositonRules(rules):
     rulesToAdd = set()
     for rule in rules:
         if not rule.isDefeasible :
-            rulesToAdd.add(rule.contraposition())
+            rulesToAdd.update(rule.contraposition())
 
     rules.update(rulesToAdd)
     return rules
@@ -66,6 +76,10 @@ def generateArgs(rules):
 
     while countArg > 0:
         countArg = generateArgsFromRules(rulesWithNoArgs)
+        # print("new count arg : ", countArg)
+        
+
+
 
 def main():
     # a = Literals.Literals("a", False)
@@ -156,10 +170,10 @@ def main():
 
     # Testing the generation of arguments
     print("\n")
-    # rules = {rule2, rule5, rule6, rule7}
-
+    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
 
+    generateArgs(rules)
 
 if __name__ == "__main__":
     main()
