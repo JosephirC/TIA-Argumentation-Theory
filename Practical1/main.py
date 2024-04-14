@@ -43,19 +43,24 @@ def generateArgsFromRules(rules):
 
         if len(subArguments) == len(rule.premises):
             newArg = Arguments.Arguments(rule, subArguments)
-            if newArg not in bf:
-                argToAdd.update(newArg)
-    
-    bf.update(argToAdd)
+            if {newArg} not in bf:
+                argToAdd.update({newArg})
 
     print("\n")
     for b in bf:
-        print("current bf : ", b)
+        print("current bf before update : ", b)
     
     for arg in argToAdd:
         print("current arg : ", arg)
+    
+    print("\n")
+    bf.update(argToAdd)
+
+    for b in bf:
+        print("current bf after update : ", b)
 
     print("\n")
+    print("E###################################")
     return len(argToAdd)
 
 def generateContrapositonRules(rules):
@@ -69,14 +74,16 @@ def generateContrapositonRules(rules):
 
 
 def generateArgs(rules):
-    rulesWithContraposition = generateContrapositonRules(rules)
-    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    # rulesWithContraposition = generateContrapositonRules(rules)
+    # rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    rulesWithNoArgs = generateInitialArguments(rules)
     
     countArg = generateArgsFromRules(rulesWithNoArgs)
 
     while countArg > 0:
         countArg = generateArgsFromRules(rulesWithNoArgs)
         # print("new count arg : ", countArg)
+        break
         
 
 

@@ -14,8 +14,7 @@ class Arguments:
 
     def __eq__(self, other):
         return (self.topRule == other.topRule 
-                and self.subArguments == other.subArguments 
-                and self.name == other.name)
+                and self.subArguments == other.subArguments)
 
     # arguemtn example : $A_1: \rightarrow a$ == A1: -> a
     # argument example : $A_2: A_1 \Rightarrow c$ == A2: A2, A1 => c
