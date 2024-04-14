@@ -149,6 +149,8 @@ def main():
     for arg in bf:
         print(arg)
 
+    print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
+
 
 if __name__ == "__main__":
     main()
