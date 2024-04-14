@@ -2,6 +2,55 @@ import Literals
 import Rules
 import Arguments
 
+
+# static bf to store all the arguments
+bf = set()
+
+# 1. contraposition on strict rules
+# 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
+# 2.1 add the arguments in the bf
+# 3. in a different function have a list of all the rules minus the rules for the intial arguments
+# 3.1 for each rule in the list of rules, generate the arguments
+# 3.2 add the respective arguments in the bf
+# 4. during this step we will try to generate the remaining arguments
+# 4.1 go through all the rules once and again and for each rule iterate over the bf and check if you can genereate a new argument for it and add it to the bf
+# 4.2. iterate over the whole bf once again and check if you can generate a new argument and then move to the next rule
+# 4.3 repeate 4.1 and 4.2 until no new arguments are generated
+
+def addArgsToBF(setOfArguments):
+    for arg in setOfArguments:
+        if isinstance(arg, Arguments):
+            bf.add(arg)
+         
+    return bf
+        
+def generateInitialArguments(rules):
+    rulesCopy = rules.copy()
+    for rule in rules:
+        if len(rule.premises) == 0 and len(rule.conclusion) > 0:
+            arg = Arguments.Arguments(rule, set())
+            bf.add(arg)
+            rulesCopy.remove(rule)
+    
+    return rulesCopy
+
+def generateArgsFromRules(rules):
+    subArguments = set()
+    for rule in rules:
+        premiseCount = 0
+        for premise in rule.premises:
+            premiseCount += 1
+            bfCopy = bf.copy()
+            for arg in bfCopy:
+                if premise in arg.topRule.conclusion:
+                    subArguments.add(arg)
+
+        if len(subArguments) == premiseCount:
+            newArg = Arguments.Arguments(rule, subArguments)
+            bf.add(newArg)
+        
+    return bf
+
 def main():
     # a = Literals.Literals("a", False)
     # b = Literals.Literals("b", False)
@@ -87,6 +136,18 @@ def main():
     print(rule7)
     print(rule8)
     print(rule9)
+
+
+    # Testing the generation of arguments
+    print("\n")
+    # rules = {rule2, rule5, rule6, rule7}
+    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    rCopy = generateInitialArguments(rules)
+    print(len(rCopy))
+    
+    generateArgsFromRules(rCopy)
+    for arg in bf:
+        print(arg)
 
 
 if __name__ == "__main__":
