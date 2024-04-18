@@ -22,8 +22,6 @@ def addArgsToBF(setOfArguments):
         if isinstance(arg, Arguments):
             bf.add(arg)
          
-    return bf
-        
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
@@ -34,22 +32,67 @@ def generateInitialArguments(rules):
     
     return rulesCopy
 
+#Idee debug
+## faire sous fonctions 
+## déplacer le while de generateArgs pour faire un appel récursif dans generateArgsFromRules
+## repenser a la logique de if premises in argtopruleccl (cas où on a 5 arg avec la même ccl)
+
 def generateArgsFromRules(rules):
-    subArguments = set()
+    argToAdd = set()
     for rule in rules:
-        premiseCount = 0
+        subArguments = set()
         for premise in rule.premises:
-            premiseCount += 1
-            bfCopy = bf.copy()
-            for arg in bfCopy:
+            for arg in bf:
                 if premise in arg.topRule.conclusion:
                     subArguments.add(arg)
+                    break
 
-        if len(subArguments) == premiseCount:
+        if len(subArguments) == len(rule.premises):
             newArg = Arguments.Arguments(rule, subArguments)
-            bf.add(newArg)
+            if newArg not in bf and newArg not in argToAdd:
+                argToAdd.add(newArg)
+
+    # print("\n")
+    # for b in bf:
+    #     print("current bf before update : ", b)
+    
+    # for arg in argToAdd:
+    #     print("current arg : ", arg)
+    
+    # print("\n")
+    bf.update(argToAdd)
+
+    # for b in bf:
+    #     print("current bf after update : ", b)
+
+    # print("\n")
+    # print("E###################################")
+    return len(argToAdd)
+
+def generateContrapositonRules(rules):
+    rulesToAdd = set()
+    for rule in rules:
+        if not rule.isDefeasible :
+            rulesToAdd.update(rule.contraposition())
+
+    rules.update(rulesToAdd)
+    return rules
+
+
+def generateArgs(rules):
+    # rulesWithContraposition = generateContrapositonRules(rules)
+    # rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    rulesWithNoArgs = generateInitialArguments(rules)
+    
+    countArg = generateArgsFromRules(rulesWithNoArgs)
+
+    while countArg > 0:
+        countArg = generateArgsFromRules(rulesWithNoArgs)
+        # print("new count arg : ", countArg)
+        break
         
-    return bf
+
+
 
 def main():
     # a = Literals.Literals("a", False)
@@ -140,15 +183,10 @@ def main():
 
     # Testing the generation of arguments
     print("\n")
-    # rules = {rule2, rule5, rule6, rule7}
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    rCopy = generateInitialArguments(rules)
-    print(len(rCopy))
-    
-    generateArgsFromRules(rCopy)
-    for arg in bf:
-        print(arg)
+    print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
 
+    generateArgs(rules)
 
 if __name__ == "__main__":
     main()

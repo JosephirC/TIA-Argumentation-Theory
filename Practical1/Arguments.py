@@ -3,6 +3,7 @@
 
 class Arguments:
 
+    setOfArgs_call_count = 0
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -13,8 +14,7 @@ class Arguments:
 
     def __eq__(self, other):
         return (self.topRule == other.topRule 
-                and self.subArguments == other.subArguments 
-                and self.name == other.name)
+                and self.subArguments == other.subArguments)
 
     # arguemtn example : $A_1: \rightarrow a$ == A1: -> a
     # argument example : $A_2: A_1 \Rightarrow c$ == A2: A2, A1 => c
@@ -62,8 +62,9 @@ class Arguments:
 
         return uniqueArguments
 
-
     def setOfArguemnts(self):
+        Arguments.setOfArgs_call_count += 1
+
         allArguments = [self.name]
 
         for subArgument in self.subArguments:
