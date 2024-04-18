@@ -1,10 +1,14 @@
 import Literals
 import Rules
 import Arguments
+import itertools
 
 
 # static bf to store all the arguments
-bf = set()
+# bf = set()
+bf = {
+
+}
 
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
@@ -20,17 +24,31 @@ bf = set()
 def addArgsToBF(setOfArguments):
     for arg in setOfArguments:
         if isinstance(arg, Arguments):
-            bf.add(arg)
+            bf[arg] = arg.topRule.conclusion
          
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
         if len(rule.premises) == 0 and len(rule.conclusion) > 0:
             arg = Arguments.Arguments(rule, set())
-            bf.add(arg)
+            bf[arg] = arg.topRule.conclusion
             rulesCopy.remove(rule)
     
     return rulesCopy
+
+def find_combinations(dictionary, target_values):
+    valid_combinations = set()
+    keys = list(dictionary.keys())
+
+    for r in range(1, len(keys) + 1):
+        for combo in itertools.combinations(keys, r):
+            values = set()
+            for key in combo:
+                values.update(dictionary[key])
+            if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
+                valid_combinations.add(tuple(combo))
+
+    return valid_combinations
 
 #Idee debug
 ## faire sous fonctions 
@@ -40,17 +58,17 @@ def generateInitialArguments(rules):
 def generateArgsFromRules(rules):
     argToAdd = set()
     for rule in rules:
-        subArguments = set()
-        for premise in rule.premises:
-            for arg in bf:
-                if premise in arg.topRule.conclusion:
-                    subArguments.add(arg)
-                    break
+        combination = find_combinations(bf, rule.premises)
+        for subArg in combination:
+            arg = Arguments.Arguments(rule, subArg)
+            # faire la vérif i pa déjà dan la bf
+            argToAdd.add(arg)
+            bf[arg] = arg.topRule.conclusion
 
-        if len(subArguments) == len(rule.premises):
-            newArg = Arguments.Arguments(rule, subArguments)
-            if newArg not in bf and newArg not in argToAdd:
-                argToAdd.add(newArg)
+        # if len(subArguments) == len(rule.premises):
+        #     newArg = Arguments.Arguments(rule, subArguments)
+        #     if newArg not in bf and newArg not in argToAdd:
+        #         argToAdd.add(newArg)
 
     # print("\n")
     # for b in bf:
@@ -60,7 +78,7 @@ def generateArgsFromRules(rules):
     #     print("current arg : ", arg)
     
     # print("\n")
-    bf.update(argToAdd)
+    # bf.update(argToAdd)
 
     # for b in bf:
     #     print("current bf after update : ", b)
@@ -78,21 +96,18 @@ def generateContrapositonRules(rules):
     rules.update(rulesToAdd)
     return rules
 
-
 def generateArgs(rules):
-    # rulesWithContraposition = generateContrapositonRules(rules)
-    # rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
-    rulesWithNoArgs = generateInitialArguments(rules)
+    rulesWithContraposition = generateContrapositonRules(rules)
+    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    # rulesWithNoArgs = generateInitialArguments(rules)
     
     countArg = generateArgsFromRules(rulesWithNoArgs)
+    print("new count arg : ", countArg)
 
     while countArg > 0:
         countArg = generateArgsFromRules(rulesWithNoArgs)
-        # print("new count arg : ", countArg)
+        print("new count arg : ", countArg)
         break
-        
-
-
 
 def main():
     # a = Literals.Literals("a", False)
@@ -187,6 +202,9 @@ def main():
     print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
 
     generateArgs(rules)
+
+    for cle in bf.keys():
+        print(cle)
 
 if __name__ == "__main__":
     main()
