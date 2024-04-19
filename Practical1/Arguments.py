@@ -13,7 +13,7 @@ class Arguments:
         self.name = "A" + str(Arguments.nameCount)
 
     def __eq__(self, other):
-        return (self.topRule == other.topRule 
+        return (self.topRule.conclusion == other.topRule.conclusion
                 and self.subArguments == other.subArguments)
 
     # arguemtn example : $A_1: \rightarrow a$ == A1: -> a

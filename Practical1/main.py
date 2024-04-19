@@ -33,7 +33,7 @@ def generateInitialArguments(rules):
     return rulesCopy
 
 #Idee debug
-## faire sous fonctions 
+## faire sous des fonctions 
 ## déplacer le while de generateArgs pour faire un appel récursif dans generateArgsFromRules
 ## repenser a la logique de if premises in argtopruleccl (cas où on a 5 arg avec la même ccl)
 
@@ -52,21 +52,21 @@ def generateArgsFromRules(rules):
             if newArg not in bf and newArg not in argToAdd:
                 argToAdd.add(newArg)
 
-    # print("\n")
-    # for b in bf:
-    #     print("current bf before update : ", b)
+    print("\n")
+    for b in bf:
+        print("current bf before update : ", b)
     
-    # for arg in argToAdd:
-    #     print("current arg : ", arg)
+    for arg in argToAdd:
+        print("current arg : ", arg)
     
-    # print("\n")
+    print("\n")
     bf.update(argToAdd)
 
-    # for b in bf:
-    #     print("current bf after update : ", b)
+    for b in bf:
+        print("current bf after update : ", b)
 
-    # print("\n")
-    # print("E###################################")
+    print("\n")
+    print("E###################################")
     return len(argToAdd)
 
 def generateContrapositonRules(rules):
@@ -80,9 +80,9 @@ def generateContrapositonRules(rules):
 
 
 def generateArgs(rules):
-    # rulesWithContraposition = generateContrapositonRules(rules)
-    # rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
-    rulesWithNoArgs = generateInitialArguments(rules)
+    rulesWithContraposition = generateContrapositonRules(rules)
+    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    # rulesWithNoArgs = generateInitialArguments(rules)
     
     countArg = generateArgsFromRules(rulesWithNoArgs)
 
