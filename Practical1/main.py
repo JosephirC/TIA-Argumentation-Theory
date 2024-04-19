@@ -10,6 +10,10 @@ bf = {
 
 }
 
+undercut = {
+
+}
+
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
 # 2.1 add the arguments in the bf
@@ -108,6 +112,26 @@ def generateArgs(rules):
         countArg = generateArgsFromRules(rulesWithNoArgs)
         print("new count arg : ", countArg)
         break
+
+def undercut(rules, arguments):
+    bfCopy = bf
+    for cle in bf.keys() :
+        print(cle)
+        if(cle.topRule.premises is not None) :
+            topRule = cle.topRule
+            bfCopy.pop(cle)
+            for autreCle in bfCopy.keys():
+                if(cle.topRule.__eq__(autreCle)):
+                    print("if autreCle" + autreCle.topRule)  
+                    undercut[cle] = autreCle
+                else:
+                    print("else")
+                    for subArguments in cle.subArguments:
+                        if(cle.topRule.__eq__(subArguments)):
+                            print("else if cle" + subArguments.topRule)
+                            undercut[cle] = subArguments.topRule
+    print(undercut)
+            
 
 def main():
     # a = Literals.Literals("a", False)
