@@ -2,7 +2,7 @@ import Literals
 import Rules
 import Arguments
 import itertools
-
+import time
 
 # static bf to store all the arguments
 # bf = set()
@@ -40,56 +40,45 @@ def generateInitialArguments(rules):
     
     return rulesCopy
 
-def find_combinations(dictionary, target_values):
+def find_combinations(target_values):
     valid_combinations = set()
-    keys = list(dictionary.keys())
+    keys = list(bf.keys())
 
     for r in range(1, len(keys) + 1):
         for combo in itertools.combinations(keys, r):
             values = set()
             for key in combo:
-                values.update(dictionary[key])
+                values.update(bf[key])
             if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
                 valid_combinations.add(tuple(combo))
 
     return valid_combinations
 
-#Idee debug
-## faire sous des fonctions 
-## déplacer le while de generateArgs pour faire un appel récursif dans generateArgsFromRules
-## repenser a la logique de if premises in argtopruleccl (cas où on a 5 arg avec la même ccl)
-
 def generateArgsFromRules(rules):
+    print("je rentre une foi")
     argToAdd = set()
     for rule in rules:
-        combination = find_combinations(bf, rule.premises)
+        combination = find_combinations(rule.premises) 
         for subArg in combination:
+
             arg = Arguments.Arguments(rule, subArg)
-            # faire la vérif i pa déjà dan la bf
-            argToAdd.add(arg)
-            bf[arg] = arg.topRule.conclusion
+            compt = 0
+            for elem in bf:
 
-        # if len(subArguments) == len(rule.premises):
-        #     newArg = Arguments.Arguments(rule, subArguments)
-        #     if newArg not in bf and newArg not in argToAdd:
-        #         argToAdd.add(newArg)
-
-    print("\n")
-    for b in bf:
-        print("current bf before update : ", b)
+                if elem.subArguments != arg.subArguments:
+                    compt = compt + 1
+            if len(bf) == compt:
+                argToAdd.add(arg)
+            else:
+                Arguments.Arguments.nameCount = Arguments.Arguments.nameCount - 1
     
-    for arg in argToAdd:
-        print("current arg : ", arg)
+    for key in argToAdd:
+        bf[key] = key.topRule.conclusion
     
-    # print("\n")
-    # bf.update(argToAdd)
-
-    for b in bf:
-        print("current bf after update : ", b)
-
-    print("\n")
-    print("E###################################")
-    return len(argToAdd)
+    print(len(argToAdd))
+    print("je rentre une or \n")
+    if(len(argToAdd)) > 0:
+        generateArgsFromRules(rules)
 
 def generateContrapositonRules(rules):
     rulesToAdd = set()
@@ -103,15 +92,8 @@ def generateContrapositonRules(rules):
 def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
     rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
-    # rulesWithNoArgs = generateInitialArguments(rules)
-    
-    countArg = generateArgsFromRules(rulesWithNoArgs)
-    print("new count arg : ", countArg)
+    generateArgsFromRules(rulesWithNoArgs)
 
-    while countArg > 0:
-        countArg = generateArgsFromRules(rulesWithNoArgs)
-        print("new count arg : ", countArg)
-        break
 
 def generateAttacks():
     for cle in bf.keys() :
@@ -224,9 +206,10 @@ def main():
     print("\n")
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
-
+    deb  = time.time()
     generateArgs(rules)
-
+    fin = time.time()
+    print("temp", fin-deb)
     for cle in bf.keys():
         print(cle)
 
