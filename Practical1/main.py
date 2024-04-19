@@ -113,24 +113,24 @@ def generateArgs(rules):
         print("new count arg : ", countArg)
         break
 
-def undercut(rules, arguments):
-    bfCopy = bf
+def generateAttacks():
     for cle in bf.keys() :
-        print(cle)
         if(cle.topRule.premises is not None) :
-            topRule = cle.topRule
-            bfCopy.pop(cle)
-            for autreCle in bfCopy.keys():
-                if(cle.topRule.__eq__(autreCle)):
-                    print("if autreCle" + autreCle.topRule)  
-                    undercut[cle] = autreCle
-                else:
-                    print("else")
-                    for subArguments in cle.subArguments:
-                        if(cle.topRule.__eq__(subArguments)):
-                            print("else if cle" + subArguments.topRule)
-                            undercut[cle] = subArguments.topRule
+            top = cle.topRule
+            for autreCle in bf.keys():
+                if cle != autreCle: # vérifier que cle et autreCle sont différents
+                    autreTop = autreCle.topRule
+                    if(top == autreTop):
+                        if(top.conclusion == autreTop.conclusion) :
+                            undercut[cle.name] = autreCle.name
+                    else:
+                        for subArgument in cle.subArguments:
+                            if(top == autreTop):
+                                if(subArgument.topRule.conclusion == autreTop.conclusion) :
+                                    undercut[cle.name] = subArgument.topRule.name
     print(undercut)
+    return undercut
+
             
 
 def main():
@@ -229,6 +229,8 @@ def main():
 
     for cle in bf.keys():
         print(cle)
+
+    generateAttacks()
 
 if __name__ == "__main__":
     main()
