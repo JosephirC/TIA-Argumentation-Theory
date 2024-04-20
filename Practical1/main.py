@@ -1,10 +1,18 @@
 import Literals
 import Rules
 import Arguments
-
+import itertools
+import time
 
 # static bf to store all the arguments
-bf = set()
+# bf = set()
+bf = {
+
+}
+
+undercut = {
+
+}
 
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
@@ -20,54 +28,54 @@ bf = set()
 def addArgsToBF(setOfArguments):
     for arg in setOfArguments:
         if isinstance(arg, Arguments):
-            bf.add(arg)
+            bf[arg] = arg.topRule.conclusion
          
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
         if len(rule.premises) == 0 and len(rule.conclusion) > 0:
             arg = Arguments.Arguments(rule, set())
-            bf.add(arg)
+            bf[arg] = arg.topRule.conclusion
             rulesCopy.remove(rule)
     
     return rulesCopy
 
-#Idee debug
-## faire sous fonctions 
-## déplacer le while de generateArgs pour faire un appel récursif dans generateArgsFromRules
-## repenser a la logique de if premises in argtopruleccl (cas où on a 5 arg avec la même ccl)
+def find_combinations(target_values):
+    valid_combinations = set()
+    keys = list(bf.keys())
+
+    for r in range(1, len(keys) + 1):
+        for combo in itertools.combinations(keys, r):
+            values = set()
+            for key in combo:
+                values.update(bf[key])
+            if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
+                valid_combinations.add(tuple(combo))
+
+    return valid_combinations
 
 def generateArgsFromRules(rules):
     argToAdd = set()
     for rule in rules:
-        subArguments = set()
-        for premise in rule.premises:
-            for arg in bf:
-                if premise in arg.topRule.conclusion:
-                    subArguments.add(arg)
-                    break
+        combination = find_combinations(rule.premises) 
+        for subArg in combination:
 
-        if len(subArguments) == len(rule.premises):
-            newArg = Arguments.Arguments(rule, subArguments)
-            if newArg not in bf and newArg not in argToAdd:
-                argToAdd.add(newArg)
+            arg = Arguments.Arguments(rule, subArg)
+            compt = 0
+            for elem in bf:
 
-    # print("\n")
-    # for b in bf:
-    #     print("current bf before update : ", b)
+                if elem.subArguments != arg.subArguments:
+                    compt = compt + 1
+            if len(bf) == compt:
+                argToAdd.add(arg)
+            else:
+                Arguments.Arguments.nameCount = Arguments.Arguments.nameCount - 1
     
-    # for arg in argToAdd:
-    #     print("current arg : ", arg)
+    for key in argToAdd:
+        bf[key] = key.topRule.conclusion
     
-    # print("\n")
-    bf.update(argToAdd)
-
-    # for b in bf:
-    #     print("current bf after update : ", b)
-
-    # print("\n")
-    # print("E###################################")
-    return len(argToAdd)
+    if(len(argToAdd)) > 0:
+        generateArgsFromRules(rules)
 
 def generateContrapositonRules(rules):
     rulesToAdd = set()
@@ -78,21 +86,66 @@ def generateContrapositonRules(rules):
     rules.update(rulesToAdd)
     return rules
 
-
 def generateArgs(rules):
-    # rulesWithContraposition = generateContrapositonRules(rules)
-    # rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
-    rulesWithNoArgs = generateInitialArguments(rules)
-    
-    countArg = generateArgsFromRules(rulesWithNoArgs)
-
-    while countArg > 0:
-        countArg = generateArgsFromRules(rulesWithNoArgs)
-        # print("new count arg : ", countArg)
-        break
-        
+    rulesWithContraposition = generateContrapositonRules(rules)
+    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    generateArgsFromRules(rulesWithNoArgs)
 
 
+def generateAttacks(rules):
+    for cle in bf.keys():
+        print(cle.name)
+        print(cle.topRule.conclusion)
+        if(cle.topRule.premises is not None) :
+            top = cle.topRule
+            for autreCle in bf.keys():
+                if cle != autreCle: # vérifier que cle et autreCle sont différents
+                    for conclusion in bf[cle]:
+                        autreTop = autreCle.topRule
+                        for premise in autreTop.premises:
+                            if conclusion.name == premise.name:
+                                print("arg", cle.name, ": ", top.conclusion.name)
+                                undercut[cle.name] = autreCle.name
+                            # else:
+                            #     # for subArgument in cle.subArguments:
+                            #     #     if(subArgument.topRule.conclusion == autreTop.conclusion):
+                            #     #         if(top == autreTop):
+                            #     #             print("subArg", cle.name, ": ", top.conclusion)
+                            #     #             undercut[cle.name] = subArgument.topRule.name
+                            #     if top.premises and autreTop.conclusion in top.premises:
+                            #         undercut[cle.name] = autreCle.name
+
+    return undercut
+
+# def generateAttacks(bf):
+#     undercuts = {}
+
+#     for arg1 in bf:
+#         for arg2 in bf:
+#             if arg1 != arg2:
+#                 for conclusion in bf[arg1]:
+#                     for premise in arg2.topRule.premises:
+#                         if conclusion.name == premise.name and conclusion.isNeg != premise.isNeg:
+#                             if arg2 not in undercuts:
+#                                 undercuts[arg2.name] = set()
+#                             undercuts[arg2.name].add(arg1.name)
+
+#     return undercuts
+
+
+def generate_undercuts(rules):
+    undercut = {}
+    for arg in list(bf.keys()):  # utilisez une copie des clés de bf pour itérer
+        top_rule = arg.topRule
+        for other_arg in bf.values():
+            if other_arg != arg:  # évitez de comparer un argument à lui-même
+                other_top_rule = other_arg.topRule
+                if top_rule == other_top_rule:
+                    undercut[arg.name] = other_arg.name
+                elif top_rule.premises and other_top_rule.conclusion in top_rule.premises:
+                    undercut[arg.name] = other_arg.name
+    return undercut
+            
 
 def main():
     # a = Literals.Literals("a", False)
@@ -185,8 +238,20 @@ def main():
     print("\n")
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
-
+    deb  = time.time()
     generateArgs(rules)
+    fin = time.time()
+    print("temp", fin-deb)
+    for cle in bf.keys():
+        print(cle)
+
+    # undercut = generate_undercuts(rules)
+    # print("Undercuts:")
+    # for (arg, sub_arg), attacker in undercut.items():
+    #     print(f"{arg} is undercut by {attacker} on sub-argument {sub_arg}")
+
+    print(generateAttacks(bf))
+
 
 if __name__ == "__main__":
     main()
