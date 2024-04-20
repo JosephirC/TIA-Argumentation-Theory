@@ -119,24 +119,28 @@ def generateAttacks(bf):
     undercuts = {}
     for cle in bf.keys():
         if cle.topRule.premises : 
-            if not isinstance(cle.topRule.conclusion, Literals.Literals) :
-                print("les arguments du premier for ", cle.name, ": ", cle.topRule.premises)
-                top = cle.topRule
-                for autreCle in bf.keys():
-                    if cle != autreCle: # vérifier que cle et autreCle sont différents
-                        autreTop = autreCle.topRule
-                        autreConclusion = autreTop.conclusion
-                        if top.conclusion == autreConclusion.negate():
+            # if isinstance(cle.topRule.conclusion, Rules.Rules) :
+            print("les arguments du premier for ", cle.name, ": ", cle.topRule.conclusion)
+            top = cle.topRule
+            for autreCle in bf.keys():
+                if cle != autreCle: # vérifier que cle et autreCle sont différents
+                    autreTop = autreCle.topRule
+                    autreConclusion = autreTop.conclusion
+                    if isinstance(autreConclusion, Literals.Literals) :
+                        if top.conclusion == autreConclusion.negate(): #autreConclusion.negate(): #marche pas car set...
                             undercuts[cle.name] = autreCle.name
-                        else:
-                            if isinstance(cle, Arguments.Arguments):
-                                if autreCle in cle.subArguments:
-                                    undercuts[autreCle.name] = cle.name
-                                else:
-                                    for subArgument in cle.subArguments:
-                                        if(subArgument.topRule.conclusion == autreTop.conclusion):
-                                            if(top == autreTop):
-                                                undercuts[cle.name] = subArgument.topRule.name
+                    elif isinstance(autreConclusion, Rules.Rules) :
+                        if autreConclusion == top.conclusion.negate():
+                            undercuts[autreCle.name] = cle.name
+                    else:
+                        if isinstance(cle, Arguments.Arguments):
+                            if autreCle in cle.subArguments:
+                                undercuts[autreCle.name] = cle.name
+                            else:
+                                for subArgument in cle.subArguments:
+                                    if(subArgument.topRule.conclusion == autreTop.conclusion):
+                                        if(top == autreTop):
+                                            undercuts[cle.name] = subArgument.topRule.name
     return undercuts
 
 

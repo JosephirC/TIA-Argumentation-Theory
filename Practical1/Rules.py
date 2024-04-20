@@ -32,7 +32,10 @@ class Rules:
             rulePremises += str(premise) + ","
 
         for conclusion in self.conclusion:
-            ruleConclusion += str(conclusion) + ","
+            if(isinstance(conclusion, Rules)):
+                ruleConclusion += conclusion.name + ","
+            else :
+                ruleConclusion += str(conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
         ruleConclusion = ruleConclusion[:-1] + " "
@@ -78,4 +81,3 @@ class Rules:
                 newConclusion = set() 
 
             return newRules
-    
