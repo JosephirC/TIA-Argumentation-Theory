@@ -93,54 +93,89 @@ def generateArgs(rules):
 
 # def generateAttacks(bf):
 #     undercuts = {}
-#     for cle in bf.keys():
-#         print(cle.name)
-#         if(cle.topRule.premises is not None and not(isinstance(cle.topRule.conclusion, Literals.Literals))) :
-#             top = cle.topRule
-#             for autreCle in bf.keys():
-#                 if cle != autreCle: # vérifier que cle et autreCle sont différents
-#                     autreTop = autreCle.topRule
+#     for cleArg in bf.keys():
+#         print(cleArg.name)
+#         if(cleArg.topRule.premises is not None and not(isinstance(cleArg.topRule.conclusion, Literals.Literals))) :
+#             top = cleArg.topRule
+#             for autrecleArg in bf.keys():
+#                 if cleArg != autrecleArg: # vérifier que cleArg et autrecleArg sont différents
+#                     autreTop = autrecleArg.topRule
 #                     if top.conclusion == autreTop.premises:
 #                         # print("in if : conclusion == premises", autreTop.name)
-#                         undercuts[cle.name] = autreCle.name
+#                         undercuts[cleArg.name] = autrecleArg.name
 #                     else:
-#                         if isinstance(cle, Arguments.Arguments):
-#                             for subArgument in cle.subArguments:
+#                         if isinstance(cleArg, Arguments.Arguments):
+#                             for subArgument in cleArg.subArguments:
 #                                 if(subArgument.topRule.conclusion == autreTop.conclusion):
 #                                     if(top == autreTop):
-#                                         # print("subArg", cle.name, ": ", top.conclusion)
-#                                         undercuts[cle.name] = subArgument.topRule.name
+#                                         # print("subArg", cleArg.name, ": ", top.conclusion)
+#                                         undercuts[cleArg.name] = subArgument.topRule.name
 #                             # if top.premises and autreTop.conclusion in top.premises:
-#                             #     undercut[cle.name] = autreCle.name
+#                             #     undercut[cleArg.name] = autrecleArg.name
 
 #     return undercuts
 
 def generateAttacks(bf):
     undercuts = {}
-    for cle in bf.keys():
-        if cle.topRule.premises : 
-            # if isinstance(cle.topRule.conclusion, Rules.Rules) :
-            print("les arguments du premier for ", cle.name, ": ", cle.topRule.conclusion)
-            top = cle.topRule
-            for autreCle in bf.keys():
-                if cle != autreCle: # vérifier que cle et autreCle sont différents
-                    autreTop = autreCle.topRule
+    for cleArg in bf.keys():
+        if cleArg.topRule.premises : 
+            # if isinstance(cleArg.topRule.conclusion, Rules.Rules) :
+            #     print("les arguments du premier for ", cleArg.name, ": ", cleArg.topRule.conclusion)
+            #     top = cleArg.topRule
+            #     for autrecleArg in bf.keys():
+            #         if cleArg != autrecleArg: # vérifier que cleArg et autrecleArg sont différents
+            #             autreTop = autrecleArg.topRule
+            #             autreConclusion = autreTop.conclusion
+            #             if isinstance(autreConclusion, Literals.Literals) :
+            #                 if top.conclusion == autreConclusion.negate(): 
+            #                     undercuts[cleArg.name] = autrecleArg.name
+            #                 else:
+            #                     for subArgument in cleArg.subArguments:
+            #                         if(subArgument.topRule.conclusion.negate() == autreTop.conclusion):
+            #                             undercuts[cleArg.name] = autrecleArg.name
+            #             elif isinstance(autreConclusion, Rules.Rules) :
+            #                 if autreConclusion == top.conclusion.negate() and top.notRule(top.name) == autreTop:
+            #                     undercuts[autrecleArg.name] = cleArg.name
+            #             # else:
+            #             #     if isinstance(cleArg, Arguments.Arguments):
+            #             #         if autrecleArg in cleArg.subArguments:
+            #             #             undercuts[autrecleArg.name] = cleArg.name
+            #             #         else:
+            #             #             for subArgument in cleArg.subArguments:
+            #             #                 if(subArgument.topRule.conclusion == autreTop.conclusion):
+            #             #                     if(top == autreTop):
+            #             #                         undercuts[cleArg.name] = subArgument.topRule.name
+            # else :
+            top = cleArg.topRule
+            print("les arguments du premier for ", cleArg.name, ": ", cleArg.topRule.conclusion)
+            for autrecleArg in bf.keys():
+                if cleArg != autrecleArg:
+                    autreTop = autrecleArg.topRule
                     autreConclusion = autreTop.conclusion
+                    print("les arguments du 2e for ", autrecleArg.name, ": ", autreConclusion)
+                    ##TODO ne rentre pas dans les if... => isinstance ne marche pas...
                     if isinstance(autreConclusion, Literals.Literals) :
+                        print("ccl instance of Literals : ", autrecleArg.name)
                         if top.conclusion == autreConclusion.negate(): #autreConclusion.negate(): #marche pas car set...
-                            undercuts[cle.name] = autreCle.name
+                            print("ccl = autreccl.negate()", top.conclusion.name, autreConclusion.negate())
+                            undercuts[cleArg.name] = autrecleArg.name
+                        else:
+                            for subArgument in cleArg.subArguments:
+                                if(subArgument.topRule.conclusion.negate() == autreTop.conclusion):
+                                    undercuts[cleArg.name] = autrecleArg.name
                     elif isinstance(autreConclusion, Rules.Rules) :
-                        if autreConclusion == top.conclusion.negate():
-                            undercuts[autreCle.name] = cle.name
-                    else:
-                        if isinstance(cle, Arguments.Arguments):
-                            if autreCle in cle.subArguments:
-                                undercuts[autreCle.name] = cle.name
-                            else:
-                                for subArgument in cle.subArguments:
-                                    if(subArgument.topRule.conclusion == autreTop.conclusion):
-                                        if(top == autreTop):
-                                            undercuts[cle.name] = subArgument.topRule.name
+                        print("ccl instance of Rules : ", autrecleArg.name)
+                        if autreConclusion == top.conclusion.negate() or top.notRule(top.name) == autreTop:
+                            print("ccl = autreccl.negate()", top.conclusion.name, autreConclusion.negate())
+                            undercuts[autrecleArg.name] = cleArg.name
+                        else:
+                            for subArgument in cleArg.subArguments:
+                                print("subArg: ", subArgument.name)
+                                if(subArgument.topRule.conclusion.negate() == autreTop.conclusion or top.notRule(top.name) == autreTop):
+                                    print("ccl = autreccl.negate()", top.conclusion.name, autreConclusion.negate())
+                                    undercuts[cleArg.name] = autrecleArg.name
+
+
     return undercuts
 
 
@@ -171,24 +206,24 @@ def generateAttacks(bf):
 
 # def generateAttacks(bf):
 #     undercuts = {}
-#     for cle in bf.keys():
-#         print(cle.name)
-#         if(cle.topRule.premises is not None) :
-#             top = cle.topRule
-#             for autreCle in bf.keys():
-#                 if cle != autreCle: # vérifier que cle et autreCle sont différents
-#                     autreTop = autreCle.topRule
+#     for cleArg in bf.keys():
+#         print(cleArg.name)
+#         if(cleArg.topRule.premises is not None) :
+#             top = cleArg.topRule
+#             for autrecleArg in bf.keys():
+#                 if cleArg != autrecleArg: # vérifier que cleArg et autrecleArg sont différents
+#                     autreTop = autrecleArg.topRule
 #                     print(autreTop.name)
 #                     if(top == autreTop):
 #                         if(top.conclusion == autreTop.conclusion) :
-#                             undercut[cle.name] = autreCle.name
+#                             undercut[cleArg.name] = autrecleArg.name
 #                     else:
-#                         if isinstance(cle, Arguments.Arguments):
-#                             for subArgument in cle.subArguments:
+#                         if isinstance(cleArg, Arguments.Arguments):
+#                             for subArgument in cleArg.subArguments:
 #                                 print("subArg", subArgument.name)
 #                                 if(top == autreTop):
 #                                     if(subArgument.topRule.conclusion == autreTop.conclusion) :
-#                                         undercut[cle.name] = subArgument.topRule.name
+#                                         undercut[cleArg.name] = subArgument.topRule.name
 #     return undercut
             
 
@@ -269,14 +304,16 @@ def main():
     rule6 = Rules.Rules({}, {c}, True)
     rule7 = Rules.Rules({}, {dF}, True)
     rule8 = Rules.Rules({cF}, {eF}, True)
-    rule9 = Rules.Rules({c}, {rule4}, True)
-
+    notRule4 = rule4.copy()
+    rule9 = Rules.Rules({c}, {notRule4.notRule(rule4.name)}, True)
+    
     print(rule4)
     print(rule5)
     print(rule6)
     print(rule7)
     print(rule8)
-    print(rule9)
+
+    print(rule9, notRule4)
 
 
     # Testing the generation of arguments
@@ -287,8 +324,8 @@ def main():
     generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
-    for cle in bf.keys():
-        print(cle)
+    for cleArg in bf.keys():
+        print(cleArg)
 
     undercuts = generateAttacks(bf)
     print(undercuts)
