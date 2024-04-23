@@ -241,10 +241,9 @@ def generateAttacks(bf):
     for arg in bf.keys():
         if arg.topRule.premises:
             for conclusion in other_arg.topRule.conclusion:
-        for other_arg in bf.keys():
-                for conclusion in other_arg.topRule.conclusion:
-                    if isinstance(conclusion, Rules.Rules):
-                        print("arg : ", arg.topRule.name, "other arg: ", other_arg.topRule.name, conclusion.name)
+                if isinstance(conclusion, Rules.Rules):
+                    print("arg : ", arg.topRule.name, "other arg: ", other_arg.topRule.name, conclusion.name)
+                    for other_arg in bf.keys():
                         if arg != other_arg and arg.topRule == conclusion.notRule(conclusion.name):
                             print("dans le if:", other_arg.name)
                             conflicting_rules = set(arg.topRule.premises) & set(other_arg.topRule.premises)
@@ -351,24 +350,14 @@ def main():
     for rule in contrapositionRules:
         print(rule)
 
-<<<<<<< HEAD
-    rule4 = Rules.Rules({aF}, {d}, True)
-    rule5 = Rules.Rules({}, {bF}, True)
-    rule6 = Rules.Rules({}, {c}, True)
-    rule7 = Rules.Rules({}, {dF}, True)
-    rule8 = Rules.Rules({cF}, {eF}, True)
-    notRule4:Rules.Rules = rule4.copy()
-    rule9 = Rules.Rules({c}, {notRule4.notRule(rule4.name)}, True)
-    
-=======
     rule4 = Rules.Rules({aF}, d, True)
     rule5 = Rules.Rules({}, bF, True)
     rule6 = Rules.Rules({}, c, True)
     rule7 = Rules.Rules({}, dF, True)
     rule8 = Rules.Rules({cF}, eF, True)
-    rule9 = Rules.Rules({c}, rule4, True)
+    notRule4:Rules.Rules = rule4.copy()
+    rule9 = Rules.Rules({c}, notRule4.notRule(rule4.name), True)
 
->>>>>>> d927e00db2b255c44d720c4765a11d628480b1f2
     print(rule4)
     print(rule5)
     print(rule6)
@@ -386,14 +375,10 @@ def main():
     generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
-<<<<<<< HEAD
+
     for cleArg in bf.keys():
         print(cleArg)
 
-    undercuts = generateAttacks(bf)
-    print(undercuts)
-
-=======
     for cle in bf.keys():
         print(cle)
         defeasibleRules = cle.getAllDefeasible()
@@ -401,7 +386,9 @@ def main():
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
->>>>>>> d927e00db2b255c44d720c4765a11d628480b1f2
+
+    undercuts = generateAttacks(bf)
+    print(undercuts)
 
 if __name__ == "__main__":
     main()
