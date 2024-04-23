@@ -188,6 +188,11 @@ def main():
     print("temp", fin-deb)
     for cle in bf.keys():
         print(cle)
+        defeasibleRules = cle.getAllDefeasible()
+        print("Les règles defeasibles: ")
+        for rules in defeasibleRules:
+            print(rules.name)
+        print("\n")
 
 if __name__ == "__main__":
     main()
