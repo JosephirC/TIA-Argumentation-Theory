@@ -83,10 +83,16 @@ class Rules:
             return newRules
 
     def notRule(self, name):
-        self.name = "¬" + name #pour garder le même nom de la règle
-        self.premises = {literal.negate() for literal in self.premises}
-        self.conclusion = {literal.negate() for literal in self.conclusion}
-        return self
+        if "¬" in name:
+            self.name = name[1:] #pour garder le même nom de la règle
+            self.premises = {literal.negate() for literal in self.premises}
+            self.conclusion = {literal.negate() for literal in self.conclusion}
+            return self
+        else:    
+            self.name = "¬" + name #pour garder le même nom de la règle
+            self.premises = {literal.negate() for literal in self.premises}
+            self.conclusion = {literal.negate() for literal in self.conclusion}
+            return self
     
     def copy(self):
         Rules.ruleCount -=1 #pour ne pas rajouter une nouvelle règle dans la base
