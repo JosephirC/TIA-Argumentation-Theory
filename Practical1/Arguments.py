@@ -76,8 +76,9 @@ class Arguments:
         if(self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
         for arg in self.subArguments:
-            if(arg.topRule.isDefeasible):
-                rulesDefeasible.add(arg.topRule)
+            #if(arg.topRule.isDefeasible):
+                # rulesDefeasible.add(arg.topRule)
+                rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
         return rulesDefeasible
 
     def getLastDefeasible(self):

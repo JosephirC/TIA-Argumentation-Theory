@@ -29,3 +29,5 @@ class Literals:
     def negate(self):
         return Literals(self.name, not self.isNeg)
     
+    def copy(self):
+        return Literals(self.name, self.isNeg)

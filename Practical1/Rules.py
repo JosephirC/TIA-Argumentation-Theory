@@ -82,12 +82,12 @@ class Rules:
         if "¬" in name:
             self.name = name[1:] #pour garder le même nom de la règle
             self.premises = {literal.negate() for literal in self.premises}
-            self.conclusion = {literal.negate() for literal in self.conclusion}
+            self.conclusion = self.conclusion.negate()
             return self
         else:    
             self.name = "¬" + name #pour garder le même nom de la règle
             self.premises = {literal.negate() for literal in self.premises}
-            self.conclusion = {literal.negate() for literal in self.conclusion}
+            self.conclusion = self.conclusion.negate()
             return self
     
     def copy(self):
