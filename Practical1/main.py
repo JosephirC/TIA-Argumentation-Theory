@@ -33,7 +33,7 @@ def addArgsToBF(setOfArguments):
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
-        if len(rule.premises) == 0 and len(rule.conclusion) > 0:
+        if len(rule.premises) == 0 :
             arg = Arguments.Arguments(rule, set())
             bf[arg] = arg.topRule.conclusion
             rulesCopy.remove(rule)
@@ -48,7 +48,7 @@ def find_combinations(target_values):
         for combo in itertools.combinations(keys, r):
             values = set()
             for key in combo:
-                values.update(bf[key])
+                values.add(bf[key])
             if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
                 valid_combinations.add(tuple(combo))
 
@@ -59,7 +59,6 @@ def generateArgsFromRules(rules):
     for rule in rules:
         combination = find_combinations(rule.premises) 
         for subArg in combination:
-
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
             for elem in bf:
@@ -332,9 +331,9 @@ def main():
     eF = Literals.Literals("e", False)
 
 
-    rule1 = Rules.Rules({}, {aF}, False)
-    rule2 = Rules.Rules({bF, dF}, {cF}, False)
-    rule3 = Rules.Rules({c}, {dF}, False)
+    rule1 = Rules.Rules({}, aF, False)
+    rule2 = Rules.Rules({bF, dF}, cF, False)
+    rule3 = Rules.Rules({c}, dF, False)
     
     print(rule1)
     print(rule2)
@@ -352,6 +351,7 @@ def main():
     for rule in contrapositionRules:
         print(rule)
 
+<<<<<<< HEAD
     rule4 = Rules.Rules({aF}, {d}, True)
     rule5 = Rules.Rules({}, {bF}, True)
     rule6 = Rules.Rules({}, {c}, True)
@@ -360,6 +360,15 @@ def main():
     notRule4:Rules.Rules = rule4.copy()
     rule9 = Rules.Rules({c}, {notRule4.notRule(rule4.name)}, True)
     
+=======
+    rule4 = Rules.Rules({aF}, d, True)
+    rule5 = Rules.Rules({}, bF, True)
+    rule6 = Rules.Rules({}, c, True)
+    rule7 = Rules.Rules({}, dF, True)
+    rule8 = Rules.Rules({cF}, eF, True)
+    rule9 = Rules.Rules({c}, rule4, True)
+
+>>>>>>> d927e00db2b255c44d720c4765a11d628480b1f2
     print(rule4)
     print(rule5)
     print(rule6)
@@ -377,12 +386,22 @@ def main():
     generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
+<<<<<<< HEAD
     for cleArg in bf.keys():
         print(cleArg)
 
     undercuts = generateAttacks(bf)
     print(undercuts)
 
+=======
+    for cle in bf.keys():
+        print(cle)
+        defeasibleRules = cle.getAllDefeasible()
+        print("Les règles defeasibles: ")
+        for rules in defeasibleRules:
+            print(rules.name)
+        print("\n")
+>>>>>>> d927e00db2b255c44d720c4765a11d628480b1f2
 
 if __name__ == "__main__":
     main()
