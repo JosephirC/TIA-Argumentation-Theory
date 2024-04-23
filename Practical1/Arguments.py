@@ -43,11 +43,9 @@ class Arguments:
         else :
             argumentImplication = "->"
 
-        # Extracting the literals from the conclusion set
-        for conclusion in argumentTopRule.conclusion:
-            argumentTopRuleConclusion = argumentTopRuleConclusion + str(conclusion)
+        argumentTopRuleConclusion = argumentTopRule.conclusion
             
-        return argumentName + argumentSubArguments + argumentImplication + argumentTopRuleConclusion
+        return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
     def __hash__(self):
         return hash((self.topRule, tuple(self.subArguments), self.name))
