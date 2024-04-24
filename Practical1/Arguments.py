@@ -36,6 +36,8 @@ class Arguments:
         for argument in argumentSubArgumentsList:
             argumentSubArguments = argumentSubArguments + argument + ","
 
+        argumentSubArguments = argumentSubArguments[:-1] + " "
+
         if(argumentTopRule.isDefeasible):
             argumentImplication = "=> "
         else :
