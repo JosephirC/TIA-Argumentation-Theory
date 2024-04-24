@@ -1,4 +1,8 @@
+from Literals import Literals
+from collections import defaultdict
+
 undercuts = set()
+rebuts = defaultdict(set)
 
 def getRulesNames(rules):
     rulesNames = set()
@@ -28,3 +32,28 @@ def generateUndercuts(argumentBase, rules):
                         undercuts.add(argTuple)
 
     return undercuts
+
+def generateRebuts(bf):
+    for arg in bf:
+        for other_arg in bf:
+            conclusionCopy = arg.topRule.conclusion.copy()
+            conclusionCopy = conclusionCopy.negate()
+            if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
+                paire = (arg, other_arg)
+                rebuts[arg.topRule.conclusion].add(paire)
+            else:
+                subArgs = subArgConclusion(other_arg.subArguments)
+                for s in subArgs:
+                    if conclusionCopy == s.topRule.conclusion:
+                        paire = (arg, other_arg)
+                        rebuts[arg.topRule.conclusion].add(paire)
+                        break
+
+    return rebuts
+
+def subArgConclusion(args):
+    subConclusion = set()
+    for arg in args:
+        subConclusion.add(arg)
+        subConclusion = subConclusion.union(subArgConclusion(arg.subArguments))
+    return subConclusion
