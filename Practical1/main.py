@@ -3,11 +3,14 @@ import Rules
 import Arguments
 import itertools
 import time
+from collections import defaultdict
 
 # static bf to store all the arguments
 bf =  set()
 
 undercuts = set()
+
+rebuts = defaultdict(set)
 
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
@@ -56,7 +59,6 @@ def generateArgsFromRules(rules):
         time_start = time.time()
         combination = find_combinations(rule.premises) 
         time_end = time.time()
-        print("time to find combinations : ", time_end - time_start)
         for subArg in combination:
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
@@ -124,11 +126,101 @@ def generateUndercutsWithSet(bf):
                     other_defeasible = other_arg.getAllDefeasible()
                     arg_ruleCopy = arg_rule.copy()
                     if arg_ruleCopy.notRule(arg_rule.name) in other_defeasible:
-                        print(other_arg.name)
                         tupe = (arg.name, other_arg.name)
                         undercuts.add(tupe)
 
     return undercuts
+
+"""
+def generateRebuts(bf):
+    for arg in bf:
+        for other_arg in bf:
+            if arg != other_arg:
+                if isinstance(arg.topRule.conclusion, Literals.Literals):
+                    conclusionCopy = arg.topRule.conclusion.copy()
+                    conclusionCopy = conclusionCopy.negate()
+                    # if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
+                    # # if arg.topRule.conclusion.name == other_arg.topRule.conclusion.name and arg.topRule.conclusion != other_arg.topRule.conclusion:
+                    #     # print("(", arg.name, ", ", other_arg.name, ")")
+                    #     paire = (arg.name, other_arg.name)
+                    #     rebuts.add(paire)
+                    # else:
+                    subArgs = subArgConclusion(other_arg.subArguments)
+                    for s in subArgs:
+                        if conclusionCopy == s.topRule.conclusion:
+                        # if arg.topRule.conclusion.name == s.topRule.conclusion.name and arg.topRule.conclusion != s.topRule.conclusion:
+                            paire = (arg.name, s.name)
+                            rebuts.add(paire)
+                            paire = (arg.name, other_arg.name)
+                            rebuts.add(paire)
+                if isinstance(arg.topRule.conclusion, Rules.Rules):
+                    conclusionCopy = arg.topRule.conclusion.conclusion.copy()
+                    conclusionCopy = conclusionCopy.negate()
+                    # if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
+                    # if arg.topRule.conclusion.conclusion.name == other_arg.topRule.conclusion.name and arg.topRule.conclusion.conclusion != other_arg.topRule.conclusion:
+                        # print("(", arg.name, ", ", other_arg.name, ")")
+                    #     paire = (arg.name, other_arg.name)
+                    #     rebuts.add(paire)
+                    # else:
+                    subArgs = subArgConclusion(other_arg.subArguments)
+                    for s in subArgs:
+                        if conclusionCopy == s.topRule.conclusion:
+                        # if arg.topRule.conclusion.name == s.topRule.conclusion.name and arg.topRule.conclusion != s.topRule.conclusion:
+                            # paire = (arg.name, s.name)
+                            # rebuts.add(paire)
+                            paire = (arg.name, other_arg.name)
+                            rebuts.add(paire)
+
+    return rebuts
+"""
+
+def generateRebuts(bf):
+    for arg in bf:
+        for other_arg in bf:
+            if arg != other_arg:
+                if isinstance(arg.topRule.conclusion, Literals.Literals):
+                    conclusionCopy = arg.topRule.conclusion.copy()
+                    conclusionCopy = conclusionCopy.negate()
+                    if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
+                        print("(", arg.name, ", ", other_arg.name, ")")
+                        paire = (arg, other_arg)
+                        rebuts[arg.topRule.conclusion].add(paire)
+                    else:
+                        subArgs = subArgConclusion(other_arg.subArguments)
+                        for s in subArgs:
+                            if conclusionCopy == s.topRule.conclusion:
+                                paire = (arg, s)
+                                rebuts[arg.topRule.conclusion].add(paire)
+                                paire = (arg, other_arg)
+                                rebuts[arg.topRule.conclusion].add(paire)
+                if isinstance(arg.topRule.conclusion, Rules.Rules):
+                    conclusionCopy = arg.topRule.conclusion.conclusion.copy()
+                    conclusionCopy = conclusionCopy.negate()
+                    # if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
+                    #     print("(", arg.name, ", ", other_arg.name, ")")
+                    #     paire = (arg, other_arg)
+                    #     rebuts[arg.topRule.conclusion.conclusion].add(paire)
+                    subArgs = subArgConclusion(other_arg.subArguments)
+                    for s in subArgs:
+                        # if conclusionCopy == s.topRule.conclusion:
+                        if isinstance(s.topRule.conclusion, Rules.Rules):
+                            if arg.topRule.conclusion == s.topRule.conclusion:
+                                paire = (arg, s)
+                                rebuts[arg.topRule.conclusion.conclusion].add(paire)
+
+    return rebuts
+
+def subArgConclusion(args):
+    subConclusion = set()
+    for arg in args:
+        if isinstance(arg.topRule.conclusion, Literals.Literals):
+            subConclusion.add(arg)
+        if isinstance(arg.topRule.conclusion, Rules.Rules):
+            subConclusion.add(arg)
+        
+        subConclusion = subConclusion.union(subArgConclusion(arg.subArguments))
+    return subConclusion
+
 
 def main():
     # a = Literals.Literals("a", False)
@@ -215,25 +307,31 @@ def main():
 
     print_sorted(bf)    
 
-    defeasibleRules = set()
-    for arg in bf:
-        print(f"argument {arg}")
-        defeasibleRules.update(arg.getAllDefeasible())
-        print("The defeasible rules : ")
+    # defeasibleRules = set()
+    # for arg in bf:
+    #     print(f"argument {arg}")
+    #     defeasibleRules.update(arg.getAllDefeasible())
+    #     print("The defeasible rules : ")
 
+    print()
     undercuts = generateUndercutsWithSet(bf)
     print("undercuts are : ", undercuts)
+
+    # for arg in bf:
+    #     print(arg)
+    #     defeasibleRules = arg.getAllDefeasible()
+    #     print("Les règles defeasibles: ")
+    #     for rules in defeasibleRules:
+    #         print(rules.name)
+
     print()
-
-    print("\nundercuts done \n")
-
-    for arg in bf:
-        print(arg)
-        defeasibleRules = arg.getAllDefeasible()
-        print("Les règles defeasibles: ")
-        for rules in defeasibleRules:
-            print(rules.name)
-        print("\n")
+    generateRebuts(bf)
+    for key in rebuts:
+        print(f'For {key.isNeg} {key.name} len {len(rebuts[key])} :')
+        for (arg1, arg2) in rebuts[key]:
+            print(f'{arg1.name} -> {arg2.name}')
+        print()
+    print(len(rebuts))
 
 if __name__ == "__main__":
     main()

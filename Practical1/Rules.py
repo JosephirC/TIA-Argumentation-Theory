@@ -12,6 +12,8 @@ class Rules:
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
     def __eq__(self, other):
+        if not isinstance(other, Rules):
+            return False
         return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible ))
