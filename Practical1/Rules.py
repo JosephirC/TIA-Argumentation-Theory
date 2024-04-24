@@ -93,3 +93,7 @@ class Rules:
     def copy(self):
         Rules.ruleCount -=1 #pour ne pas rajouter une nouvelle règle dans la base
         return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible)
+        
+
+    def contradicts(self, other):
+        return self.conclusion.contradicts(other.conclusion)

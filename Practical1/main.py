@@ -114,6 +114,29 @@ def generateUndercuts(bf):
 
     return undercuts
 
+
+def compare_arguments(arg1, arg2):
+    return arg1.name != arg2.name
+
+def generate_rebuts(bf):
+    rebuts = {}
+    print("Rebuts:")
+    for arg in bf:
+        contradicting_args = []
+        for other_arg in bf:
+            if compare_arguments(arg, other_arg):
+                if arg.topRule.conclusion.contradicts(other_arg.topRule):
+                    contradicting_args.append(other_arg.name)
+        if contradicting_args:
+            rebuts[arg.name] = contradicting_args
+            print("affichage de rebuts")
+            print("arg.name is", arg.name)
+            print("OTHER_arg.name is", contradicting_args)
+
+    return rebuts
+
+
+
 def main():
     # a = Literals.Literals("a", False)
     # b = Literals.Literals("b", False)
@@ -207,6 +230,11 @@ def main():
     for undercut in undercuts:
         print(undercuts)
     print()
+
+    rebuts = generate_rebuts(bf)
+    
+    for rebut in rebuts:
+        print(rebuts)
 
     for cle in bf.keys():
         print(cle)
