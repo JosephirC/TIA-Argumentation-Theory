@@ -69,13 +69,82 @@ def democraticWeakestLink(arg1, arg2):
         
     
 def democraticLastLink(arg1, arg2):
-    pass
+    allDefeasible1 = arg1.getLastDefeasible()
+    allDefeasible2 = arg2.getLastDefeasible()
 
+    for ruleArg2 in allDefeasible2:
+        comparisonCounter = 0
+        for ruleArg1 in allDefeasible1:
+            
+            if ruleArg1.isDefeasible and ruleArg2.isDefeasible:
+                if ruleArg1.weight >= ruleArg2.weight:
+                    comparisonCounter += 1
+            
+            elif not (ruleArg1.isDefeasible) and ruleArg2.isDefeasible:
+                comparisonCounter += 1
+            
+            elif ruleArg1.isDefeasible and not (ruleArg2.isDefeasible):
+                continue
+
+            elif not (ruleArg1.isDefeasible) and not (ruleArg2.isDefeasible):
+                comparisonCounter += 1
+
+        if comparisonCounter == len(allDefeasible1):
+            return True
+        
+    return False
+        
 def elitistWeakestLink(arg1, arg2):
-    pass
+    allDefeasible1 = arg1.getAllDefeasible()
+    allDefeasible2 = arg2.getAllDefeasible()
 
+    for ruleArg1 in allDefeasible1:
+        comparisonCounter = 0
+        for ruleArg2 in allDefeasible2:
+
+            if ruleArg1.isDefeasible and ruleArg2.isDefeasible:
+                if ruleArg1.weight >= ruleArg2.weight:
+                    comparisonCounter += 1
+            
+            elif not (ruleArg1.isDefeasible) and ruleArg2.isDefeasible:
+                comparisonCounter += 1
+            
+            elif ruleArg1.isDefeasible and not (ruleArg2.isDefeasible):
+                continue
+
+            elif not (ruleArg1.isDefeasible) and not (ruleArg2.isDefeasible):
+                comparisonCounter += 1         
+
+            if comparisonCounter == len(allDefeasible2):
+                return True
+
+    return False
+        
 def elitistLastLink(arg1, arg2):
-    pass
+    allDefeasible1 = arg1.getLastDefeasible()
+    allDefeasible2 = arg2.getLastDefeasible()
+    
+    for ruleArg1 in allDefeasible1:
+        comparisonCounter = 0
+        for ruleArg2 in allDefeasible2:
+
+            if ruleArg1.isDefeasible and ruleArg2.isDefeasible:
+                if ruleArg1.weight >= ruleArg2.weight:
+                    comparisonCounter += 1
+            
+            elif not (ruleArg1.isDefeasible) and ruleArg2.isDefeasible:
+                comparisonCounter += 1
+            
+            elif ruleArg1.isDefeasible and not (ruleArg2.isDefeasible):
+                continue
+
+            elif not (ruleArg1.isDefeasible) and not (ruleArg2.isDefeasible):
+                comparisonCounter += 1         
+
+            if comparisonCounter == len(allDefeasible2):
+                return True
+
+    return False
 
 def defeat(arg1, arg2, method, principal):
 

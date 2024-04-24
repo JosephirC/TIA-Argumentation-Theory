@@ -152,12 +152,12 @@ def main():
 
     # weightComparison = comparePreferred(preferred)
     # print("weightComparison: ", weightComparison)
-
+    print("DEFEATS:")
     defeatWeakLink = defaultdict(set)
 
     for rebut in rebuts:
         for (arg1, arg2) in rebuts[rebut]:
-            defeatTuple = defeat(arg1, arg2, "democratic", "weakest-link")
+            defeatTuple = defeat(arg1, arg2, "elitist", "weakest-link")
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
     
