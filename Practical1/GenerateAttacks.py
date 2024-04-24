@@ -20,11 +20,11 @@ def generateUndercuts(argumentBase, rules):
         if arg.topRule.premises:
             if arg.topRule.conclusion.name in rulesNames:
                 for otherArg in argumentBase:
-                    currentArgRule = arg.topRule.conclusion
-                    defeasibleRuleNames = getAllDefeasibleRulesNames(otherArg)
-                    currentArgRuleCopy = currentArgRule.copy()
-                    if currentArgRuleCopy.name in defeasibleRuleNames:
-                        tupe = (arg.name, otherArg.name)
-                        undercuts.add(tupe)
+                    currentArgRuleConclusion = arg.topRule.conclusion
+                    defeasibleRulesNames = getAllDefeasibleRulesNames(otherArg)
+                    currentArgRuleConclusionCopy = currentArgRuleConclusion.copy()
+                    if currentArgRuleConclusionCopy.name in defeasibleRulesNames:
+                        argTuple = (arg.name, otherArg.name)
+                        undercuts.add(argTuple)
 
     return undercuts

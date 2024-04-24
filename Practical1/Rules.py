@@ -2,8 +2,6 @@ import Literals
 
 class Rules:
 
-    ruleCount = 0
-
     def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
         self.premises = premises
         self.conclusion = conclusion
@@ -18,7 +16,6 @@ class Rules:
         else:
             self.weight = weight
 
-        Rules.ruleCount += 1
         self.name : Literals = literal
 
     # Handle equality between objects.

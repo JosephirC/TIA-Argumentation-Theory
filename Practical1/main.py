@@ -4,7 +4,7 @@ import Arguments
 import time
 from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts
-from Defeats import makePreferred, displayWeightComparison, comparePreferred
+from Defeats import makePreferred, comparePreferred
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -122,6 +122,17 @@ def main():
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
+
+    print("DEFEATS:")
+    
+    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    
+    preferred = makePreferred(rules)
+    for key in preferred:   
+        print(f"key: {key} value: {preferred[key]}")
+
+    weightComparison = comparePreferred(preferred)
+    print("weightComparison: ", weightComparison)
 
 if __name__ == "__main__":
     main()
