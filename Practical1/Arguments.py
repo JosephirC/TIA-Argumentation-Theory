@@ -12,6 +12,8 @@ class Arguments:
         self.name = "A" + str(Arguments.nameCount)
 
     def __eq__(self, other):
+        if not isinstance(other, Arguments):
+            return False
         return (self.topRule.conclusion == other.topRule.conclusion
                 and self.subArguments == other.subArguments)
 
