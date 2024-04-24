@@ -1,13 +1,25 @@
+import Literals
+
 class Rules:
 
     ruleCount = 0
 
-    def __init__(self, premises, conclusion, isDefeasible):
+    def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
+        
+        if weight is None:
+            if isDefeasible:
+                if len(premises) == 0:
+                    self.weight = 1
+                else:
+                    self.weight = 0
+        else:
+            self.weight = weight
+
         Rules.ruleCount += 1
-        self.name = "r" + str(Rules.ruleCount)
+        self.name : Literals = literal
 
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
@@ -16,33 +28,32 @@ class Rules:
             return False
         return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
-                and self.isDefeasible == other.isDefeasible ))
-
+                and self.isDefeasible == other.isDefeasible
+                and self.weight == other.weight))
+    
     # handle print of the class
     def __str__(self):
-        ruleName = "[" + self.name + "] "
+        ruleName = "[" + str(self.name) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""
+        ruleWeight = ""
 
         for premise in self.premises:
             rulePremises += str(premise) + ","
 
-        # for conclusion in self.conclusion:
-        if(isinstance(self.conclusion, Rules)):
-            ruleConclusion += self.conclusion.name + ","
-        else :
-            ruleConclusion += str(self.conclusion) + ","
+        ruleConclusion += str(self.conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
             ruleImplication = "=> "
+            ruleWeight = str(self.weight)
         else:
             ruleImplication = "->"
 
-        return ruleName + rulePremises + ruleImplication + ruleConclusion
+        return ruleName + rulePremises + ruleImplication + ruleConclusion + ruleWeight
     
     # handle hash of the class
     def __hash__(self):
@@ -51,50 +62,23 @@ class Rules:
     def contraposition(self):
         newRules = set()
         newPremise = set()
+        conclusion = self.conclusion
+        
+        for premise in self.premises:
+            newConclusion = premise.negate()
 
-        if len(self.premises) == 1:
-            conclusion = self.conclusion
+            newPremise = self.premises.copy()
+            newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            literal = next(iter(self.premises))
-            newRules.add(Rules(newPremise, literal.negate(), self.isDefeasible))
+            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, self.name))
 
-            return newRules
-        
-        else:
-            conclusion = self.conclusion
-            
-            for premise in self.premises:
-                currentLiteral = premise.negate()
+        return newRules
 
-                newPremise = self.premises.copy()
-                newPremise.remove(premise)
-                newPremise.add(conclusion.negate())
-
-                newRules.add(Rules(newPremise, currentLiteral, self.isDefeasible))
-
-            return newRules
-    
-    def notRule(self, name):
-        """
-        This method is used to create a negated rule object.
-        """
-
-        if "¬" in name:
-            self.name = name[1:]
-            self.premises = {literal.negate() for literal in self.premises}
-            self.conclusion = self.conclusion.negate()
-            return self
-        else:    
-            self.name = "¬" + name 
-            self.premises = {literal.negate() for literal in self.premises}
-            self.conclusion = self.conclusion.negate()
-            return self
-    
     def copy(self):
         """
         This method is used to create a copy of a rule object without incrementing the ruleCount.
         """
 
         Rules.ruleCount -=1 
-        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible)
+        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.name)

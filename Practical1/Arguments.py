@@ -2,7 +2,6 @@ import Rules
 
 class Arguments:
 
-    setOfArgs_call_count = 0
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -39,6 +38,8 @@ class Arguments:
         for argument in argumentSubArgumentsList:
             argumentSubArguments = argumentSubArguments + argument + ","
 
+        argumentSubArguments = argumentSubArguments[:-1] + " "
+
         if(argumentTopRule.isDefeasible):
             argumentImplication = "=> "
         else :
@@ -65,8 +66,6 @@ class Arguments:
         return uniqueArguments
 
     def setOfArguemnts(self):
-        Arguments.setOfArgs_call_count += 1
-
         allArguments = [self.name]
 
         for subArgument in self.subArguments:
