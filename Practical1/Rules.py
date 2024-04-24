@@ -23,10 +23,15 @@ class Rules:
     def __eq__(self, other):
         if not isinstance(other, Rules):
             return False
-        return ((self.premises == other.premises 
+        if self.weight is not None:
+            return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible
                 and self.weight == other.weight))
+        else :
+            return ((self.premises == other.premises 
+                and self.conclusion == other.conclusion 
+                and self.isDefeasible == other.isDefeasible))
     
     # handle print of the class
     def __str__(self):

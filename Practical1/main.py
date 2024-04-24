@@ -6,6 +6,7 @@ from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts, generateRebuts
 from Defeats import makePreferred, comparePreferred, defeat
 from collections import defaultdict
+from parseAspartix import parseAttacks, parseRules
 from ExportArguments import exportArguments
 
 def printSorted(argumentBase):
@@ -168,7 +169,6 @@ def main():
             print(f'{arg1.name} -> {arg2.name}')
         print()
 
-    exportArguments(argumentBase)
 
 if __name__ == "__main__":
     main()
