@@ -2,8 +2,9 @@ import Literals
 import Rules
 import Arguments
 import time
-from GenerateArguments import generateArgs, getArgumentBase
+from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts
+from Defeats import makePreferred, displayWeightComparison, comparePreferred
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -61,39 +62,44 @@ def main():
     dF = Literals.Literals("d", False)
     eF = Literals.Literals("e", False)
 
-    rule1 = Rules.Rules({}, aF, False)
-    rule2 = Rules.Rules({bF, dF}, cF, False)
-    rule3 = Rules.Rules({c}, dF, False)
+    r1 = Literals.Literals("r1", False)
+    r2 = Literals.Literals("r2", False)
+    r3 = Literals.Literals("r3", False)
+    r4 = Literals.Literals("r4", False)
+    r5 = Literals.Literals("r5", False)
+    r6 = Literals.Literals("r6", False)
+    r7 = Literals.Literals("r7", False)
+    r8 = Literals.Literals("r8", False)
+    r9 = Literals.Literals("r9", False)
+
+    rule1 = Rules.Rules({}, aF, False, r1)
+    rule2 = Rules.Rules({bF, dF}, cF, False, r2)
+    rule3 = Rules.Rules({c}, dF, False, r3)
+    
+    rule4 = Rules.Rules({aF}, d, True, r4)
+    rule5 = Rules.Rules({}, bF, True, r5, 1)
+    rule6 = Rules.Rules({}, c, True, r6, 1)
+    rule7 = Rules.Rules({}, dF, True, r7, 0)
+    rule8 = Rules.Rules({cF}, eF, True, r8)
+    rule9 = Rules.Rules({c}, r4.negate(), True, r9)
     
     print(rule1)
     print(rule2)
     print(rule3)
-
-    rule4 = Rules.Rules({aF}, d, True)
-    rule5 = Rules.Rules({}, bF, True)
-    rule6 = Rules.Rules({}, c, True)
-    rule7 = Rules.Rules({}, dF, True)
-    rule8 = Rules.Rules({cF}, eF, True)
-    notRule4 = rule4.copy()
-    rule9 = Rules.Rules({c}, notRule4.notRule(rule4.name), True)
-
     print(rule4)
     print(rule5)
     print(rule6)
     print(rule7)
     print(rule8)
-
     print(rule9)
 
     # Testing the generation of arguments
     print("\n")
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     deb  = time.time()
-    generateArgs(rules)
+    argumentBase = generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
-
-    argumentBase = getArgumentBase()
 
     printSorted(argumentBase)    
 
@@ -103,7 +109,7 @@ def main():
         defeasibleRules.update(arg.getAllDefeasible())
         print("The defeasible rules : ")
 
-    undercuts = generateUndercuts(argumentBase)
+    undercuts = generateUndercuts(argumentBase, rules)
     print("undercuts are : ", undercuts)
     print()
 

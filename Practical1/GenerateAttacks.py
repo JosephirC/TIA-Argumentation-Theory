@@ -1,17 +1,29 @@
-import Rules
-
 undercuts = set()
 
-def generateUndercuts(bf):
-    for arg in bf:
+def getRulesNames(rules):
+    rulesNames = set()
+    for rule in rules:
+        rulesNames.add(rule.name.name)
+    return rulesNames
+
+def getAllDefeasibleRulesNames(argument):
+    defeasibleRulesNames = set()
+    argumentAllDefeasibles = argument.getAllDefeasible()
+    for rule in argumentAllDefeasibles:
+        defeasibleRulesNames.add(rule.name.name)
+
+    return defeasibleRulesNames
+
+def generateUndercuts(argumentBase, rules):
+    rulesNames = getRulesNames(rules)
+    for arg in argumentBase:
         if arg.topRule.premises:
-            if isinstance(arg.topRule.conclusion, Rules.Rules):
-                for otherArg in bf:
+            if arg.topRule.conclusion.name in rulesNames:
+                for otherArg in argumentBase:
                     currentArgRule = arg.topRule.conclusion
-                    otherArgDefeasibles = otherArg.getAllDefeasible()
+                    defeasibleRuleNames = getAllDefeasibleRulesNames(otherArg)
                     currentArgRuleCopy = currentArgRule.copy()
-                    if currentArgRuleCopy.notRule(currentArgRule.name) in otherArgDefeasibles:
-                        print(otherArg.name)
+                    if currentArgRuleCopy.name in defeasibleRuleNames:
                         tupe = (arg.name, otherArg.name)
                         undercuts.add(tupe)
 
