@@ -20,7 +20,7 @@ def parseRules(rules):
         fichier = open('KB.txt', 'w')
         pass
     fichier = open('KB.txt', 'a')
-    rules = generateContrapositonRules(rules)
+    # rules = generateContrapositonRules(rules)
     for rule in rules:
         print(rule)
     for rule in rules:
@@ -56,4 +56,8 @@ def parseRules(rules):
             fichier.write(chaine + "\n")             
     fichier.close()
 
-# def readKB():
+def readKB():
+    if os.path.exists('KB.txt'):
+        fichier = open('KB.txt', 'r')
+
+    print("pas de fichier KB.txt")
