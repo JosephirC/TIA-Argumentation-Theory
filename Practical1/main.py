@@ -7,6 +7,8 @@ import time
 # static bf to store all the arguments
 bf =  set()
 
+undercuts = set()
+
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
 # 2.1 add the arguments in the bf
@@ -40,7 +42,6 @@ def find_combinations(target_values):
         valid_combinations = set()
         
         for arg in bf:    
-            # if arg.topRule.conclusion.issubset(target_values):
             if arg.topRule.conclusion in target_values:
                 sub_valid_combinations = find_combinations(target_values - {arg.topRule.conclusion})
                 
@@ -71,7 +72,6 @@ def generateArgsFromRules(rules):
     for key in argToAdd:
         bf.add(key)
     
-    print(len(argToAdd))
     if(len(argToAdd)) > 0:
         generateArgsFromRules(rules)
 
@@ -94,6 +94,41 @@ def print_sorted(bf):
     for arg in sorted_args:
         print(arg)
 
+def generateUndercuts(bf):
+    undercuts = {}
+    conflict_arg = []
+
+    for arg in bf:
+        if arg.topRule.premises:
+            if isinstance(arg.topRule.conclusion, Rules.Rules):
+                for other_arg in bf:
+                    other_rule = other_arg.topRule
+                    arg_rule = arg.topRule.conclusion
+                    other_defeasible = other_arg.getAllDefeasible()
+                    arg_ruleCopy = arg_rule.copy()
+                    if arg_ruleCopy.notRule(arg_rule.name) in other_defeasible:
+                        notArg = arg
+                        print(other_arg.name)
+                        if other_arg.name not in conflict_arg:
+                            conflict_arg.append(other_arg.name)
+                    undercuts[arg.name] = conflict_arg
+
+    return undercuts
+
+def generateUndercutsWithSet(bf):
+    for arg in bf:
+        if arg.topRule.premises:
+            if isinstance(arg.topRule.conclusion, Rules.Rules):
+                for other_arg in bf:
+                    arg_rule = arg.topRule.conclusion
+                    other_defeasible = other_arg.getAllDefeasible()
+                    arg_ruleCopy = arg_rule.copy()
+                    if arg_ruleCopy.notRule(arg_rule.name) in other_defeasible:
+                        print(other_arg.name)
+                        tupe = (arg.name, other_arg.name)
+                        undercuts.add(tupe)
+
+    return undercuts
 
 def main():
     # a = Literals.Literals("a", False)
@@ -146,7 +181,6 @@ def main():
     dF = Literals.Literals("d", False)
     eF = Literals.Literals("e", False)
 
-
     rule1 = Rules.Rules({}, aF, False)
     rule2 = Rules.Rules({bF, dF}, cF, False)
     rule3 = Rules.Rules({c}, dF, False)
@@ -155,32 +189,21 @@ def main():
     print(rule2)
     print(rule3)
 
-    contrapositionRules = rule1.contraposition()
-    for rule in contrapositionRules:
-        print(rule)
-    
-    contrapositionRules = rule2.contraposition()
-    for rule in contrapositionRules:
-        print(rule)
-
-    contrapositionRules = rule3.contraposition()
-    for rule in contrapositionRules:
-        print(rule)
-
     rule4 = Rules.Rules({aF}, d, True)
     rule5 = Rules.Rules({}, bF, True)
     rule6 = Rules.Rules({}, c, True)
     rule7 = Rules.Rules({}, dF, True)
     rule8 = Rules.Rules({cF}, eF, True)
-    rule9 = Rules.Rules({c}, rule4, True)
+    notRule4 = rule4.copy()
+    rule9 = Rules.Rules({c}, notRule4.notRule(rule4.name), True)
 
     print(rule4)
     print(rule5)
     print(rule6)
     print(rule7)
     print(rule8)
-    print(rule9)
 
+    print(rule9)
 
     # Testing the generation of arguments
     print("\n")
@@ -197,9 +220,21 @@ def main():
         print(f"argument {arg}")
         defeasibleRules.update(arg.getAllDefeasible())
         print("The defeasible rules : ")
+
+    undercuts = generateUndercutsWithSet(bf)
+    print("undercuts are : ", undercuts)
+    print()
+
+    print("\nundercuts done \n")
+
+    for arg in bf:
+        print(arg)
+        defeasibleRules = arg.getAllDefeasible()
+        print("Les règles defeasibles: ")
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
 
 if __name__ == "__main__":
     main()
+    
