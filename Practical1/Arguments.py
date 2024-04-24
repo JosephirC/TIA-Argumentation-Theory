@@ -2,7 +2,6 @@ import Rules
 
 class Arguments:
 
-    setOfArgs_call_count = 0
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -63,8 +62,6 @@ class Arguments:
         return uniqueArguments
 
     def setOfArguemnts(self):
-        Arguments.setOfArgs_call_count += 1
-
         allArguments = [self.name]
 
         for subArgument in self.subArguments:
