@@ -1,81 +1,91 @@
-# Rules are objects which are referred by their premises (set of literals), its conclusion (a literal), a boolean which indicates if the rule is 
-# defeasible or not, and a literal (e.g., $r_1$) which uniquely references it. 
-# An object of this class would be used to represent: $r_1: a, \neg b, c \Rightarrow e$ or $r_2: \rightarrow \neg a$
-
+from Literals import Literals
 
 class Rules:
 
     ruleCount = 0
 
-    def __init__(self, premises, conclusion, isDefeasible):
+    def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        self.name = "r" + str(Rules.ruleCount)
+        
+        if weight is None:
+            if isDefeasible:
+                if len(premises) == 0:
+                    self.weight = 1
+                else:
+                    self.weight = 0
+        else:
+            self.weight = weight
+
+        self.name : Literals = literal
 
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
     def __eq__(self, other):
-        return ((self.premises == other.premises 
+        if not isinstance(other, Rules):
+            return False
+        if self.weight is not None:
+            return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
-                and self.isDefeasible == other.isDefeasible ))
-
+                and self.isDefeasible == other.isDefeasible
+                and self.weight == other.weight))
+        else :
+            return ((self.premises == other.premises 
+                and self.conclusion == other.conclusion 
+                and self.isDefeasible == other.isDefeasible))
+    
     # handle print of the class
     def __str__(self):
-        ruleName = "[" + self.name + "] "
+        ruleName = "[" + str(self.name) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""
+        ruleWeight = ""
 
         for premise in self.premises:
             rulePremises += str(premise) + ","
 
-        for conclusion in self.conclusion:
-            ruleConclusion += str(conclusion) + ","
+        ruleConclusion += str(self.conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
             ruleImplication = "=> "
+            ruleWeight = str(self.weight)
         else:
             ruleImplication = "->"
 
-        return ruleName + rulePremises + ruleImplication + ruleConclusion
+        return ruleName + rulePremises + ruleImplication + ruleConclusion + ruleWeight
     
     # handle hash of the class
     def __hash__(self):
-        return hash((tuple(self.premises), tuple(self.conclusion), self.isDefeasible, self.name))
+        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.name))
 
     def contraposition(self):
         newRules = set()
         newPremise = set()
-        newConclusion = set()
+        conclusion = self.conclusion
+        
+        for premise in self.premises:
+            newConclusion = premise.negate()
 
-        if len(self.premises) == 1:
-            conclusion = next(iter(self.conclusion))
+            newPremise = self.premises.copy()
+            newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            literal = next(iter(self.premises))
-            newConclusion.add(literal.negate())
-            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
+            rX = Literals("r" + str(Rules.ruleCount), self.name.isNeg)
 
-            return newRules
-        
-        else:
-            conclusion = next(iter(self.conclusion))
-            
-            for premise in self.premises:
-                currentLiteral = premise.negate()
-                newConclusion.add(currentLiteral)
+            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
-                newPremise = self.premises.copy()
-                newPremise.remove(premise)
-                newPremise.add(conclusion.negate())
+        return newRules
 
-                newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
-                newConclusion = set() 
+    def copy(self):
+        """
+        This method is used to create a copy of a rule object without incrementing the ruleCount.
+        """
 
-            return newRules
-    
+        # Rules.ruleCount -=1 
+        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.name)

@@ -1,6 +1,3 @@
-# Literals are objects which are referred by a name (string) and a boolean which indicates if the literal is in its negative form or not. 
-# An object of this class can represent an atom (e.g., $x$) or the negation of an atom (e.g., $\neg x$).
-
 class Literals:
     def __init__(self, name, isNeg):
         self.name = name
@@ -11,16 +8,12 @@ class Literals:
                 and self.isNeg == other.isNeg)
 
     def __str__(self):
-
         literalName = str(self.name)
-
         if(not self.isNeg):
             literalName = literalName
         else:
             literalName = "¬" + literalName
-
         return literalName
-    
 
     def __hash__(self):
         return hash((self.name, self.isNeg))
@@ -29,3 +22,5 @@ class Literals:
     def negate(self):
         return Literals(self.name, not self.isNeg)
     
+    def copy(self):
+        return Literals(self.name, self.isNeg)
