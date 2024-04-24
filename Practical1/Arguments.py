@@ -1,6 +1,3 @@
-# Arguments are objects which are referred by their top rule, the set of direct sub arguments, and its unique name (string). 
-# We give below two examples of arguments
-
 class Arguments:
 
     setOfArgs_call_count = 0

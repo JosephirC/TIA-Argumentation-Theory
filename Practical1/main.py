@@ -5,10 +5,7 @@ import itertools
 import time
 
 # static bf to store all the arguments
-# bf = set()
-bf = {
-
-}
+bf =  set()
 
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
@@ -24,55 +21,56 @@ bf = {
 def addArgsToBF(setOfArguments):
     for arg in setOfArguments:
         if isinstance(arg, Arguments):
-            bf[arg] = arg.topRule.conclusion
+            bf.add(arg)
          
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
         if len(rule.premises) == 0 and len(rule.conclusion) > 0:
             arg = Arguments.Arguments(rule, set())
-            bf[arg] = arg.topRule.conclusion
+            bf.add(arg)
             rulesCopy.remove(rule)
     
     return rulesCopy
 
 def find_combinations(target_values):
-    valid_combinations = set()
-    keys = list(bf.keys())
+    if not target_values:
+        return set([frozenset([])])
+    else:
+        valid_combinations = set()
+        
+        for arg in bf:    
+            if arg.topRule.conclusion.issubset(target_values):
+                sub_valid_combinations = find_combinations(target_values - arg.topRule.conclusion)
+                
+                for combination in sub_valid_combinations:
+                    valid_combinations.add(frozenset([arg]) | combination)
 
-    for r in range(1, len(keys) + 1):
-        for combo in itertools.combinations(keys, r):
-            values = set()
-            for key in combo:
-                values.update(bf[key])
-            if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
-                valid_combinations.add(tuple(combo))
-
-    return valid_combinations
+        return valid_combinations
 
 def generateArgsFromRules(rules):
-    print("je rentre une foi")
     argToAdd = set()
     for rule in rules:
+        time_start = time.time()
         combination = find_combinations(rule.premises) 
+        time_end = time.time()
+        print("time to find combinations : ", time_end - time_start)
         for subArg in combination:
-
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
             for elem in bf:
-
                 if elem.subArguments != arg.subArguments:
                     compt = compt + 1
+
             if len(bf) == compt:
                 argToAdd.add(arg)
             else:
                 Arguments.Arguments.nameCount = Arguments.Arguments.nameCount - 1
     
     for key in argToAdd:
-        bf[key] = key.topRule.conclusion
+        bf.add(key)
     
     print(len(argToAdd))
-    print("je rentre une or \n")
     if(len(argToAdd)) > 0:
         generateArgsFromRules(rules)
 
@@ -89,6 +87,11 @@ def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
     rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
     generateArgsFromRules(rulesWithNoArgs)
+
+def print_sorted(bf):
+    sorted_args = sorted(bf, key=lambda arg: int(arg.name[1:]))
+    for arg in sorted_args:
+        print(arg)
 
 
 def main():
@@ -181,13 +184,13 @@ def main():
     # Testing the generation of arguments
     print("\n")
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
     deb  = time.time()
     generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
-    for cle in bf.keys():
-        print(cle)
+
+    print_sorted(bf)    
+
 
 if __name__ == "__main__":
     main()

@@ -1,8 +1,3 @@
-# Rules are objects which are referred by their premises (set of literals), its conclusion (a literal), a boolean which indicates if the rule is 
-# defeasible or not, and a literal (e.g., $r_1$) which uniquely references it. 
-# An object of this class would be used to represent: $r_1: a, \neg b, c \Rightarrow e$ or $r_2: \rightarrow \neg a$
-
-
 class Rules:
 
     ruleCount = 0
@@ -79,3 +74,20 @@ class Rules:
 
             return newRules
     
+    def notRule(self, name):
+        """
+        This method is used to create a negated rule object.
+        """
+
+        self.name = "¬" + name
+        self.premises = {literal.negate() for literal in self.premises}
+        self.conclusion = {literal.negate() for literal in self.conclusion}
+        return self
+    
+    def copy(self):
+        """
+        This method is used to create a copy of a rule object without incrementing the ruleCount.
+        """
+
+        Rules.ruleCount -=1
+        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible)
