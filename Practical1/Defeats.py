@@ -91,5 +91,3 @@ def defeat(arg1, arg2, method, principal):
     elif method == "elitist" and principal == "last-link":
         if (elitistLastLink(arg1, arg2)):
             return (arg1, arg2)
-    else:
-        return None
