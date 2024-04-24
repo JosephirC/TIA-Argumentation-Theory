@@ -28,15 +28,15 @@ class Arguments:
 
         # Extracting all sub arguments and putting them in a list
         for subArgument in self.subArguments:
-            for argument in subArgument.setOfArguemnts():
-                argumentSubArgumentsList.append(argument)
+            # for argument in subArgument.setOfArguemnts():
+            argumentSubArgumentsList.append(subArgument)
 
         # Extracting unique arguments from the list
-        argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
+        # argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
 
         # Creating the string of unique sub arguments
         for argument in argumentSubArgumentsList:
-            argumentSubArguments = argumentSubArguments + argument + ","
+            argumentSubArguments = argumentSubArguments + argument.name + ","
 
         argumentSubArguments = argumentSubArguments[:-1] + " "
 
