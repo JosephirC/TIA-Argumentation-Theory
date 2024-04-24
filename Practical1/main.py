@@ -90,7 +90,7 @@ def generateArgs(rules):
     rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
     generateArgsFromRules(rulesWithNoArgs)
 
-def generateAttacks(bf):
+def generateUndercuts(bf):
     undercuts = {}
     conflict_arg = []
 
@@ -203,7 +203,7 @@ def main():
         print(cleArg, cleArg.topRule)
     print()
 
-    undercuts = generateAttacks(bf)
+    undercuts = generateUndercuts(bf)
     for undercut in undercuts:
         print(undercuts)
     print()
