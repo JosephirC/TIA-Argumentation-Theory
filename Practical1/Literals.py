@@ -25,5 +25,3 @@ class Literals:
     def copy(self):
         return Literals(self.name, self.isNeg)
     
-    def contradicts(self, other):
-        return (self.name == other.name and self.isNeg != other.isNeg)

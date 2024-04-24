@@ -6,33 +6,12 @@ from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts, generateRebuts
 from Defeats import makePreferred, comparePreferred, defeat
 from collections import defaultdict
+from ExportArguments import exportArguments
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
     for arg in sortedArgs:
         print(arg)
-
-
-def compare_arguments(arg1, arg2):
-    return arg1.name != arg2.name
-
-def generate_rebuts(bf):
-    rebuts = {}
-    print("Rebuts:")
-    for arg in bf:
-        contradicting_args = []
-        for other_arg in bf:
-            if compare_arguments(arg, other_arg):
-                if arg.topRule.conclusion.contradicts(other_arg.topRule):
-                    contradicting_args.append(other_arg.name)
-        if contradicting_args:
-            rebuts[arg.name] = contradicting_args
-            print("affichage de rebuts")
-            print("arg.name is", arg.name)
-            print("OTHER_arg.name is", contradicting_args)
-
-    return rebuts
-
 
 
 def main():
@@ -124,7 +103,7 @@ def main():
     argumentBase = generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
-
+    
     printSorted(argumentBase)    
 
     defeasibleRules = set()
@@ -155,8 +134,7 @@ def main():
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
-
-
+    
     print("\n")
     print("REBUTS:")
     rebuts = generateRebuts(argumentBase)
@@ -190,6 +168,7 @@ def main():
             print(f'{arg1.name} -> {arg2.name}')
         print()
 
+    exportArguments(argumentBase)
 
 if __name__ == "__main__":
     main()
