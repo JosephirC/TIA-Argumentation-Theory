@@ -172,6 +172,8 @@ def main():
             print(f'{arg1.name} -> {arg2.name}')
         print()
 
+    exportArguments(argumentBase)
+
     bur = addset(argumentBase, rebuts, 5)
     for b in bur:
         print(b)
