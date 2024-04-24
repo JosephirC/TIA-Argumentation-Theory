@@ -33,9 +33,9 @@ def generateUndercuts(argumentBase, rules):
 
     return undercuts
 
-def generateRebuts(bf):
-    for arg in bf:
-        for other_arg in bf:
+def generateRebuts(argumentBase):
+    for arg in argumentBase:
+        for other_arg in argumentBase:
             conclusionCopy = arg.topRule.conclusion.copy()
             conclusionCopy = conclusionCopy.negate()
             if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
