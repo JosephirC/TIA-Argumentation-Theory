@@ -1,8 +1,6 @@
-# Arguments are objects which are referred by their top rule, the set of direct sub arguments, and its unique name (string). 
-# We give below two examples of arguments
-
 class Arguments:
 
+    setOfArgs_call_count = 0
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -12,9 +10,8 @@ class Arguments:
         self.name = "A" + str(Arguments.nameCount)
 
     def __eq__(self, other):
-        return (self.topRule == other.topRule 
-                and self.subArguments == other.subArguments 
-                and self.name == other.name)
+        return (self.topRule.conclusion == other.topRule.conclusion
+                and self.subArguments == other.subArguments)
 
     # arguemtn example : $A_1: \rightarrow a$ == A1: -> a
     # argument example : $A_2: A_1 \Rightarrow c$ == A2: A2, A1 => c
@@ -24,6 +21,7 @@ class Arguments:
         argumentSubArguments = ""
         argumentTopRule = self.topRule
         argumentImplication = ""
+        argumentTopRuleConclusion = ""
 
         # Extracting all sub arguments and putting them in a list
         for subArgument in self.subArguments:
@@ -41,8 +39,10 @@ class Arguments:
             argumentImplication = "=> "
         else :
             argumentImplication = "->"
+
+        argumentTopRuleConclusion = argumentTopRule.conclusion
             
-        return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRule.conclusion)
+        return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
     def __hash__(self):
         return hash((self.topRule, tuple(self.subArguments), self.name))
@@ -57,8 +57,9 @@ class Arguments:
 
         return uniqueArguments
 
-
     def setOfArguemnts(self):
+        Arguments.setOfArgs_call_count += 1
+
         allArguments = [self.name]
 
         for subArgument in self.subArguments:
@@ -66,4 +67,24 @@ class Arguments:
                 allArguments.append(argument)
 
         return self.extractUniqueArguments(allArguments)
+    
+    def getAllDefeasible(self):
+        rulesDefeasible = set()
+        if(self.topRule.isDefeasible):
+            rulesDefeasible.add(self.topRule)
+        for arg in self.subArguments:
+            if(arg.topRule.isDefeasible):
+                rulesDefeasible.add(arg.topRule)
+        return rulesDefeasible
 
+    def getLastDefeasible(self):
+        rulesDefeasible = set()
+        if(self.topRule.isDefeasible):
+            rulesDefeasible.add(self.topRule)
+        return rulesDefeasible
+
+    def getAllSubArg(self):
+        rulesDefeasible = set()
+        for arg in self.subArguments:
+            rulesDefeasible.add(arg)
+        return rulesDefeasible

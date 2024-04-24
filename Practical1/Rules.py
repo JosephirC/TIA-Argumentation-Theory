@@ -1,8 +1,3 @@
-# Rules are objects which are referred by their premises (set of literals), its conclusion (a literal), a boolean which indicates if the rule is 
-# defeasible or not, and a literal (e.g., $r_1$) which uniquely references it. 
-# An object of this class would be used to represent: $r_1: a, \neg b, c \Rightarrow e$ or $r_2: \rightarrow \neg a$
-
-
 class Rules:
 
     ruleCount = 0
@@ -12,7 +7,7 @@ class Rules:
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        self.literalReference = "r" + str(Rules.ruleCount)
+        self.name = "r" + str(Rules.ruleCount)
 
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
@@ -23,35 +18,72 @@ class Rules:
 
     # handle print of the class
     def __str__(self):
-        ruleLiteralReference = "[" + self.literalReference + "] "
+        ruleName = "[" + self.name + "] "
         rulePremises = ""
         ruleImplication = ""
-        ruleConclusion = str(self.conclusion)
+        ruleConclusion = ""
 
         for premise in self.premises:
-            rulePremises = rulePremises + str(premise) + ","
+            rulePremises += str(premise) + ","
+
+        # for conclusion in self.conclusion:
+        ruleConclusion += str(self.conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
+        ruleConclusion = ruleConclusion[:-1] + " "
 
-        if(self.isDefeasible):
+        if self.isDefeasible:
             ruleImplication = "=> "
-        else :
+        else:
             ruleImplication = "->"
-        
-        return ruleLiteralReference + rulePremises + ruleImplication + ruleConclusion
-        
+
+        return ruleName + rulePremises + ruleImplication + ruleConclusion
+    
     # handle hash of the class
     def __hash__(self):
-        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.literalReference))
+        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.name))
 
-    # set rule literal reference
-    def setLiteralReference(self, literalReference):
-        self.literalReference = literalReference
+    def contraposition(self):
+        newRules = set()
+        newPremise = set()
 
+        if len(self.premises) == 1:
+            conclusion = self.conclusion
+            newPremise.add(conclusion.negate())
 
+            literal = next(iter(self.premises))
+            newRules.add(Rules(newPremise, literal.negate(), self.isDefeasible))
 
-
+            return newRules
         
-    
+        else:
+            conclusion = self.conclusion
+            
+            for premise in self.premises:
+                currentLiteral = premise.negate()
 
+                newPremise = self.premises.copy()
+                newPremise.remove(premise)
+                newPremise.add(conclusion.negate())
+
+                newRules.add(Rules(newPremise, currentLiteral, self.isDefeasible))
+
+            return newRules
     
+    def notRule(self, name):
+        """
+        This method is used to create a negated rule object.
+        """
+
+        self.name = "¬" + name
+        self.premises = {literal.negate() for literal in self.premises}
+        self.conclusion = {literal.negate() for literal in self.conclusion}
+        return self
+    
+    def copy(self):
+        """
+        This method is used to create a copy of a rule object without incrementing the ruleCount.
+        """
+
+        Rules.ruleCount -=1
+        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible)
