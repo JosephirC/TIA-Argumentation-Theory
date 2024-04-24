@@ -117,7 +117,8 @@ def main():
 
     for arg in argumentBase:
         print(arg)
-        defeasibleRules = arg.getAllDefeasible()
+        # defeasibleRules = arg.getAllDefeasible()
+        defeasibleRules = arg.getLastDefeasible()
         print("Les règles defeasibles: ")
         for rules in defeasibleRules:
             print(rules.name)

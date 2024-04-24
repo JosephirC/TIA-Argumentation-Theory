@@ -32,3 +32,53 @@ def comparePreferred(preferred):
         result += rules
 
     return result
+
+
+"""
+une fonction qui prend arg1 et arg2 et le method (democratic ou elitist) et le principal (last link ou weakest link)
+selon ces parametres je fais le calcul des defeats
+il faut utiliser les fonctions de la classe Arguments : getAllDefeasible, getLastDefeasible
+
+"""
+
+def democraticWeakestLink(arg1, arg2):
+    allDefeasible1 = arg1.getAllDefeasible()
+    allDefeasible2 = arg2.getAllDefeasible()
+
+    for ruleArg2 in allDefeasible2:
+        comparisonCounter = 0
+        for ruleArg1 in allDefeasible1:
+            if ruleArg1.isDefeasible and ruleArg2.isDefeasible:
+                if ruleArg1.weight >= ruleArg2.weight:
+                    comparisonCounter += 1
+        if comparisonCounter == len(allDefeasible1):
+            print("arg1 rules are >= to at least one rule of arg2")
+            return True
+        
+    
+                    
+
+                
+
+def democraticLastLink(arg1, arg2):
+    pass
+
+def elitistWeakestLink(arg1, arg2):
+    pass
+
+def elitistLastLink(arg1, arg2):
+    pass
+
+def defeat(arg1, arg2, method, principal):
+
+    if method == "democratic" and principal == "weakest link":
+        if (democraticWeakestLink(arg1, arg2)):
+            return True
+    elif method == "democratic" and principal == "last link":
+        return democraticLastLink(arg1, arg2)
+    elif method == "elitist" and principal == "weakest link":
+        return elitistWeakestLink(arg1, arg2)
+    elif method == "elitist" and principal == "last link":
+        return elitistLastLink(arg1, arg2)
+    else:
+        return None
