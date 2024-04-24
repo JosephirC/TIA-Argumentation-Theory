@@ -26,7 +26,7 @@ def addArgsToBF(setOfArguments):
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
-        if len(rule.premises) == 0 and len(rule.conclusion) > 0:
+        if len(rule.premises) == 0 :
             arg = Arguments.Arguments(rule, set())
             bf.add(arg)
             rulesCopy.remove(rule)
@@ -40,8 +40,9 @@ def find_combinations(target_values):
         valid_combinations = set()
         
         for arg in bf:    
-            if arg.topRule.conclusion.issubset(target_values):
-                sub_valid_combinations = find_combinations(target_values - arg.topRule.conclusion)
+            # if arg.topRule.conclusion.issubset(target_values):
+            if arg.topRule.conclusion in target_values:
+                sub_valid_combinations = find_combinations(target_values - {arg.topRule.conclusion})
                 
                 for combination in sub_valid_combinations:
                     valid_combinations.add(frozenset([arg]) | combination)
@@ -146,9 +147,9 @@ def main():
     eF = Literals.Literals("e", False)
 
 
-    rule1 = Rules.Rules({}, {aF}, False)
-    rule2 = Rules.Rules({bF, dF}, {cF}, False)
-    rule3 = Rules.Rules({c}, {dF}, False)
+    rule1 = Rules.Rules({}, aF, False)
+    rule2 = Rules.Rules({bF, dF}, cF, False)
+    rule3 = Rules.Rules({c}, dF, False)
     
     print(rule1)
     print(rule2)
@@ -166,12 +167,12 @@ def main():
     for rule in contrapositionRules:
         print(rule)
 
-    rule4 = Rules.Rules({aF}, {d}, True)
-    rule5 = Rules.Rules({}, {bF}, True)
-    rule6 = Rules.Rules({}, {c}, True)
-    rule7 = Rules.Rules({}, {dF}, True)
-    rule8 = Rules.Rules({cF}, {eF}, True)
-    rule9 = Rules.Rules({c}, {rule4}, True)
+    rule4 = Rules.Rules({aF}, d, True)
+    rule5 = Rules.Rules({}, bF, True)
+    rule6 = Rules.Rules({}, c, True)
+    rule7 = Rules.Rules({}, dF, True)
+    rule8 = Rules.Rules({cF}, eF, True)
+    rule9 = Rules.Rules({c}, rule4, True)
 
     print(rule4)
     print(rule5)
@@ -191,6 +192,14 @@ def main():
 
     print_sorted(bf)    
 
+    defeasibleRules = set()
+    for arg in bf:
+        print(f"argument {arg}")
+        defeasibleRules.update(arg.getAllDefeasible())
+        print("The defeasible rules : ")
+        for rules in defeasibleRules:
+            print(rules.name)
+        print("\n")
 
 if __name__ == "__main__":
     main()

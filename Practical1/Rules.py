@@ -26,8 +26,8 @@ class Rules:
         for premise in self.premises:
             rulePremises += str(premise) + ","
 
-        for conclusion in self.conclusion:
-            ruleConclusion += str(conclusion) + ","
+        # for conclusion in self.conclusion:
+        ruleConclusion += str(self.conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
         ruleConclusion = ruleConclusion[:-1] + " "
@@ -41,36 +41,32 @@ class Rules:
     
     # handle hash of the class
     def __hash__(self):
-        return hash((tuple(self.premises), tuple(self.conclusion), self.isDefeasible, self.name))
+        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.name))
 
     def contraposition(self):
         newRules = set()
         newPremise = set()
-        newConclusion = set()
 
         if len(self.premises) == 1:
-            conclusion = next(iter(self.conclusion))
+            conclusion = self.conclusion
             newPremise.add(conclusion.negate())
 
             literal = next(iter(self.premises))
-            newConclusion.add(literal.negate())
-            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
+            newRules.add(Rules(newPremise, literal.negate(), self.isDefeasible))
 
             return newRules
         
         else:
-            conclusion = next(iter(self.conclusion))
+            conclusion = self.conclusion
             
             for premise in self.premises:
                 currentLiteral = premise.negate()
-                newConclusion.add(currentLiteral)
 
                 newPremise = self.premises.copy()
                 newPremise.remove(premise)
                 newPremise.add(conclusion.negate())
 
-                newRules.add(Rules(newPremise, newConclusion, self.isDefeasible))
-                newConclusion = set() 
+                newRules.add(Rules(newPremise, currentLiteral, self.isDefeasible))
 
             return newRules
     
