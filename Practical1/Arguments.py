@@ -13,7 +13,7 @@ class Arguments:
         self.name = "A" + str(Arguments.nameCount)
 
     def __eq__(self, other):
-        return (self.topRule == other.topRule 
+        return (self.topRule.conclusion == other.topRule.conclusion
                 and self.subArguments == other.subArguments)
 
     # arguemtn example : $A_1: \rightarrow a$ == A1: -> a
@@ -43,11 +43,9 @@ class Arguments:
         else :
             argumentImplication = "->"
 
-        # Extracting the literals from the conclusion set
-        for conclusion in argumentTopRule.conclusion:
-            argumentTopRuleConclusion = argumentTopRuleConclusion + str(conclusion)
+        argumentTopRuleConclusion = argumentTopRule.conclusion
             
-        return argumentName + argumentSubArguments + argumentImplication + argumentTopRuleConclusion
+        return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
     def __hash__(self):
         return hash((self.topRule, tuple(self.subArguments), self.name))
@@ -72,4 +70,25 @@ class Arguments:
                 allArguments.append(argument)
 
         return self.extractUniqueArguments(allArguments)
+    
+    def getAllDefeasible(self):
+        rulesDefeasible = set()
+        if(self.topRule.isDefeasible):
+            rulesDefeasible.add(self.topRule)
+        for arg in self.subArguments:
+            #if(arg.topRule.isDefeasible):
+                # rulesDefeasible.add(arg.topRule)
+                rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
+        return rulesDefeasible
 
+    def getLastDefeasible(self):
+        rulesDefeasible = set()
+        if(self.topRule.isDefeasible):
+            rulesDefeasible.add(self.topRule)
+        return rulesDefeasible
+
+    def getAllSubArg(self):
+        rulesDefeasible = set()
+        for arg in self.subArguments:
+            rulesDefeasible.add(arg)
+        return rulesDefeasible
