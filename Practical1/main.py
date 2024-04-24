@@ -3,7 +3,7 @@ import Rules
 import Arguments
 import time
 from GenerateArguments import generateArgs
-from GenerateAttacks import generateUndercuts
+from GenerateAttacks import generateUndercuts, generateRebuts
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -130,5 +130,12 @@ def main():
             print(rules.name)
         print("\n")
 
+    rebuts = generateRebuts(argumentBase)
+    for key in rebuts:
+        print(f'For {key.isNeg} {key.name} len {len(rebuts[key])} :')
+        for (arg1, arg2) in rebuts[key]:
+            print(f'{arg1.name} -> {arg2.name}')
+        print()
+    
 if __name__ == "__main__":
     main()
