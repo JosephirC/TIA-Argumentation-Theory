@@ -7,10 +7,7 @@ import time
 # static bf to store all the arguments
 bf =  set()
 
-# undercut = {
-# }
-
-undercut = set()
+undercuts = set()
 
 # 1. contraposition on strict rules
 # 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
@@ -114,10 +111,22 @@ def generateUndercuts(bf):
                         print(other_arg.name)
                         if other_arg.name not in conflict_arg:
                             conflict_arg.append(other_arg.name)
-                    if arg not in undercuts:
-                        undercuts[arg.name] = conflict_arg
-                    else:
-                        undercuts[arg.name] = conflict_arg
+                    undercuts[arg.name] = conflict_arg
+
+    return undercuts
+
+def generateUndercutsWithSet(bf):
+    for arg in bf:
+        if arg.topRule.premises:
+            if isinstance(arg.topRule.conclusion, Rules.Rules):
+                for other_arg in bf:
+                    arg_rule = arg.topRule.conclusion
+                    other_defeasible = other_arg.getAllDefeasible()
+                    arg_ruleCopy = arg_rule.copy()
+                    if arg_ruleCopy.notRule(arg_rule.name) in other_defeasible:
+                        print(other_arg.name)
+                        tupe = (arg.name, other_arg.name)
+                        undercuts.add(tupe)
 
     return undercuts
 
@@ -212,9 +221,8 @@ def main():
         defeasibleRules.update(arg.getAllDefeasible())
         print("The defeasible rules : ")
 
-    undercuts = generateUndercuts(bf)
-    for undercut in undercuts:
-        print(undercuts)
+    undercuts = generateUndercutsWithSet(bf)
+    print("undercuts are : ", undercuts)
     print()
 
     print("\nundercuts done \n")
@@ -229,8 +237,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# A14
-# A8
-# A17
-# {'A9': ['A14', 'A8', 'A17']}
+    
