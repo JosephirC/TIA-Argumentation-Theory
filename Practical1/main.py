@@ -4,7 +4,6 @@ import Arguments
 import time
 from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts
-from Defeats import makePreferred, displayWeightComparison, comparePreferred
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
