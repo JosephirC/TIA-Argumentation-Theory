@@ -1,9 +1,7 @@
-# Arguments are objects which are referred by their top rule, the set of direct sub arguments, and its unique name (string). 
-# We give below two examples of arguments
+import Rules
 
 class Arguments:
 
-    setOfArgs_call_count = 0
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -43,7 +41,10 @@ class Arguments:
         else :
             argumentImplication = "->"
 
-        argumentTopRuleConclusion = argumentTopRule.conclusion
+        if isinstance(argumentTopRule.conclusion, Rules.Rules):
+            argumentTopRuleConclusion = argumentTopRule.conclusion.name
+        else:
+            argumentTopRuleConclusion = argumentTopRule.conclusion
             
         return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
@@ -61,8 +62,6 @@ class Arguments:
         return uniqueArguments
 
     def setOfArguemnts(self):
-        Arguments.setOfArgs_call_count += 1
-
         allArguments = [self.name]
 
         for subArgument in self.subArguments:
@@ -76,8 +75,6 @@ class Arguments:
         if(self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
         for arg in self.subArguments:
-            #if(arg.topRule.isDefeasible):
-                # rulesDefeasible.add(arg.topRule)
                 rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
         return rulesDefeasible
 

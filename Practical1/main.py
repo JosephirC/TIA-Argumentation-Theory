@@ -1,118 +1,14 @@
 import Literals
 import Rules
 import Arguments
-import itertools
 import time
+from GenerateArguments import generateArgs, getArgumentBase
+from GenerateAttacks import generateUndercuts
 
-# static bf to store all the arguments
-# bf = set()
-bf = {
-
-}
-
-undercut = {
-
-}
-
-# 1. contraposition on strict rules
-# 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
-# 2.1 add the arguments in the bf
-# 3. in a different function have a list of all the rules minus the rules for the intial arguments
-# 3.1 for each rule in the list of rules, generate the arguments
-# 3.2 add the respective arguments in the bf
-# 4. during this step we will try to generate the remaining arguments
-# 4.1 go through all the rules once and again and for each rule iterate over the bf and check if you can genereate a new argument for it and add it to the bf
-# 4.2. iterate over the whole bf once again and check if you can generate a new argument and then move to the next rule
-# 4.3 repeate 4.1 and 4.2 until no new arguments are generated
-
-def addArgsToBF(setOfArguments):
-    for arg in setOfArguments:
-        if isinstance(arg, Arguments):
-            bf[arg] = arg.topRule.conclusion
-         
-def generateInitialArguments(rules):
-    rulesCopy = rules.copy()
-    for rule in rules:
-        if len(rule.premises) == 0 :
-            arg = Arguments.Arguments(rule, set())
-            bf[arg] = arg.topRule.conclusion
-            rulesCopy.remove(rule)
-    
-    return rulesCopy
-
-def find_combinations(target_values):
-    valid_combinations = set()
-    keys = list(bf.keys())
-
-    for r in range(1, len(keys) + 1):
-        for combo in itertools.combinations(keys, r):
-            values = set()
-            for key in combo:
-                values.add(bf[key])
-            if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
-                valid_combinations.add(tuple(combo))
-
-    return valid_combinations
-
-def generateArgsFromRules(rules):
-    argToAdd = set()
-    for rule in rules:
-        combination = find_combinations(rule.premises) 
-        for subArg in combination:
-            arg = Arguments.Arguments(rule, subArg)
-            compt = 0
-            for elem in bf:
-
-                if elem.subArguments != arg.subArguments:
-                    compt = compt + 1
-            if len(bf) == compt:
-                argToAdd.add(arg)
-            else:
-                Arguments.Arguments.nameCount = Arguments.Arguments.nameCount - 1
-    
-    for key in argToAdd:
-        bf[key] = key.topRule.conclusion
-    
-    if(len(argToAdd)) > 0:
-        generateArgsFromRules(rules)
-
-def generateContrapositonRules(rules):
-    rulesToAdd = set()
-    for rule in rules:
-        if not rule.isDefeasible :
-            rulesToAdd.update(rule.contraposition())
-
-    rules.update(rulesToAdd)
-    return rules
-
-def generateArgs(rules):
-    rulesWithContraposition = generateContrapositonRules(rules)
-    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
-    generateArgsFromRules(rulesWithNoArgs)
-
-def generateUndercuts(bf):
-    undercuts = {}
-    conflict_arg = []
-
-    for arg in bf.keys():
-        if arg.topRule.premises:
-            if isinstance(arg.topRule.conclusion, Rules.Rules):
-                for other_arg in bf.keys():
-                    other_rule = other_arg.topRule
-                    arg_rule = arg.topRule.conclusion
-                    other_defeasible = other_arg.getAllDefeasible()
-                    arg_ruleCopy = arg_rule.copy()
-                    if arg_ruleCopy.notRule(arg_rule.name) in other_defeasible:
-                        notArg = arg
-                        print(other_arg.name)
-                        if other_arg.name not in conflict_arg:
-                            conflict_arg.append(other_arg.name)
-                    if arg not in undercuts:
-                        undercuts[arg.name] = conflict_arg
-                    else:
-                        undercuts[arg.name] = conflict_arg
-
-    return undercuts
+def printSorted(argumentBase):
+    sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
+    for arg in sortedArgs:
+        print(arg)
 
 
 def compare_arguments(arg1, arg2):
@@ -210,39 +106,46 @@ def main():
     print(rule7)
     print(rule8)
 
-    print(rule9, notRule4)
-
+    print(rule9)
 
     # Testing the generation of arguments
     print("\n")
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
     deb  = time.time()
     generateArgs(rules)
     fin = time.time()
     print("temp", fin-deb)
 
-    for cleArg in bf.keys():
-        print(cleArg, cleArg.topRule)
+    argumentBase = getArgumentBase()
+
+    printSorted(argumentBase)    
+
+    defeasibleRules = set()
+    for arg in argumentBase:
+        print(f"argument {arg}")
+        defeasibleRules.update(arg.getAllDefeasible())
+        print("The defeasible rules : ")
+
+    undercuts = generateUndercuts(argumentBase)
+    print("undercuts are : ", undercuts)
     print()
 
-    undercuts = generateUndercuts(bf)
-    for undercut in undercuts:
-        print(undercuts)
-    print()
+    print("\nundercuts done \n")
 
-    rebuts = generate_rebuts(bf)
-    
-    for rebut in rebuts:
-        print(rebuts)
-
-    for cle in bf.keys():
-        print(cle)
-        defeasibleRules = cle.getAllDefeasible()
+    for arg in argumentBase:
+        print(arg)
+        defeasibleRules = arg.getAllDefeasible()
         print("Les règles defeasibles: ")
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
+    rebuts = generate_rebuts(argumentBase)
+    
+    for rebut in rebuts:
+        print(rebuts)
 
+    for cle in argumentBase:
+        print(cle)
+        defeasibleRules = cle.getAllDefeasible()
 if __name__ == "__main__":
     main()
