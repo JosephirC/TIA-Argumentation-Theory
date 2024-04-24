@@ -1,3 +1,5 @@
+import Rules
+
 class Arguments:
 
     setOfArgs_call_count = 0
@@ -40,7 +42,10 @@ class Arguments:
         else :
             argumentImplication = "->"
 
-        argumentTopRuleConclusion = argumentTopRule.conclusion
+        if isinstance(argumentTopRule.conclusion, Rules.Rules):
+            argumentTopRuleConclusion = argumentTopRule.conclusion.name
+        else:
+            argumentTopRuleConclusion = argumentTopRule.conclusion
             
         return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
@@ -73,8 +78,7 @@ class Arguments:
         if(self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
         for arg in self.subArguments:
-            if(arg.topRule.isDefeasible):
-                rulesDefeasible.add(arg.topRule)
+                rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
         return rulesDefeasible
 
     def getLastDefeasible(self):

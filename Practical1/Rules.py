@@ -27,7 +27,10 @@ class Rules:
             rulePremises += str(premise) + ","
 
         # for conclusion in self.conclusion:
-        ruleConclusion += str(self.conclusion) + ","
+        if(isinstance(self.conclusion, Rules)):
+            ruleConclusion += self.conclusion.name + ","
+        else :
+            ruleConclusion += str(self.conclusion) + ","
 
         rulePremises = rulePremises[:-1] + " "
         ruleConclusion = ruleConclusion[:-1] + " "
@@ -75,15 +78,21 @@ class Rules:
         This method is used to create a negated rule object.
         """
 
-        self.name = "¬" + name
-        self.premises = {literal.negate() for literal in self.premises}
-        self.conclusion = {literal.negate() for literal in self.conclusion}
-        return self
+        if "¬" in name:
+            self.name = name[1:]
+            self.premises = {literal.negate() for literal in self.premises}
+            self.conclusion = self.conclusion.negate()
+            return self
+        else:    
+            self.name = "¬" + name 
+            self.premises = {literal.negate() for literal in self.premises}
+            self.conclusion = self.conclusion.negate()
+            return self
     
     def copy(self):
         """
         This method is used to create a copy of a rule object without incrementing the ruleCount.
         """
 
-        Rules.ruleCount -=1
+        Rules.ruleCount -=1 
         return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible)
