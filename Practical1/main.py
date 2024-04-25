@@ -165,9 +165,9 @@ def main():
     
     for key in defeatWeakLink:
         print(f'For {key.isNeg} {key.name} len {len(defeatWeakLink[key])} :')
-        for (arg1, arg2) in defeatWeakLink[key]:
-            print(f'{arg1.name} -> {arg2.name}')
-        print()
+        # for (arg1, arg2) in defeatWeakLink[key]:
+        #     print(f'{arg1.name} -> {arg2.name}')
+        # print()
 
 
 if __name__ == "__main__":
