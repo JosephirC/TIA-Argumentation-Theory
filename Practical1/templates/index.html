@@ -7,15 +7,36 @@
 <body>
    <h1>Notre super site de TIA</h1>
    <input type="file" id="avatar" name="avatar" accept=".txt" />
-   <a href="/calcArg">Calculer mes arguments</a>
-     
+    <br>
+    <a href="/calcArg">Calculer mes arguments</a>
     <ol>
-    <!-- For loop logic of jinja template -->
     {%for i in arguments%}
-      
         <li>{{i}}</li>
     {%endfor%}
-      
     </ol>
-</body>
+
+    <a href="/calcAttaq">Calculer mes attaques</a>
+    {% if undercuts %}
+    <h2>Pour vos undercut</h2>
+    <ol>
+        {%for i in undercuts%}
+            <li>{{i}}</li>
+        {%endfor%}
+    </ol>
+    {% endif %}
+
+    {% if rebuts %}
+    <h2>Pour vos rebuts</h2>
+    <ul>
+        {% for key, value in rebuts.items() %}
+            <li>Pour {{ key }} il y a {{ value|length }} arguments :</li>
+            <ul>
+                {% for arg1, arg2 in value %}
+                    <li>{{ arg1.name }} -> {{ arg2.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 </html>

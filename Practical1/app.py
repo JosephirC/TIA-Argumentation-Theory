@@ -1,28 +1,15 @@
 from flask import Flask, render_template, jsonify
-from GenerateArguments import generateArgs
 import Literals
 import Rules
 import Arguments
+from GenerateArguments import generateArgs
+from GenerateAttacks import generateUndercuts, generateRebuts
 
 app = Flask(__name__)
 
-employees = [
-   {'id': 0,
-	'Nom': 'Dupont',
-	'Prénom': 'Jean',
-	'Fonction': 'Développeur',
-	'Ancienneté': '5'},
-   {'id': 1,
-	'Nom': 'Durand',
-	'Prénom': 'Elodie',
-	'Fonction': 'Directrice Commerciale',
-	'Ancienneté': '4'},
-   {'id': 2,
-	'Nom': 'Lucas',
-	'Prénom': 'Jérémie',
-	'Fonction': 'DRH',
-	'Ancienneté': '4'}
-]
+arguments = []
+arg = []
+rules = {}
 
 @app.route('/')
 def index():
@@ -30,6 +17,11 @@ def index():
 
 @app.route('/calcArg',  methods=['GET'])
 def calcArg():
+    global arguments, arg, rules 
+    arguments = []
+    arg = []
+    rules = {}
+
     a = Literals.Literals("a", True)
     aF = Literals.Literals("a", False)
     b = Literals.Literals("b", True)
@@ -61,5 +53,15 @@ def calcArg():
     rule8 = Rules.Rules({cF}, eF, True, r8)
     rule9 = Rules.Rules({c}, r4.negate(), True, r9)
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    arg = generateArgs(rules)
+    arguments = generateArgs(rules)
+    arg = sorted(arguments, key=lambda arg: int(arg.name[1:]))
     return render_template('index.html', arguments=arg)
+
+@app.route('/calcAttaq',  methods=['GET'])
+def calcAttaq():
+   global arguments, arg, rules
+   undercuts = generateUndercuts(arguments, rules)
+   print(undercuts)
+   rebuts = generateRebuts(arguments)
+   print(rebuts)
+   return render_template('index.html', arguments=arg, undercuts=undercuts, rebuts=rebuts)
