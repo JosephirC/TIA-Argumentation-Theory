@@ -68,6 +68,6 @@ def generateContrapositonRules(rules):
 
 def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
-    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
+    rulesWithNoArgs = generateInitialArguments(rules)
     generateArgsFromRules(rulesWithNoArgs)
     return argumentBase
