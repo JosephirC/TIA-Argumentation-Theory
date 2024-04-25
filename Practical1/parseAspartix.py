@@ -21,9 +21,6 @@ def parseRules(rules):
         fichier = open('KB.txt', 'w')
         pass
     fichier = open('KB.txt', 'a')
-    # rules = generateContrapositonRules(rules)
-    for rule in rules:
-        print(rule)
     for rule in rules:
         if rule.isDefeasible:
             chaine = "[" + rule.name.name + "] "
@@ -73,10 +70,7 @@ def readKB(parsedRules):
         #     [text, premises, conclusion, fleche] = element(f)
         for f in fichier:
             [text, premises, conclusion, fleche] = element(f)
-            print(text, premises, fleche, conclusion)
-            # print()
             if fleche == "=>":
-                print()
                 if len(premises) > 1:
                     if '!' in premises[0]:
                         tmpPreLit1 = Literals.Literals(premises[0][1:], True)
@@ -108,18 +102,15 @@ def readKB(parsedRules):
                     if len(conclusion) == 1 and conclusion[0] != '':
                         parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, text[0]))
             if fleche == '->':
-                print()
                 if len(premises) > 1:
                     if '!' in premises[0]:
                         tmpPreLit1 = Literals.Literals(premises[0][1:], True)
-                        print(tmpPreLit1)
                     else :
                         tmpPreLit1 = Literals.Literals(premises[0], False)
                     if '!' in premises[1]:
                         tmpPreLit2 = Literals.Literals(premises[1][1:], True)
                     else :
                         tmpPreLit2 = Literals.Literals(premises[1], False)
-                        print(tmpPreLit2)
                     if '!' in conclusion[0]:
                         tmpCclLit = Literals.Literals(conclusion[0], True)
                     else:

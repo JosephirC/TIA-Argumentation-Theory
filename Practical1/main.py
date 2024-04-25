@@ -176,6 +176,7 @@ def main():
 
     parseAttacks(defeatWeakLink)
     
+    print()
     parsedRules = set()
     readKB(parsedRules)
     for rule in parsedRules:
