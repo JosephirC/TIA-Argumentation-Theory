@@ -67,7 +67,6 @@ def democraticWeakestLink(arg1, arg2):
         
     return False
         
-    
 def democraticLastLink(arg1, arg2):
     allDefeasible1 = arg1.getLastDefeasible()
     allDefeasible2 = arg2.getLastDefeasible()
@@ -94,7 +93,6 @@ def democraticLastLink(arg1, arg2):
         
     return False
         
-
 def searchForAttackedArguments(arg1, arg2):
     attackdArguments = set()
 

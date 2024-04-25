@@ -4,20 +4,21 @@ class Rules:
 
     ruleCount = 0
 
-    def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
+    def __init__(self, premises, conclusion, isDefeasible, literal, weight=0):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
         
-        if weight is None:
-            if isDefeasible:
-                if len(premises) == 0:
-                    self.weight = 1
-                else:
-                    self.weight = 0
-        else:
-            self.weight = weight
+        # if weight is None:
+        #     if isDefeasible:
+        #         if len(premises) == 0:
+        #             self.weight = 1
+        #         else:
+        #             self.weight = 0
+        # else:
+        self.weight = weight
+        
 
         self.name : Literals = literal
 

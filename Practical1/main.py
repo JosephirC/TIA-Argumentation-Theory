@@ -123,15 +123,17 @@ def main():
     print()
 
     print("\nundercuts done \n")
-
+    defeasibleRulesSize = 0
     for arg in argumentBase:
         print(arg)
-        defeasibleRules = arg.getAllDefeasible()
-        # defeasibleRules = arg.getLastDefeasible()
+        # defeasibleRules = arg.getAllDefeasible()
+        defeasibleRules = arg.getLastDefeasible()
         print("Les règles defeasibles: ")
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
+
+        # print("lengeth of defeasible rules: ", len(defeasibleRules))
 
 
     print("\n")
@@ -159,7 +161,7 @@ def main():
 
     for rebut in rebuts:
         for (arg1, arg2) in rebuts[rebut]:
-            defeatTuple = defeat(arg1, arg2, "elitist", "weakest-link")
+            defeatTuple = defeat(arg1, arg2, "democratic", "weakest-link")
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
     
