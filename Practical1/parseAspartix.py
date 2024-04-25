@@ -55,3 +55,5 @@ def parseRules(rules):
                 chaine += rule.conclusion.name
             fichier.write(chaine + "\n")             
     fichier.close()
+
+# def readKB():
