@@ -76,8 +76,9 @@ class Rules:
             newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            rX = Literals("r" + str(Rules.ruleCount), self.name.isNeg)
-
+            compt = Rules.ruleCount
+            compt = compt + 1
+            rX = Literals("r" + str(compt), self.name.isNeg)
             newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
         return newRules
