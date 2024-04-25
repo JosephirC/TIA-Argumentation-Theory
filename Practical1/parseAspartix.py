@@ -66,37 +66,35 @@ def parseRules(rules):
 def readKB(parsedRules):
     if os.path.exists('KB.txt'):
         fichier = open('KB.txt', 'r')
-        tmpPreLit1 = Literals.Literals("tmp2", False)
-        tmpPreLit2 = Literals.Literals("tmp1", False)
-        tmpCclLit = Literals.Literals("ccl1", False)
+        tmpPreLit1 = Literals.Literals("", False)
+        tmpPreLit2 = Literals.Literals("", False)
+        tmpCclLit = Literals.Literals("", False)
+        # for f in fichier:
+        #     [text, premises, conclusion, fleche] = element(f)
         for f in fichier:
             [text, premises, conclusion, fleche] = element(f)
             print(text, premises, fleche, conclusion)
+            # print()
             if fleche == "=>":
+                print()
                 if len(premises) > 1:
                     if '!' in premises[0]:
-                        print(premises[0][0][1], "test")
                         tmpPreLit1 = Literals.Literals(premises[0][1:], True)
                     else:
-                        print(premises[0][0])
                         tmpPreLit1 = Literals.Literals(premises[0], True)
                     if '!' in premises[1]:
-                        print(premises[1][0])
                         tmpPreLit2 = Literals.Literals(premises[0][1:], True)
                     else:
-                        print(premises[1][0])
                         tmpPreLit2 = Literals.Literals(premises[0], False)
                     if '!' in conclusion[0]:
-                        print(conclusion[0][0])
                         tmpCclLit = Literals.Literals(conclusion[0], True)
                     else:
-                        print(conclusion[0][0])
                         tmpCclLit = Literals.Literals(conclusion[0], False)
                     if len(conclusion) > 1:
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, True, text[0], conclusion[1]))
                     if len(conclusion) == 1:
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, True, text[0]))
-                if len(premises) == 1 and premises[0] != '':
+                if len(premises) == 1:
                     if '!' in premises[0]:
                         tmpPreLit1 = Literals.Literals(premises[0][1:], True)
                     else:
@@ -106,20 +104,22 @@ def readKB(parsedRules):
                     else:
                         tmpCclLit = Literals.Literals(conclusion[0], False)
                     if len(conclusion) > 1:
-                        # print(tmpPreLit1)
-                        parsedRules.add(Rules.Rules(tmpPreLit1, tmpCclLit, True, text[0], conclusion[1]))
+                        parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, text[0], conclusion[1]))
                     if len(conclusion) == 1 and conclusion[0] != '':
-                        parsedRules.add(Rules.Rules(tmpPreLit1, tmpCclLit, True, text[0]))
+                        parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, text[0]))
             if fleche == '->':
+                print()
                 if len(premises) > 1:
                     if '!' in premises[0]:
                         tmpPreLit1 = Literals.Literals(premises[0][1:], True)
+                        print(tmpPreLit1)
                     else :
                         tmpPreLit1 = Literals.Literals(premises[0], False)
                     if '!' in premises[1]:
-                        tmpPreLit1 = Literals.Literals(premises[1][1:], True)
+                        tmpPreLit2 = Literals.Literals(premises[1][1:], True)
                     else :
-                        tmpPreLit1 = Literals.Literals(premises[1], False)
+                        tmpPreLit2 = Literals.Literals(premises[1], False)
+                        print(tmpPreLit2)
                     if '!' in conclusion[0]:
                         tmpCclLit = Literals.Literals(conclusion[0], True)
                     else:
@@ -128,7 +128,7 @@ def readKB(parsedRules):
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, text[0], conclusion[1]))
                     if len(conclusion) == 1:
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, text[0]))
-                if len(premises) == 1 and premises[0] != '':
+                if len(premises) == 1:
                     if '!' in premises[0]:
                         tmpPreLit1 = Literals.Literals(premises[0][1:], True)
                     else:
@@ -138,10 +138,9 @@ def readKB(parsedRules):
                     else:
                         tmpCclLit = Literals.Literals(conclusion[0], False)
                     if len(conclusion) > 1:
-                        parsedRules.add(Rules.Rules(tmpPreLit1, tmpCclLit, False, text[0], conclusion[1]))
+                        parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, False, text[0], conclusion[1]))
                     if len(conclusion) == 1 and conclusion[0] != '':
-                        print(tmpPreLit1)
-                        parsedRules.add(Rules.Rules(tmpPreLit1, tmpCclLit, False, text[0]))
+                        parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, False, text[0]))
         return parsedRules
     else :
         print("pas de fichier KB.txt")
@@ -165,19 +164,19 @@ def element(f):
         if len(sous) > 1:
             premises = [sous[0].split(',')]
             conclusion = sous[1].split(' ')
-        
+
+            # extraire les chaînes de caractères dans premises
+            premises_str = []
+            for p in premises[0]:
+                if isinstance(p, str):
+                    premises_str.append(p)
+            premises = premises_str
+
+            # extraire les chaînes de caractères dans conclusion
+            conclusion_str = []
+            for c in conclusion:
+                if isinstance(c, str):
+                    conclusion_str.append(c)
+            conclusion = conclusion_str
+
     return text, premises, conclusion, fleche
-
-
-# [r1] ->a
-# [r2] d,b->c
-# [r3] !c->d
-# [r10] !c,b->!d
-# [r11] !c,d->!b
-# [r12] !d->c
-# [r4] a=>!d 0
-# [r5] =>b 1
-# [r6] =>!c 1
-# [r7] =>d 0
-# [r8] c=>e 0
-# [r9] !c=>!r4 0
