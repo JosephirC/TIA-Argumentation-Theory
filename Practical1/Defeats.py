@@ -94,9 +94,22 @@ def democraticLastLink(arg1, arg2):
         
     return False
         
+
+def searchForAttackedArguments(arg1, arg2):
+
+    if arg1.topRule.conclusion == arg2.topRule.conclusion.negate():
+        return arg2
+    else:
+        for subArg2 in arg2.subArguments:
+            if searchForAttackedArguments(arg1, subArg2):
+                return subArg2
+
 def elitistWeakestLink(arg1, arg2):
     allDefeasible1 = arg1.getAllDefeasible()
     allDefeasible2 = arg2.getAllDefeasible()
+
+    if not allDefeasible1:
+        return False
 
     for ruleArg1 in allDefeasible1:
         comparisonCounter = 0
@@ -117,9 +130,14 @@ def elitistWeakestLink(arg1, arg2):
 
             if comparisonCounter == len(allDefeasible2):
                 return True
+    
+    arg2AttackedArgument = searchForAttackedArguments(arg1, arg2)
+    if arg2AttackedArgument != arg2:
+        if elitistWeakestLink(arg1, arg2AttackedArgument):
+            return True
 
     return False
-        
+
 def elitistLastLink(arg1, arg2):
     allDefeasible1 = arg1.getLastDefeasible()
     allDefeasible2 = arg2.getLastDefeasible()

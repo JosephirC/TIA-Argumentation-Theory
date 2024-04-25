@@ -105,10 +105,10 @@ def main():
     printSorted(argumentBase)    
 
     defeasibleRules = set()
-    for arg in argumentBase:
-        print(f"argument {arg}")
-        defeasibleRules.update(arg.getAllDefeasible())
-        print("The defeasible rules : ")
+    # for arg in argumentBase:
+    #     print(f"argument {arg}")
+    #     defeasibleRules.update(arg.getAllDefeasible())
+    #     print("The defeasible rules : ")
 
     undercuts = generateUndercuts(argumentBase, rules)
     print("undercuts are : ", undercuts)
@@ -126,8 +126,8 @@ def main():
 
     for arg in argumentBase:
         print(arg)
-        # defeasibleRules = arg.getAllDefeasible()
-        defeasibleRules = arg.getLastDefeasible()
+        defeasibleRules = arg.getAllDefeasible()
+        # defeasibleRules = arg.getLastDefeasible()
         print("Les règles defeasibles: ")
         for rules in defeasibleRules:
             print(rules.name)
@@ -152,6 +152,8 @@ def main():
 
     # weightComparison = comparePreferred(preferred)
     # print("weightComparison: ", weightComparison)
+
+    print("\n")
     print("DEFEATS:")
     defeatWeakLink = defaultdict(set)
 
