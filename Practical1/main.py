@@ -6,6 +6,8 @@ from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts, generateRebuts
 from Defeats import makePreferred, comparePreferred, defeat
 from collections import defaultdict
+from parseAspartix import parseAttacks, parseRules, readKB
+from BurdenBasedSemantics import bur, addset
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -99,6 +101,7 @@ def main():
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     deb  = time.time()
     argumentBase = generateArgs(rules)
+    parseRules(rules)
     fin = time.time()
     print("temp", fin-deb)
 
@@ -169,6 +172,17 @@ def main():
         #     print(f'{arg1.name} -> {arg2.name}')
         # print()
 
+    parseAttacks(defeatWeakLink)
+    
+    parsedRules = set()
+    readKB(parsedRules)
+    for rule in parsedRules:
+        print(rule)
+    
+    bur = addset(argumentBase, rebuts, 5)
+    for b in bur:
+        print(b)
+    
 
 if __name__ == "__main__":
     main()
