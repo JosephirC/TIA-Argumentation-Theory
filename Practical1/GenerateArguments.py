@@ -60,7 +60,7 @@ def generateArgsFromRules(rules):
 def generateContrapositonRules(rules):
     rulesToAdd = set()
     for rule in rules:
-        if not rule.isDefeasible :
+        if not rule.isDefeasible and rule not in rules:
             rulesToAdd.update(rule.contraposition())
 
     rules.update(rulesToAdd)
@@ -68,6 +68,6 @@ def generateContrapositonRules(rules):
 
 def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
-    rulesWithNoArgs = generateInitialArguments(rules)
+    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
     generateArgsFromRules(rulesWithNoArgs)
     return argumentBase

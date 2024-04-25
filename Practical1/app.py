@@ -30,24 +30,6 @@ def genReg():
     file = request.files['file']
     if file:
         file.save(os.path.join('uploads', 'KB.txt'))
-    
-    readKB(parsedRules)
-    # for r in parsedRules:
-    #     print(r)
-    #     print('\n')
-    return render_template('index.html', parsedRules=parsedRules)
-
-@app.route('/calcArg',  methods=['GET'])
-def calcArg():
-    global arguments, arg, parsedRules, undercuts, rebuts
-
-    resetArgumentsBase()
-    Arguments.Arguments.nameCount = 0
-    
-    arguments = []
-    arg = []
-    undercuts = {}
-    rebuts = {}
 
     # a = Literals.Literals("a", True)
     # aF = Literals.Literals("a", False)
@@ -79,16 +61,33 @@ def calcArg():
     # rule7 = Rules.Rules({}, dF, True, r7, 0)
     # rule8 = Rules.Rules({cF}, eF, True, r8)
     # rule9 = Rules.Rules({c}, r4.negate(), True, r9)
-    # print(len(rules))
-    # rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+            
+    # parsedRules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    
+    readKB(parsedRules)
+    
+    return render_template('index.html', parsedRules=parsedRules)
+
+@app.route('/calcArg',  methods=['GET'])
+def calcArg():
+    global arguments, arg, parsedRules, undercuts, rebuts
+
+    resetArgumentsBase()
+    Arguments.Arguments.nameCount = 0
+    
+    arguments = []
+    arg = []
+    undercuts = {}
+    rebuts = {}
 
     # print(len(arguments))
     # print("mtn apres")
     arguments = generateArgs(parsedRules)
-    # print(len(arguments))
 
     arg = sorted(arguments, key=lambda arg: int(arg.name[1:]))
-    return render_template('index.html', arguments=arg)
+
+
+    return render_template('index.html', parsedRules=parsedRules, arguments=arg)
 
 @app.route('/calcAttaq',  methods=['GET'])
 def calcAttaq():

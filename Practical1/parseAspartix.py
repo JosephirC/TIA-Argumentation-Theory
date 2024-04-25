@@ -91,10 +91,16 @@ def readKB(parsedRules):
                     else:
                         tmpCclLit = Literals.Literals(conclusion[0].replace('!', ''), False)
                     if len(conclusion) > 1:
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, True, name, conclusion[1].replace('!', '')))
                     if len(conclusion) == 1:
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, True, name))
                 if len(premises) == 1:
                     if '!' in premises[0]:
@@ -106,10 +112,16 @@ def readKB(parsedRules):
                     else:
                         tmpCclLit = Literals.Literals(conclusion[0].replace('!', ''), False)
                     if len(conclusion) > 1:
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, name, conclusion[1].replace('!', '')))
                     if len(conclusion) == 1 and conclusion[0] != '':
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, name))
             if fleche == '->':
                 print()
@@ -129,10 +141,16 @@ def readKB(parsedRules):
                     else:
                         tmpCclLit = Literals.Literals(conclusion[0].replace('!', ''), False)
                     if len(conclusion) > 1:
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, name, conclusion[1].replace('!', '')))
                     if len(conclusion) == 1:
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, name))
                 if len(premises) == 1:
                     if '!' in premises[0]:
@@ -144,10 +162,16 @@ def readKB(parsedRules):
                     else:
                         tmpCclLit = Literals.Literals(conclusion[0].replace('!', ''), False)
                     if len(conclusion) > 1:
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, False, name, conclusion[1].replace('!', '')))
                     if len(conclusion) == 1 and conclusion[0] != '':
-                        name = Literals.Literals(text[0].replace('!', ''), False)
+                        nameIt = text[0].replace('!', '')
+                        nameIt = nameIt.replace('[', '')
+                        nameIt = nameIt.replace(']', '')
+                        name = Literals.Literals(nameIt, False)
                         parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, False, name))
         return parsedRules
     else :
@@ -187,5 +211,11 @@ def element(f):
                 if isinstance(c, str):
                     conclusion_str.append(c)
             conclusion = conclusion_str
+            
+    print("Text:", text)
+    print("Premises:", premises)    
+    print("Premises len:", len(premises))
+    print("Fleche:", fleche)
+    print("Conclusion:", conclusion)
 
     return text, premises, conclusion, fleche
