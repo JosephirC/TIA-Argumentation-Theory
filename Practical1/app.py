@@ -65,7 +65,7 @@ def genReg():
     # parsedRules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     
     readKB(parsedRules)
-    
+
     return render_template('index.html', parsedRules=parsedRules)
 
 @app.route('/calcArg',  methods=['GET'])
@@ -104,8 +104,8 @@ def calcDefeats():
     
     defeatWeakLink = defaultdict(set)
 
-    for rebut in parsedRules:
-        for (arg1, arg2) in parsedRules[rebut]:
+    for rebut in rebuts:
+        for (arg1, arg2) in rebuts[rebut]:
             defeatTuple = defeat(arg1, arg2, method, principal)
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
