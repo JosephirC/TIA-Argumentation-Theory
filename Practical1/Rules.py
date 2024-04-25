@@ -1,11 +1,14 @@
-import Literals
+from Literals import Literals
 
 class Rules:
+
+    ruleCount = 0
 
     def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
+        Rules.ruleCount += 1
         
         if weight is None:
             if isDefeasible:
@@ -68,7 +71,11 @@ class Rules:
             newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, self.name))
+            Rules.ruleCount += 1
+
+            rX = Literals("r" + str(Rules.ruleCount), self.name.isNeg)
+
+            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
         return newRules
 
