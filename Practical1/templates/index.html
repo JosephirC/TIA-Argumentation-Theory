@@ -5,8 +5,11 @@
     <title>FlaskBlog</title>
 </head>
 <body>
-   <h1>Notre super site de TIA</h1>
-   <input type="file" id="avatar" name="avatar" accept=".txt" />
+    <h1>Notre super site de TIA</h1>
+    <form action="/genReg" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".txt">
+        <button type="submit">Envoyer</button>
+    </form>
     <br>
     <a href="/calcArg">Calculer mes arguments</a>
     <ol>
@@ -14,6 +17,15 @@
         <li>{{i}}</li>
     {%endfor%}
     </ol>
+
+    {% if parsedRules %}
+    <h2>Pour vos règles</h2>
+    <ol>
+        {%for i in parsedRules%}
+            <li>{{i}}</li>
+        {%endfor%}
+    </ol>
+    {% endif %}
 
     {% if arguments %}
     <a href="/calcAttaq">Calculer mes attaques</a>
@@ -34,7 +46,7 @@
             <li>Pour {{ key }} il y a {{ value|length }} arguments :</li>
             <ul>
                 {% for arg1, arg2 in value %}
-                    <li>{{ arg1.name }} -> {{ arg2.name }}</li>
+                    <li>({{ arg1.name }}, {{ arg2.name }})</li>
                 {% endfor %}
             </ul>
         {% endfor %}
@@ -56,6 +68,7 @@
 
         <button type="submit">Calculer mes defeats</button>
     </form>
+
         {% if defeatWeakLink %}
             <h2>Pour vos défaites</h2>
             <ul>
@@ -71,5 +84,13 @@
             <br/>
         {% endif %}
     {% endif %}
+
+    <p>
+        <h1>Groupe 19</h1>
+        <li>Arthur DESBIAUX</li>
+        <li>Youssef ABIDA</li>
+        <li>Olivia CHEN</li>
+        <li>Imane GARA</li>
+    </p>
 
 </html>
