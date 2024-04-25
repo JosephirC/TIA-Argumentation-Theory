@@ -180,39 +180,3 @@ def element(f):
             conclusion = conclusion_str
 
     return text, premises, conclusion, fleche
-
-# def element(f):
-#     regle = f.strip()
-#     text = []
-#     sous = []
-#     premises = []
-#     conclusion = []
-#     fleche = ''
-#     elements = regle.split(' ', 1)
-#     if len(elements) > 1:
-#         text.append(elements[0])
-#         if '=>' in elements[1]:
-#             sous = elements[1].split('=>',1)
-#             fleche = '=>'
-#         else:
-#             sous = elements[1].split('->',1)
-#             fleche = '->'
-#         if len(sous) > 1:
-#             premises = [sous[0].split(',')]
-#             conclusion = sous[1].split(' ')
-        
-#     return text, premises, conclusion, fleche
-
-
-# [r1] ->a
-# [r2] d,b->c
-# [r3] !c->d
-# [r10] !c,b->!d
-# [r11] !c,d->!b
-# [r12] !d->c
-# [r4] a=>!d 0
-# [r5] =>b 1
-# [r6] =>!c 1
-# [r7] =>d 0
-# [r8] c=>e 0
-# [r9] !c=>!r4 0
