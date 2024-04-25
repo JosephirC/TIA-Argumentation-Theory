@@ -101,8 +101,7 @@ def main():
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     deb  = time.time()
     argumentBase = generateArgs(rules)
-    for rule in rules:
-        print(rule)
+    parseRules(rules)
     fin = time.time()
     print("temp", fin-deb)
 
@@ -172,8 +171,8 @@ def main():
         print()
 
     parseAttacks(defeatWeakLink)
-    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    parseRules(rules)
+    # rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    
 
     bur = addset(argumentBase, rebuts, 5)
     for b in bur:

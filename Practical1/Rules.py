@@ -76,8 +76,6 @@ class Rules:
             newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            Rules.ruleCount += 1
-
             rX = Literals("r" + str(Rules.ruleCount), self.name.isNeg)
 
             newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
@@ -89,5 +87,5 @@ class Rules:
         This method is used to create a copy of a rule object without incrementing the ruleCount.
         """
 
-        Rules.ruleCount -=1 
+        # Rules.ruleCount -=1 
         return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.name)
