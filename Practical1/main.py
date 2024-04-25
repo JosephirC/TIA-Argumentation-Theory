@@ -6,7 +6,7 @@ from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts, generateRebuts
 from Defeats import makePreferred, comparePreferred, defeat
 from collections import defaultdict
-from parseAspartix import parseAttacks
+from parseAspartix import parseAttacks, parseRules
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -169,6 +169,8 @@ def main():
         print()
 
     parseAttacks(defeatWeakLink)
+    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    parseRules(rules)
 
 if __name__ == "__main__":
     main()
