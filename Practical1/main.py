@@ -101,7 +101,7 @@ def main():
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     deb  = time.time()
     argumentBase = generateArgs(rules)
-    # parseRules(rules)
+    parseRules(rules)
     fin = time.time()
     print("temp", fin-deb)
 

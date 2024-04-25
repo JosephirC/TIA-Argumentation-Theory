@@ -56,7 +56,7 @@ class Rules:
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
-            ruleImplication = "=> "
+            ruleImplication = "=>"
             ruleWeight = str(self.weight)
         else:
             ruleImplication = "->"
