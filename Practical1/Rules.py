@@ -38,7 +38,10 @@ class Rules:
     
     # handle print of the class
     def __str__(self):
-        ruleName = "[" + str(self.name) + "] "
+        if "[" in str(self.name) and "]" in str(self.name):
+            ruleName = self.name
+        else: 
+            ruleName = "[" + str(self.name) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""

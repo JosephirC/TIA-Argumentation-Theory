@@ -1,5 +1,5 @@
 import os
-from GenerateArguments import generateContrapositonRules
+import Rules
 
 """
 parse and write in the file aspartix.txt
@@ -56,8 +56,56 @@ def parseRules(rules):
             fichier.write(chaine + "\n")             
     fichier.close()
 
-def readKB():
+def readKB(parsedRules):
     if os.path.exists('KB.txt'):
         fichier = open('KB.txt', 'r')
+        for f in fichier:
+            [text, premises, conclusion, fleche] = element(f)
+            # print(text, premises, fleche, conclusion)
+            if fleche == "=>":
+                if len(premises) > 1:
+                    if len(conclusion) > 1:
+                        parsedRules.add(Rules.Rules({premises[0], premises[1]}, conclusion[0], True, text[0], conclusion[1]))
+                    if len(conclusion) == 1:
+                        parsedRules.add(Rules.Rules({premises[0], premises[1]}, conclusion[0], True, text[0]))
+                if len(premises) == 1:
+                    if len(conclusion) > 1:
+                        parsedRules.add(Rules.Rules(premises[0], conclusion[0], True, text[0], conclusion[1]))
+                    if len(conclusion) == 1:
+                        parsedRules.add(Rules.Rules(premises[0], conclusion[0], True, text[0]))
+            if fleche == '->':
+                if len(premises) > 1:
+                    if len(conclusion) > 1:
+                        parsedRules.add(Rules.Rules({premises[0], premises[1]}, conclusion[0], False, text[0], conclusion[1]))
+                    if len(conclusion) == 1:
+                        parsedRules.add(Rules.Rules({premises[0], premises[1]}, conclusion[0], False, text[0]))
+                if len(premises) == 1:
+                    if len(conclusion) > 1:
+                        parsedRules.add(Rules.Rules(premises[0], conclusion[0], False, text[0], conclusion[1]))
+                    if len(conclusion) == 1:
+                        parsedRules.add(Rules.Rules(premises[0], conclusion[0], False, text[0]))
+        return parsedRules
+    else :
+        print("pas de fichier KB.txt")
 
-    print("pas de fichier KB.txt")
+def element(f):
+    regle = f.strip()
+    text = []
+    sous = []
+    premises = []
+    conclusion = []
+    fleche = ''
+    elements = regle.split(' ', 1)
+    if len(elements) > 1:
+        text.append(elements[0])
+        if '=>' in elements[1]:
+            sous = elements[1].split('=>',1)
+            fleche = '=>'
+        else:
+            sous = elements[1].split('->',1)
+            fleche = '->'
+        if len(sous) > 1:
+            premises = [sous[0].split(',')]
+            conclusion = sous[1].split(' ')
+        
+    return text, premises, conclusion, fleche
