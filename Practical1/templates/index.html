@@ -15,6 +15,7 @@
     {%endfor%}
     </ol>
 
+    {% if arguments %}
     <a href="/calcAttaq">Calculer mes attaques</a>
     {% if undercuts %}
     <h2>Pour vos undercut</h2>
@@ -23,6 +24,7 @@
             <li>{{i}}</li>
         {%endfor%}
     </ol>
+    {% endif %}
     {% endif %}
 
     {% if rebuts %}
@@ -37,6 +39,37 @@
             </ul>
         {% endfor %}
     </ul>
-{% endif %}
+    <br/>
+
+    <form action="/calcDefeats" method="post">
+        <label for="method">Méthode :</label>
+        <select name="method" id="method">
+            <option value="democratic">democratic</option>
+            <option value="elitist">elitist</option>
+        </select>
+
+        <label for="principal">Principal :</label>
+        <select name="principal" id="principal">
+            <option value="weakest-link">weakest-link</option>
+            <option value="last-link">last-link</option>
+        </select>
+
+        <button type="submit">Calculer mes defeats</button>
+    </form>
+        {% if defeatWeakLink %}
+            <h2>Pour vos défaites</h2>
+            <ul>
+                {% for key, value in defeatWeakLink.items() %}
+                    <li>Pour {{ key }} il y a {{ value|length }} arguments :</li>
+                    <ul>
+                        {% for arg1, arg2 in value %}
+                            <li>{{ arg1.name }} -> {{ arg2.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+            <br/>
+        {% endif %}
+    {% endif %}
 
 </html>

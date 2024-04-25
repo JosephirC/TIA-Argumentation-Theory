@@ -1,15 +1,19 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import Literals
 import Rules
 import Arguments
 from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts, generateRebuts
+from Defeats import defeat
+from collections import defaultdict
 
 app = Flask(__name__)
 
 arguments = []
 arg = []
 rules = {}
+undercuts = {}
+rebuts = {}
 
 @app.route('/')
 def index():
@@ -17,10 +21,18 @@ def index():
 
 @app.route('/calcArg',  methods=['GET'])
 def calcArg():
-    global arguments, arg, rules 
+    global arguments, arg, rules, undercuts, rebuts
     arguments = []
     arg = []
     rules = {}
+    undercuts = {}
+    rebuts = {}
+
+    print(len(arguments))
+    print(len(arg))
+    print(len(rules))
+    print(len(undercuts))
+    print(len(rebuts))
 
     a = Literals.Literals("a", True)
     aF = Literals.Literals("a", False)
@@ -53,15 +65,31 @@ def calcArg():
     rule8 = Rules.Rules({cF}, eF, True, r8)
     rule9 = Rules.Rules({c}, r4.negate(), True, r9)
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    print(len(arguments))
+    print("mtn apres")
     arguments = generateArgs(rules)
+    print(len(arguments))
     arg = sorted(arguments, key=lambda arg: int(arg.name[1:]))
     return render_template('index.html', arguments=arg)
 
 @app.route('/calcAttaq',  methods=['GET'])
 def calcAttaq():
-   global arguments, arg, rules
+   global arguments, arg, rules, undercuts, rebuts
    undercuts = generateUndercuts(arguments, rules)
-   print(undercuts)
    rebuts = generateRebuts(arguments)
-   print(rebuts)
    return render_template('index.html', arguments=arg, undercuts=undercuts, rebuts=rebuts)
+
+@app.route('/calcDefeats', methods=['POST'])
+def calcDefeats():
+    global arguments, arg, rules, undercuts, rebuts
+    method = request.form['method']
+    principal = request.form['principal']
+    
+    defeatWeakLink = defaultdict(set)
+
+    for rebut in rebuts:
+        for (arg1, arg2) in rebuts[rebut]:
+            defeatTuple = defeat(arg1, arg2, method, principal)
+            if defeatTuple is not None:
+                defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
+    return render_template('index.html', arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink)
