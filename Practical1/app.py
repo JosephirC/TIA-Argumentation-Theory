@@ -86,7 +86,6 @@ def calcArg():
 
     arg = sorted(arguments, key=lambda arg: int(arg.name[1:]))
 
-
     return render_template('index.html', parsedRules=parsedRules, arguments=arg)
 
 @app.route('/calcAttaq',  methods=['GET'])
@@ -94,7 +93,7 @@ def calcAttaq():
    global arguments, arg, parsedRules, undercuts, rebuts
    undercuts = generateUndercuts(arguments, parsedRules)
    rebuts = generateRebuts(arguments)
-   return render_template('index.html', arguments=arg, undercuts=undercuts, rebuts=rebuts)
+   return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts)
 
 @app.route('/calcDefeats', methods=['POST'])
 def calcDefeats():
@@ -109,4 +108,4 @@ def calcDefeats():
             defeatTuple = defeat(arg1, arg2, method, principal)
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
-    return render_template('index.html', arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink)
+    return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink)
