@@ -76,10 +76,12 @@ class Arguments:
     
     def getAllDefeasible(self):
         rulesDefeasible = set()
-        if(self.topRule.isDefeasible):
+
+        if (self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
         for arg in self.subArguments:
                 rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
+                
         return rulesDefeasible
 
 

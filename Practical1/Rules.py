@@ -4,20 +4,21 @@ class Rules:
 
     ruleCount = 0
 
-    def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
+    def __init__(self, premises, conclusion, isDefeasible, literal, weight=0):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
         
-        if weight is None:
-            if isDefeasible:
-                if len(premises) == 0:
-                    self.weight = 1
-                else:
-                    self.weight = 0
-        else:
-            self.weight = weight
+        # if weight is None:
+        #     if isDefeasible:
+        #         if len(premises) == 0:
+        #             self.weight = 1
+        #         else:
+        #             self.weight = 0
+        # else:
+        self.weight = weight
+        
 
         self.name : Literals = literal
 
@@ -38,7 +39,10 @@ class Rules:
     
     # handle print of the class
     def __str__(self):
-        ruleName = "[" + str(self.name) + "] "
+        if "[" in str(self.name) and "]" in str(self.name):
+            ruleName = self.name
+        else: 
+            ruleName = "[" + str(self.name) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""
@@ -53,7 +57,7 @@ class Rules:
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
-            ruleImplication = "=> "
+            ruleImplication = "=>"
             ruleWeight = str(self.weight)
         else:
             ruleImplication = "->"
@@ -76,8 +80,9 @@ class Rules:
             newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            rX = Literals("r" + str(Rules.ruleCount), self.name.isNeg)
-
+            compt = Rules.ruleCount
+            compt = compt + 1
+            rX = Literals("r" + str(compt), self.name.isNeg)
             newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
         return newRules

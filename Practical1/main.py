@@ -8,6 +8,7 @@ from Defeats import makePreferred, comparePreferred, defeat
 from collections import defaultdict
 from parseAspartix import parseAttacks, parseRules
 from ExportArguments import exportArguments
+from parseAspartix import parseAttacks, readKB
 from BurdenBasedSemantics import bur, addset
 
 def printSorted(argumentBase):
@@ -103,17 +104,17 @@ def main():
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     deb  = time.time()
     argumentBase = generateArgs(rules)
-    parseRules(rules)
+    # parseRules(rules)
     fin = time.time()
     print("temp", fin-deb)
     
     printSorted(argumentBase)    
 
     defeasibleRules = set()
-    for arg in argumentBase:
-        print(f"argument {arg}")
-        defeasibleRules.update(arg.getAllDefeasible())
-        print("The defeasible rules : ")
+    # for arg in argumentBase:
+    #     print(f"argument {arg}")
+    #     defeasibleRules.update(arg.getAllDefeasible())
+    #     print("The defeasible rules : ")
 
     undercuts = generateUndercuts(argumentBase, rules)
     print("undercuts are : ", undercuts)
@@ -128,7 +129,7 @@ def main():
     print()
 
     print("\nundercuts done \n")
-
+    defeasibleRulesSize = 0
     for arg in argumentBase:
         print(arg)
         # defeasibleRules = arg.getAllDefeasible()
@@ -137,7 +138,10 @@ def main():
         for rules in defeasibleRules:
             print(rules.name)
         print("\n")
-    
+
+        # print("lengeth of defeasible rules: ", len(defeasibleRules))
+
+
     print("\n")
     print("REBUTS:")
     rebuts = generateRebuts(argumentBase)
@@ -156,36 +160,35 @@ def main():
 
     # weightComparison = comparePreferred(preferred)
     # print("weightComparison: ", weightComparison)
+
+    print("\n")
     print("DEFEATS:")
     defeatWeakLink = defaultdict(set)
 
     for rebut in rebuts:
         for (arg1, arg2) in rebuts[rebut]:
-            defeatTuple = defeat(arg1, arg2, "elitist", "weakest-link")
+            defeatTuple = defeat(arg1, arg2, "democratic", "weakest-link")
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
     
     for key in defeatWeakLink:
         print(f'For {key.isNeg} {key.name} len {len(defeatWeakLink[key])} :')
-        for (arg1, arg2) in defeatWeakLink[key]:
-            print(f'{arg1.name} -> {arg2.name}')
-        print()
+        # for (arg1, arg2) in defeatWeakLink[key]:
+        #     print(f'{arg1.name} -> {arg2.name}')
+        # print()
 
     parseAttacks(defeatWeakLink)
-    # rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     
-    exportArguments(argumentBase)
-
+    print()
+    parsedRules = set()
+    readKB(parsedRules)
+    print("nouvelle règle")
+    for rule in parsedRules:
+        print(rule)
+    
     bur = addset(argumentBase, rebuts, 5)
     for b in bur:
         print(b)
-
-    
-
-    bur = addset(argumentBase, rebuts, 5)
-    for b in bur:
-        print(b)
-
     
 
 if __name__ == "__main__":
