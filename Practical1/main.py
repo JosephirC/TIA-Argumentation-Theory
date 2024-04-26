@@ -10,6 +10,7 @@ from parseAspartix import parseAttacks, parseRules
 from ExportArguments import exportArguments
 from parseAspartix import parseAttacks, readKB
 from BurdenBasedSemantics import bur, rank_arguments
+from GenerateAttacks import generateRebuts
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -189,13 +190,18 @@ def main():
     # bur = addset(argumentBase, rebuts, 5)
     # for b in bur:
     #     print(b)
+    # Define rebuts based on your rules and arguments
+    rebutsBr = generateRebuts(argumentBase)
 
-    print()
-    ranked_arguments = rank_arguments(argumentBase, rebuts)
 
-    for arg in ranked_arguments.values:
+    print("ranked arguments")
+    ranked_arguments, ranks = rank_arguments(argumentBase, rebutsBr)
+
+    for arg in ranked_arguments:
         print(arg)
     
+    for rank in ranks:
+        print("rank:", rank)
 
 if __name__ == "__main__":
     main()
