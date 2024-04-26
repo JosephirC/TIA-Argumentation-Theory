@@ -7,7 +7,7 @@ from GenerateAttacks import generateUndercuts, generateRebuts
 from Defeats import makePreferred, comparePreferred, defeat
 from collections import defaultdict
 from parseAspartix import parseAttacks, readKB
-from BurdenBasedSemantics import bur, addset
+from BurdenBasedSemantics import bur, rank_arguments
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -183,9 +183,15 @@ def main():
     for rule in parsedRules:
         print(rule)
     
-    bur = addset(argumentBase, rebuts, 5)
-    for b in bur:
-        print(b)
+    # bur = addset(argumentBase, rebuts, 5)
+    # for b in bur:
+    #     print(b)
+
+    print()
+    ranked_arguments = rank_arguments(argumentBase, rebuts)
+
+    for arg in ranked_arguments.values:
+        print(arg)
     
 
 if __name__ == "__main__":
