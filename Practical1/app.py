@@ -6,6 +6,7 @@ from GenerateArguments import generateArgs, resetArgumentsBase
 from GenerateAttacks import generateUndercuts, generateRebuts
 from parseAspartix import readKB
 from Defeats import defeat
+from BurdenBasedSemantics import calculate_bur_values1
 from collections import defaultdict
 import os
 
@@ -16,6 +17,7 @@ arg = []
 parsedRules = set()
 undercuts = {}
 rebuts = {}
+defeatWeakLink = defaultdict(set)
 
 @app.route('/')
 def index():
@@ -97,7 +99,7 @@ def calcAttaq():
 
 @app.route('/calcDefeats', methods=['POST'])
 def calcDefeats():
-    global arguments, arg, parsedRules, undercuts, rebuts
+    global arguments, arg, parsedRules, undercuts, rebuts, defeatWeakLink
     method = request.form['method']
     principal = request.form['principal']
     
@@ -109,3 +111,14 @@ def calcDefeats():
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
     return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink)
+
+
+@app.route('/calcRanking', methods=['POST'])
+def calcRanking():
+    global arguments, arg, parsedRules, undercuts, rebuts, defeatWeakLink
+    
+    iteration = request.form['rankIteration']
+
+    ranking = calculate_bur_values1(arguments, defeatWeakLink, int(iteration))
+
+    return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink, ranking=ranking)
