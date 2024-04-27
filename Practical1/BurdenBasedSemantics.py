@@ -1,6 +1,8 @@
 from collections import defaultdict
 burden = set()
+dico_temp = {
 
+}
 # def bur(arg, i):
 #     b = 0
 #     if i == 0:
@@ -82,15 +84,57 @@ def burden(argument_base, arg, i, defeats):
 
         return burned_value
 
-# result not sorted
-def calculate_bur_values1(argument_base, defeats, depth):
-    bur_values = {}
+def get_attack(arg, defeats):
+    attack = set()
+    for key in defeats:
+        for (arg1, arg2) in defeats[key]:
+            if arg2.name == arg.name:
+                attack.add(arg1)
 
+    return attack
+
+def init(argument_base):
     for arg in argument_base:
-        bur_value = burden(argument_base, arg, depth, defeats)
-        bur_values[arg] = bur_value
+        dico_temp[arg.name] = [1]
 
-    return bur_values
+def burden2(argument_base, defeats, i):
+    if i == 0:
+        init(argument_base)
+    else:
+        for arg in argument_base:
+            attack = get_attack(arg, defeats)
+            somme = 0
+            for a in attack:
+                somme = somme + (1 / dico_temp[a.name][i-1])
+
+            dico_temp[arg.name].append(somme + 1)
+
+def custom_compare(entry):
+    return entry[1:]
+
+def calculate_bur_values1(argument_base, defeats, depth):
+    dico_temp.clear()
+
+    for i in range(depth): 
+        burden2(argument_base, defeats, i)
+
+    sorted_dico_temp = sorted(dico_temp.items(), key=custom_compare)
+
+    for s in sorted_dico_temp:
+        print(s)
+
+    return sorted_dico_temp
+
+
+# result not sorted
+# def calculate_bur_values1(argument_base, defeats, depth):
+#     bur_values = {}
+
+#     for arg in argument_base:
+#         bur_value = burden(argument_base, arg, depth, defeats)
+#         bur_values[arg] = bur_value
+
+#     return bur_values
 
 # sort the result
 def calculate_bur_values(argument_base, defeats, depth):

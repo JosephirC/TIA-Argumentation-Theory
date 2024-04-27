@@ -201,9 +201,11 @@ def main():
     # # for arg in ranked_arguments:
     # #     print(arg)
     
-    # # for rank in ranks:
-    # #     print("rank:", rank)
-
+    # for rank in ranks:
+    #     print("rank:", rank)
+    t = calculate_bur_values1(argumentBase, defeatWeakLink, 5)
+    for x in t:
+        print(x[0])
     # burned_values1 = calculate_bur_values1(argumentBase, defeatWeakLink, 4)
     # for arg, bur_value in burned_values1.items():
     #     print(f"Arg: {arg.name}, Rank: {bur_value}")
