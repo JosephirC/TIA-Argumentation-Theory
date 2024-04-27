@@ -206,3 +206,27 @@ def defeat(arg1, arg2, method, principal):
         if (elitistLastLink(arg1, arg2)):
             return (arg1, arg2)
     return None
+
+def genHisto(defeatWeakLink, nbrArg):
+    attack = {}
+    for key in defeatWeakLink:
+        for (arg1, arg2) in defeatWeakLink[key]:
+            if arg2 not in attack:
+                attack[arg2] = 1
+            else:
+                attack[arg2] += 1
+    
+    histo = {}
+    for attaque in attack.values():
+        if attaque not in histo:
+            histo[attaque] = 1
+        else:
+            histo[attaque] += 1
+    compt = 0
+
+    for key in histo:
+        compt = compt + histo[key]
+
+    histo[0] = nbrArg - compt
+
+    return histo
