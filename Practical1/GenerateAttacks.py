@@ -34,8 +34,11 @@ def generateUndercuts(argumentBase, rules):
     return undercuts
 
 def generateRebuts(argumentBase):
-    for arg in argumentBase:
-        for other_arg in argumentBase:
+
+    sortedArgBase = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
+
+    for arg in sortedArgBase:
+        for other_arg in sortedArgBase:
             conclusionCopy = arg.topRule.conclusion.copy()
             conclusionCopy = conclusionCopy.negate()
             if conclusionCopy.name == other_arg.topRule.conclusion.name and conclusionCopy == other_arg.topRule.conclusion:
@@ -49,7 +52,14 @@ def generateRebuts(argumentBase):
                         rebuts[arg.topRule.conclusion].add(paire)
                         break
 
-    return rebuts
+    sortedRebuts = defaultdict(list)
+    sorted_keys = sorted(rebuts.keys(), key=lambda arg: arg.name)
+
+    for key in sorted_keys:
+        sortedRebuts[key] = sorted(rebuts[key], key=lambda x: (int(x[0].name[1:]), int(x[1].name[1:])))
+
+    return sortedRebuts
+
 
 def subArgConclusion(args):
     subConclusion = set()

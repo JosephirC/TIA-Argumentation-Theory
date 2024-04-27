@@ -99,6 +99,7 @@ def main():
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     deb  = time.time()
     argumentBase = generateArgs(rules)
+
     fin = time.time()
     print("temp", fin-deb)
 
@@ -125,15 +126,15 @@ def main():
     print("\nundercuts done \n")
     defeasibleRulesSize = 0
     for arg in argumentBase:
-        print(arg)
-        # defeasibleRules = arg.getAllDefeasible()
-        defeasibleRules = arg.getLastDefeasible()
-        print("Les règles defeasibles: ")
-        for rules in defeasibleRules:
-            print(rules.name)
-        print("\n")
+        # defeasibleRules = arg.getLastDefeasible()
+        defeasibleRules = arg.getAllDefeasible()
+        defeasibleRuleNames = []
+        for rule in defeasibleRules:
+            defeasibleRulesSize += 1
+            defeasibleRuleNames.append(rule.name.name)
+        print(arg.name + " : " + ", ".join(defeasibleRuleNames))
 
-        # print("lengeth of defeasible rules: ", len(defeasibleRules))
+    print("length of defeasible rules: ", defeasibleRulesSize)
 
 
     print("\n")
@@ -146,30 +147,34 @@ def main():
         print()
     
     print("\n")
-    # rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    print("PREFERRED:")
+    rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
     
-    # preferred = makePreferred(rules)
-    # for key in preferred:   
-    #     print(f"key: {key} value: {preferred[key]}")
+    preferred = makePreferred(rules)
+    for key in preferred:   
+        print(f"key: {key} value: {preferred[key]}")
 
-    # weightComparison = comparePreferred(preferred)
-    # print("weightComparison: ", weightComparison)
+    weightComparison = comparePreferred(preferred)
+    print("weightComparison: ", weightComparison)
 
     print("\n")
     print("DEFEATS:")
-    defeatWeakLink = defaultdict(set)
+    # defeatWeakLink = defaultdict(set)
+    defeatWeakLink = defaultdict(list)
 
     for rebut in rebuts:
         for (arg1, arg2) in rebuts[rebut]:
             defeatTuple = defeat(arg1, arg2, "democratic", "weakest-link")
             if defeatTuple is not None:
-                defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
+                # defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
+                defeatWeakLink[arg1.topRule.conclusion].append(defeatTuple)
     
     for key in defeatWeakLink:
-        print(f'For {key.isNeg} {key.name} len {len(defeatWeakLink[key])} :')
-        # for (arg1, arg2) in defeatWeakLink[key]:
-        #     print(f'{arg1.name} -> {arg2.name}')
-        # print()
+        print(f'For {not key.isNeg} {key.name} : {len(defeatWeakLink[key])}')
+        for (arg1, arg2) in defeatWeakLink[key]:
+            print(f'{arg1.name} -> {arg2.name}')
+        print()
+
 
 
 if __name__ == "__main__":

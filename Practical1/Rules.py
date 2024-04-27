@@ -10,13 +10,6 @@ class Rules:
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
         
-        # if weight is None:
-        #     if isDefeasible:
-        #         if len(premises) == 0:
-        #             self.weight = 1
-        #         else:
-        #             self.weight = 0
-        # else:
         self.weight = weight
         
 
@@ -72,10 +65,9 @@ class Rules:
             newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            Rules.ruleCount += 1
-
-            rX = Literals("r" + str(Rules.ruleCount), self.name.isNeg)
-
+            compt = Rules.ruleCount
+            compt = compt + 1
+            rX = Literals("r" + str(compt), self.name.isNeg)
             newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
         return newRules

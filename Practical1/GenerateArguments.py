@@ -28,13 +28,12 @@ def findCombinations(targetValues):
 
         return validCombinations
 
-def generateArgsFromRules(rules):
+def generateArgsFromRules(rules):  
     argToAdd = set()
     for rule in rules:
         timeStart = time.time()
         combination = findCombinations(rule.premises) 
         timeEnd = time.time()
-        print("time to find combinations : ", timeEnd - timeStart)
         for subArg in combination:
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
@@ -54,13 +53,16 @@ def generateArgsFromRules(rules):
         generateArgsFromRules(rules)
 
 def generateContrapositonRules(rules):
-    rulesToAdd = set()
+    sortedRules = []
+    rulesToAdd = []
     for rule in rules:
         if not rule.isDefeasible :
-            rulesToAdd.update(rule.contraposition())
+            rulesToAdd.extend(rule.contraposition())
 
-    rules.update(rulesToAdd)
-    return rules
+    sortedRules = sorted(rules, key=lambda rule: rule.name.name)
+    sortedRules.extend(sorted(rulesToAdd, key=lambda rule: rule.name.name))
+
+    return sortedRules
 
 def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
