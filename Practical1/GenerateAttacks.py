@@ -1,6 +1,7 @@
 from Literals import Literals
 from collections import defaultdict
 
+
 undercuts = set()
 rebuts = defaultdict(set)
 
