@@ -9,10 +9,7 @@ class Rules:
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        
         self.weight = weight
-        
-
         self.name : Literals = literal
 
     # Handle equality between objects.
@@ -20,14 +17,22 @@ class Rules:
     def __eq__(self, other):
         if not isinstance(other, Rules):
             return False
-        return ((self.premises == other.premises 
+        if self.weight is not None:
+            return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible
                 and self.weight == other.weight))
+        else :
+            return ((self.premises == other.premises 
+                and self.conclusion == other.conclusion 
+                and self.isDefeasible == other.isDefeasible))
     
     # handle print of the class
     def __str__(self):
-        ruleName = "[" + str(self.name) + "] "
+        if "[" in str(self.name) and "]" in str(self.name):
+            ruleName = self.name
+        else: 
+            ruleName = "[" + str(self.name) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""
@@ -42,7 +47,7 @@ class Rules:
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
-            ruleImplication = "=> "
+            ruleImplication = "=>"
             ruleWeight = str(self.weight)
         else:
             ruleImplication = "->"
@@ -77,5 +82,5 @@ class Rules:
         This method is used to create a copy of a rule object without incrementing the ruleCount.
         """
 
-        Rules.ruleCount -=1 
+        # Rules.ruleCount -=1 
         return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.name)

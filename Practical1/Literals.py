@@ -24,3 +24,4 @@ class Literals:
     
     def copy(self):
         return Literals(self.name, self.isNeg)
+    

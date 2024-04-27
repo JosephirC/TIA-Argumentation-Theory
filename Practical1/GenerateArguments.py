@@ -3,6 +3,10 @@ import time
 
 argumentBase = set()
 
+def resetArgumentsBase():
+    global argumentBase
+    argumentBase = set()
+
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
@@ -28,13 +32,13 @@ def findCombinations(targetValues):
 
         return validCombinations
 
-def generateArgsFromRules(rules):  
+def generateArgsFromRules(rules):
     argToAdd = set()
     for rule in rules:
-        timeStart = time.time()
+        # timeStart = time.time()
         combination = findCombinations(rule.premises) 
-        timeEnd = time.time()
-        print("time to find combinations : ", timeEnd - timeStart)
+        # timeEnd = time.time()
+        # print("time to find combinations : ", timeEnd - timeStart)
         for subArg in combination:
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
@@ -59,6 +63,15 @@ def generateContrapositonRules(rules):
     for rule in rules:
         if not rule.isDefeasible :
             rulesToAdd.extend(rule.contraposition())
+
+    for r in rulesToAdd:
+        exists = False
+        for existingRules in rules:
+            if r.premises == existingRules.premises and r.conclusion == existingRules.conclusion:
+                exists = True
+                break
+        if not exists:
+            rules.update(rulesToAdd)
 
     sortedRules = sorted(rules, key=lambda rule: rule.name.name)
     sortedRules.extend(sorted(rulesToAdd, key=lambda rule: rule.name.name))
