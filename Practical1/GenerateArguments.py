@@ -34,6 +34,7 @@ def generateArgsFromRules(rules):
         timeStart = time.time()
         combination = findCombinations(rule.premises) 
         timeEnd = time.time()
+        print("time to find combinations : ", timeEnd - timeStart)
         for subArg in combination:
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
