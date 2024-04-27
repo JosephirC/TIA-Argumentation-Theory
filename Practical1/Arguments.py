@@ -85,19 +85,25 @@ class Arguments:
         return rulesDefeasible
 
 
-# si la top rule n'est pas 
     def getLastDefeasible(self):
         rulesDefeasible = set()
         if(self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
-        elif self.topRule.isDefeasible == False: # demander au prof cette partie du last defeasible
+        elif self.topRule.isDefeasible == False:
             for arg in self.subArguments:
                 rulesDefeasible = rulesDefeasible.union(arg.getLastDefeasible())
 
         return rulesDefeasible
 
+    # def getAllSubArg(self):
+    #     allSubArgs = set()
+    #     for arg in self.subArguments:
+    #         allSubArgs.add(arg)
+    #     return allSubArgs
+    
     def getAllSubArg(self):
-        rulesDefeasible = set()
+        allSubArgs = set()
         for arg in self.subArguments:
-            rulesDefeasible.add(arg)
-        return rulesDefeasible
+            allSubArgs.add(arg)
+            allSubArgs = allSubArgs.union(arg.getAllSubArg())
+        return allSubArgs

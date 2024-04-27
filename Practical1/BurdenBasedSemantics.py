@@ -118,7 +118,13 @@ def calculate_bur_values1(argument_base, defeats, depth):
     for i in range(depth): 
         burden2(argument_base, defeats, i)
 
-    return sorted(dico_temp.items(), key=custom_compare)
+    sorted_dico_temp = sorted(dico_temp.items(), key=custom_compare)
+
+    for s in sorted_dico_temp:
+        print(s)
+
+    return sorted_dico_temp
+
 
 # result not sorted
 # def calculate_bur_values1(argument_base, defeats, depth):

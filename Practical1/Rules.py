@@ -9,17 +9,7 @@ class Rules:
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        
-        # if weight is None:
-        #     if isDefeasible:
-        #         if len(premises) == 0:
-        #             self.weight = 1
-        #         else:
-        #             self.weight = 0
-        # else:
         self.weight = weight
-        
-
         self.name : Literals = literal
 
     # Handle equality between objects.
@@ -27,16 +17,12 @@ class Rules:
     def __eq__(self, other):
         if not isinstance(other, Rules):
             return False
-        if self.weight is not None:
+        else:
             return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible
                 and self.weight == other.weight))
-        else :
-            return ((self.premises == other.premises 
-                and self.conclusion == other.conclusion 
-                and self.isDefeasible == other.isDefeasible))
-    
+
     # handle print of the class
     def __str__(self):
         if "[" in str(self.name) and "]" in str(self.name):
