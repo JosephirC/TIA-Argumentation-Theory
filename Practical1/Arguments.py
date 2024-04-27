@@ -11,6 +11,8 @@ class Arguments:
         self.name = "A" + str(Arguments.nameCount)
 
     def __eq__(self, other):
+        if not isinstance(other, Arguments):
+            return False
         return (self.topRule.conclusion == other.topRule.conclusion
                 and self.subArguments == other.subArguments)
 
@@ -26,15 +28,15 @@ class Arguments:
 
         # Extracting all sub arguments and putting them in a list
         for subArgument in self.subArguments:
-            for argument in subArgument.setOfArguemnts():
-                argumentSubArgumentsList.append(argument)
+            # for argument in subArgument.setOfArguemnts():
+            argumentSubArgumentsList.append(subArgument)
 
         # Extracting unique arguments from the list
-        argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
+        # argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
 
         # Creating the string of unique sub arguments
         for argument in argumentSubArgumentsList:
-            argumentSubArguments = argumentSubArguments + argument + ","
+            argumentSubArguments = argumentSubArguments + argument.name + ","
 
         argumentSubArguments = argumentSubArguments[:-1] + " "
 
@@ -74,20 +76,34 @@ class Arguments:
     
     def getAllDefeasible(self):
         rulesDefeasible = set()
-        if(self.topRule.isDefeasible):
+
+        if (self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
         for arg in self.subArguments:
                 rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
+                
         return rulesDefeasible
+
 
     def getLastDefeasible(self):
         rulesDefeasible = set()
         if(self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
+        elif self.topRule.isDefeasible == False:
+            for arg in self.subArguments:
+                rulesDefeasible = rulesDefeasible.union(arg.getLastDefeasible())
+
         return rulesDefeasible
 
+    # def getAllSubArg(self):
+    #     allSubArgs = set()
+    #     for arg in self.subArguments:
+    #         allSubArgs.add(arg)
+    #     return allSubArgs
+    
     def getAllSubArg(self):
-        rulesDefeasible = set()
+        allSubArgs = set()
         for arg in self.subArguments:
-            rulesDefeasible.add(arg)
-        return rulesDefeasible
+            allSubArgs.add(arg)
+            allSubArgs = allSubArgs.union(arg.getAllSubArg())
+        return allSubArgs

@@ -1,37 +1,34 @@
-import Literals
+from Literals import Literals
 
 class Rules:
 
     ruleCount = 0
 
-    def __init__(self, premises, conclusion, isDefeasible, literal, weight=None):
+    def __init__(self, premises, conclusion, isDefeasible, literal, weight=0):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
-        
-        if weight is None:
-            if isDefeasible:
-                if len(premises) == 0:
-                    self.weight = 1
-                else:
-                    self.weight = 0
-        else:
-            self.weight = weight
-
         Rules.ruleCount += 1
+        self.weight = weight
         self.name : Literals = literal
 
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
     def __eq__(self, other):
-        return ((self.premises == other.premises 
+        if not isinstance(other, Rules):
+            return False
+        else:
+            return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible
                 and self.weight == other.weight))
-    
+
     # handle print of the class
     def __str__(self):
-        ruleName = "[" + str(self.name) + "] "
+        if "[" in str(self.name) and "]" in str(self.name):
+            ruleName = self.name
+        else: 
+            ruleName = "[" + str(self.name) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""
@@ -46,7 +43,7 @@ class Rules:
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
-            ruleImplication = "=> "
+            ruleImplication = "=>"
             ruleWeight = str(self.weight)
         else:
             ruleImplication = "->"
@@ -69,7 +66,10 @@ class Rules:
             newPremise.remove(premise)
             newPremise.add(conclusion.negate())
 
-            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, self.name))
+            compt = Rules.ruleCount
+            compt = compt + 1
+            rX = Literals("r" + str(compt), self.name.isNeg)
+            newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
         return newRules
 
@@ -78,5 +78,5 @@ class Rules:
         This method is used to create a copy of a rule object without incrementing the ruleCount.
         """
 
-        Rules.ruleCount -=1 
+        # Rules.ruleCount -=1 
         return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.name)

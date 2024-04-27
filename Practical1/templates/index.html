@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TIA - GRP 19</title>
+</head>
+<body>
+    <h1>Groupe 19</h1>
+    <h2>Projet de TIA - Support Session for Continuous Assessment</h2>
+    <form action="/genReg" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".txt">
+        <button type="submit">Envoyer</button>
+    </form>
+    <p>
+        Veuillez respecté le format:
+        <br/>
+        [{ruleName}] {premises}{-> or =>}{conclusion} {ruleWeight}
+    </p>
+    <br>
+
+    {% if parsedRules %}
+    <h2>Pour vos règles</h2>
+        <ol>
+            {%for i in parsedRules%}
+                <li>{{i}}</li>
+            {%endfor%}
+        </ol>
+
+        <a href="/calcArg">Calculer mes arguments</a>
+            {% if parsedRules %}
+                <h2>Pour vos arguments</h2>
+                <ol>
+                    {%for i in arguments%}
+                        <li>{{i}}</li>
+                    {%endfor%}
+                </ol>
+            {% endif %}
+    {% endif %}
+
+    {% if arguments %}
+    <a href="/calcAttaq">Calculer mes attaques</a>
+        {% if undercuts %}
+        <h2>Pour vos undercut</h2>
+        <ol>
+            {%for i in undercuts%}
+                <li>{{i}}</li>
+            {%endfor%}
+        </ol>
+        {% endif %}
+    {% endif %}
+
+    {% if rebuts %}
+    <h2>Pour vos rebuts</h2>
+    <ul>
+        {% for key, value in rebuts.items() %}
+            <li>Pour {{ key }} il y a {{ value|length }} arguments :</li>
+            <ul>
+                {% for arg1, arg2 in value %}
+                    <li>({{ arg1.name }}, {{ arg2.name }})</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+    <br/>
+
+    <form action="/calcDefeats" method="post">
+        <label for="method">Méthode :</label>
+        <select name="method" id="method">
+            <option value="democratic">democratic</option>
+            <option value="elitist">elitist</option>
+        </select>
+
+        <label for="principal">Principal :</label>
+        <select name="principal" id="principal">
+            <option value="weakest-link">weakest-link</option>
+            <option value="last-link">last-link</option>
+        </select>
+
+        <button type="submit">Calculer mes defeats</button>
+    </form>
+
+        {% if defeatWeakLink %}
+            <h2>Pour vos défaites</h2>
+            <ul>
+                {% for key, value in defeatWeakLink.items() %}
+                    <li>Pour {{ key }} il y a {{ value|length }} arguments :</li>
+                    <ul>
+                        {% for arg1, arg2 in value %}
+                            <li>{{ arg1.name }} -> {{ arg2.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+            <br/>
+
+            <form action="/calcRanking" method="post">
+                <label for="rankIteration">Nombre d'itérations pour le calcul du ranking:</label>
+                <input type="number" id="rankIteration" name="rankIteration" min="1" max="5000" />
+
+                <button type="submit">Calculer mon ranking</button>
+            </form>
+    
+            {% if ranking %}
+                <h2>Voici le classements de vos Arguments:</h2>
+                <ol>
+                    {%for i in ranking%}
+                        <li>{{i[0]}}</li>
+                    {%endfor%}
+                </ol>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    
+    <footer>
+        <p>
+            <li>Arthur DESBIAUX</li>
+            <li>Youssef ABIDA</li>
+            <li>Olivia CHEN</li>
+            <li>Imane GARA</li>
+        </p>
+    </footer>
+
+</html>

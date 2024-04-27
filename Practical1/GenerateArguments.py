@@ -3,6 +3,10 @@ import time
 
 argumentBase = set()
 
+def resetArgumentsBase():
+    global argumentBase
+    argumentBase = set()
+
 def generateInitialArguments(rules):
     rulesCopy = rules.copy()
     for rule in rules:
@@ -31,10 +35,10 @@ def findCombinations(targetValues):
 def generateArgsFromRules(rules):
     argToAdd = set()
     for rule in rules:
-        timeStart = time.time()
+        # timeStart = time.time()
         combination = findCombinations(rule.premises) 
-        timeEnd = time.time()
-        print("time to find combinations : ", timeEnd - timeStart)
+        # timeEnd = time.time()
+        # print("time to find combinations : ", timeEnd - timeStart)
         for subArg in combination:
             arg = Arguments.Arguments(rule, subArg)
             compt = 0
@@ -54,16 +58,26 @@ def generateArgsFromRules(rules):
         generateArgsFromRules(rules)
 
 def generateContrapositonRules(rules):
-    rulesToAdd = set()
+    sortedRules = []
+    rulesToAdd = []
     for rule in rules:
         if not rule.isDefeasible :
-            rulesToAdd.update(rule.contraposition())
+            ruleContraposition = rule.contraposition()
+            if ruleContraposition not in rulesToAdd:
+                rulesToAdd.extend(ruleContraposition)
 
-    rules.update(rulesToAdd)
-    return rules
+    sortedRules = sorted(rules, key=lambda rule: rule.name.name)
+    sortedRules.extend(sorted(rulesToAdd, key=lambda rule: rule.name.name))
+
+    return sortedRules
 
 def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
+
+    print("Rules with contraposition")
+    for r in rulesWithContraposition:
+        print(r)
+
     rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
     generateArgsFromRules(rulesWithNoArgs)
     return argumentBase
