@@ -95,20 +95,30 @@ def get_attack(arg, defeats):
 
 def init(argument_base):
     for arg in argument_base:
-        dico_temp[arg.name].append(0)
+        dico_temp[arg.name] = [1]
 
 def burden2(argument_base, defeats, i):
     if i == 0:
         init(argument_base)
-    for key in dico_temp:
-        print(dico_temp[key])
+    else:
+        for arg in argument_base:
+            attack = get_attack(arg, defeats)
+            somme = 0
+            for a in attack:
+                somme = somme + (1 / dico_temp[a.name][i-1])
 
-#test arthur
+            dico_temp[arg.name].append(somme + 1)
+
+def custom_compare(entry):
+    return entry[1:]
+
 def calculate_bur_values1(argument_base, defeats, depth):
     dico_temp.clear()
-    burden2(argument_base, defeats, 0)
 
-       
+    for i in range(depth): 
+        burden2(argument_base, defeats, i)
+
+    return sorted(dico_temp.items(), key=custom_compare)
 
 # result not sorted
 # def calculate_bur_values1(argument_base, defeats, depth):
