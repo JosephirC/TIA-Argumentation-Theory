@@ -2,14 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FlaskBlog</title>
+    <title>TIA - GRP 19</title>
 </head>
 <body>
-    <h1>Notre super site de TIA</h1>
+    <h1>Groupe 19</h1>
+    <h2>Projet de TIA - Support Session for Continuous Assessment</h2>
     <form action="/genReg" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept=".txt">
         <button type="submit">Envoyer</button>
     </form>
+    <p>
+        Veuillez respecté le format:
+        <br/>
+        [{ruleName}] {premises}{-> or =>}{conclusion} {ruleWeight}
+    </p>
     <br>
 
     {% if parsedRules %}
@@ -21,23 +27,26 @@
         </ol>
 
         <a href="/calcArg">Calculer mes arguments</a>
-            <ol>
-            {%for i in arguments%}
-                <li>{{i}}</li>
-            {%endfor%}
-        </ol>
+            {% if parsedRules %}
+                <h2>Pour vos arguments</h2>
+                <ol>
+                    {%for i in arguments%}
+                        <li>{{i}}</li>
+                    {%endfor%}
+                </ol>
+            {% endif %}
     {% endif %}
 
     {% if arguments %}
     <a href="/calcAttaq">Calculer mes attaques</a>
-    {% if undercuts %}
-    <h2>Pour vos undercut</h2>
-    <ol>
-        {%for i in undercuts%}
-            <li>{{i}}</li>
-        {%endfor%}
-    </ol>
-    {% endif %}
+        {% if undercuts %}
+        <h2>Pour vos undercut</h2>
+        <ol>
+            {%for i in undercuts%}
+                <li>{{i}}</li>
+            {%endfor%}
+        </ol>
+        {% endif %}
     {% endif %}
 
     {% if rebuts %}
@@ -83,12 +92,27 @@
                 {% endfor %}
             </ul>
             <br/>
+
+            <form action="/calcRanking" method="post">
+                <label for="rankIteration">Nombre d'itérations pour le calcul du ranking:</label>
+                <input type="number" id="rankIteration" name="rankIteration" min="1" max="5000" />
+
+                <button type="submit">Calculer mon ranking</button>
+            </form>
+    
+            {% if ranking %}
+                <h2>Voici le classements de vos Arguments:</h2>
+                <ol>
+                    {%for i in ranking%}
+                        <li>{{i[0]}}</li>
+                    {%endfor%}
+                </ol>
+            {% endif %}
         {% endif %}
     {% endif %}
     
     <footer>
         <p>
-            <h1>Groupe 19</h1>
             <li>Arthur DESBIAUX</li>
             <li>Youssef ABIDA</li>
             <li>Olivia CHEN</li>
