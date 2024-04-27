@@ -132,3 +132,6 @@ def calcRanking():
     ranking = calculate_bur_values1(arguments, defeatWeakLink, int(iteration))
 
     return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink, ranking=ranking)
+
+if __name__ == '__main__':
+    app.run(debug=True)
