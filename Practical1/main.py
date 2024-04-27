@@ -195,26 +195,26 @@ def main():
     # for b in bur:
     #     print(b)
 
-    print("RANKED ARGUMENTS")
-    # ranked_arguments, ranks = rank_arguments(argumentBase, rebutsBr)
+    # print("RANKED ARGUMENTS")
+    # # ranked_arguments, ranks = rank_arguments(argumentBase, rebutsBr)
 
-    # for arg in ranked_arguments:
-    #     print(arg)
+    # # for arg in ranked_arguments:
+    # #     print(arg)
     
-    # for rank in ranks:
-    #     print("rank:", rank)
+    # # for rank in ranks:
+    # #     print("rank:", rank)
 
-    burned_values1 = calculate_bur_values1(argumentBase, defeatWeakLink, 4)
-    for arg, bur_value in burned_values1.items():
-        print(f"Arg: {arg.name}, Rank: {bur_value}")
-    print(len(burned_values1))
+    # burned_values1 = calculate_bur_values1(argumentBase, defeatWeakLink, 4)
+    # for arg, bur_value in burned_values1.items():
+    #     print(f"Arg: {arg.name}, Rank: {bur_value}")
+    # print(len(burned_values1))
 
-    print("SORTED RANKED ARGUMENTS")
-    burned_values = calculate_bur_values(argumentBase, defeatWeakLink, 4)
-    for bur_value, args in burned_values.items():
-        for arg in args:
-            print(f"Arg: {[arg.name]}, Rank: {bur_value}")
-    print(len(burned_values)) #Pas la même taille que burned_values, car les arguments de même rang sont dans un sous tableau du tableau
+    # print("SORTED RANKED ARGUMENTS")
+    # burned_values = calculate_bur_values(argumentBase, defeatWeakLink, 4)
+    # for bur_value, args in burned_values.items():
+    #     for arg in args:
+    #         print(f"Arg: {[arg.name]}, Rank: {bur_value}")
+    # print(len(burned_values)) #Pas la même taille que burned_values, car les arguments de même rang sont dans un sous tableau du tableau
 
 
 if __name__ == "__main__":

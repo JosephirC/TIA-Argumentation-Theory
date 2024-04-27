@@ -62,16 +62,9 @@ def generateContrapositonRules(rules):
     rulesToAdd = []
     for rule in rules:
         if not rule.isDefeasible :
-            rulesToAdd.extend(rule.contraposition())
-
-    for r in rulesToAdd:
-        exists = False
-        for existingRules in rules:
-            if r.premises == existingRules.premises and r.conclusion == existingRules.conclusion:
-                exists = True
-                break
-        if not exists:
-            rules.update(rulesToAdd)
+            ruleContraposition = rule.contraposition()
+            if ruleContraposition not in rulesToAdd:
+                rulesToAdd.extend(ruleContraposition)
 
     sortedRules = sorted(rules, key=lambda rule: rule.name.name)
     sortedRules.extend(sorted(rulesToAdd, key=lambda rule: rule.name.name))
@@ -80,6 +73,11 @@ def generateContrapositonRules(rules):
 
 def generateArgs(rules):
     rulesWithContraposition = generateContrapositonRules(rules)
+
+    print("Rules with contraposition")
+    for r in rulesWithContraposition:
+        print(r)
+
     rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
     generateArgsFromRules(rulesWithNoArgs)
     return argumentBase
