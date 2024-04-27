@@ -1,94 +1,21 @@
 import Literals
 import Rules
 import Arguments
-import itertools
 import time
+from GenerateArguments import generateArgs
+from GenerateAttacks import generateUndercuts, generateRebuts
+from Defeats import makePreferred, comparePreferred, defeat
+from collections import defaultdict
+from parseAspartix import parseAttacks, parseRules
+from ExportArguments import exportArguments
+from parseAspartix import parseAttacks, readKB
+from BurdenBasedSemantics import bur, rank_arguments
+from GenerateAttacks import generateRebuts
 
-# static bf to store all the arguments
-# bf = set()
-bf = {
-
-}
-
-# 1. contraposition on strict rules
-# 2. search for the rules with conclusions only and generate their respective arguments (verify if the rule has a conclusion?)
-# 2.1 add the arguments in the bf
-# 3. in a different function have a list of all the rules minus the rules for the intial arguments
-# 3.1 for each rule in the list of rules, generate the arguments
-# 3.2 add the respective arguments in the bf
-# 4. during this step we will try to generate the remaining arguments
-# 4.1 go through all the rules once and again and for each rule iterate over the bf and check if you can genereate a new argument for it and add it to the bf
-# 4.2. iterate over the whole bf once again and check if you can generate a new argument and then move to the next rule
-# 4.3 repeate 4.1 and 4.2 until no new arguments are generated
-
-def addArgsToBF(setOfArguments):
-    for arg in setOfArguments:
-        if isinstance(arg, Arguments):
-            bf[arg] = arg.topRule.conclusion
-         
-def generateInitialArguments(rules):
-    rulesCopy = rules.copy()
-    for rule in rules:
-        if len(rule.premises) == 0 and len(rule.conclusion) > 0:
-            arg = Arguments.Arguments(rule, set())
-            bf[arg] = arg.topRule.conclusion
-            rulesCopy.remove(rule)
-    
-    return rulesCopy
-
-def find_combinations(target_values):
-    valid_combinations = set()
-    keys = list(bf.keys())
-
-    for r in range(1, len(keys) + 1):
-        for combo in itertools.combinations(keys, r):
-            values = set()
-            for key in combo:
-                values.update(bf[key])
-            if len(tuple(combo)) == len(target_values) and set(values) == set(target_values):
-                valid_combinations.add(tuple(combo))
-
-    return valid_combinations
-
-def generateArgsFromRules(rules):
-    print("je rentre une foi")
-    argToAdd = set()
-    for rule in rules:
-        combination = find_combinations(rule.premises) 
-        for subArg in combination:
-
-            arg = Arguments.Arguments(rule, subArg)
-            compt = 0
-            for elem in bf:
-
-                if elem.subArguments != arg.subArguments:
-                    compt = compt + 1
-            if len(bf) == compt:
-                argToAdd.add(arg)
-            else:
-                Arguments.Arguments.nameCount = Arguments.Arguments.nameCount - 1
-    
-    for key in argToAdd:
-        bf[key] = key.topRule.conclusion
-    
-    print(len(argToAdd))
-    print("je rentre une or \n")
-    if(len(argToAdd)) > 0:
-        generateArgsFromRules(rules)
-
-def generateContrapositonRules(rules):
-    rulesToAdd = set()
-    for rule in rules:
-        if not rule.isDefeasible :
-            rulesToAdd.update(rule.contraposition())
-
-    rules.update(rulesToAdd)
-    return rules
-
-def generateArgs(rules):
-    rulesWithContraposition = generateContrapositonRules(rules)
-    rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
-    generateArgsFromRules(rulesWithNoArgs)
+def printSorted(argumentBase):
+    sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
+    for arg in sortedArgs:
+        print(arg)
 
 
 def main():
@@ -142,34 +69,30 @@ def main():
     dF = Literals.Literals("d", False)
     eF = Literals.Literals("e", False)
 
+    r1 = Literals.Literals("r1", False)
+    r2 = Literals.Literals("r2", False)
+    r3 = Literals.Literals("r3", False)
+    r4 = Literals.Literals("r4", False)
+    r5 = Literals.Literals("r5", False)
+    r6 = Literals.Literals("r6", False)
+    r7 = Literals.Literals("r7", False)
+    r8 = Literals.Literals("r8", False)
+    r9 = Literals.Literals("r9", False)
 
-    rule1 = Rules.Rules({}, {aF}, False)
-    rule2 = Rules.Rules({bF, dF}, {cF}, False)
-    rule3 = Rules.Rules({c}, {dF}, False)
+    rule1 = Rules.Rules({}, aF, False, r1)
+    rule2 = Rules.Rules({bF, dF}, cF, False, r2)
+    rule3 = Rules.Rules({c}, dF, False, r3)
+    
+    rule4 = Rules.Rules({aF}, d, True, r4)
+    rule5 = Rules.Rules({}, bF, True, r5, 1)
+    rule6 = Rules.Rules({}, c, True, r6, 1)
+    rule7 = Rules.Rules({}, dF, True, r7, 0)
+    rule8 = Rules.Rules({cF}, eF, True, r8)
+    rule9 = Rules.Rules({c}, r4.negate(), True, r9)
     
     print(rule1)
     print(rule2)
     print(rule3)
-
-    contrapositionRules = rule1.contraposition()
-    for rule in contrapositionRules:
-        print(rule)
-    
-    contrapositionRules = rule2.contraposition()
-    for rule in contrapositionRules:
-        print(rule)
-
-    contrapositionRules = rule3.contraposition()
-    for rule in contrapositionRules:
-        print(rule)
-
-    rule4 = Rules.Rules({aF}, {d}, True)
-    rule5 = Rules.Rules({}, {bF}, True)
-    rule6 = Rules.Rules({}, {c}, True)
-    rule7 = Rules.Rules({}, {dF}, True)
-    rule8 = Rules.Rules({cF}, {eF}, True)
-    rule9 = Rules.Rules({c}, {rule4}, True)
-
     print(rule4)
     print(rule5)
     print(rule6)
@@ -177,17 +100,108 @@ def main():
     print(rule8)
     print(rule9)
 
-
     # Testing the generation of arguments
     print("\n")
     rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
-    print("nbr of recursive calls : ", Arguments.Arguments.setOfArgs_call_count)
     deb  = time.time()
-    generateArgs(rules)
+    argumentBase = generateArgs(rules)
+    # parseRules(rules)
     fin = time.time()
     print("temp", fin-deb)
-    for cle in bf.keys():
-        print(cle)
+    
+    printSorted(argumentBase)    
+
+    defeasibleRules = set()
+    # for arg in argumentBase:
+    #     print(f"argument {arg}")
+    #     defeasibleRules.update(arg.getAllDefeasible())
+    #     print("The defeasible rules : ")
+
+    undercuts = generateUndercuts(argumentBase, rules)
+    print("undercuts are : ", undercuts)
+
+    # for arg in bf:
+    #     print(arg)
+    #     defeasibleRules = arg.getAllDefeasible()
+    #     print("Les règles defeasibles: ")
+    #     for rules in defeasibleRules:
+    #         print(rules.name)
+
+    print()
+
+    print("\nundercuts done \n")
+    defeasibleRulesSize = 0
+    for arg in argumentBase:
+        print(arg)
+        # defeasibleRules = arg.getAllDefeasible()
+        defeasibleRules = arg.getLastDefeasible()
+        print("Les règles defeasibles: ")
+        for rules in defeasibleRules:
+            print(rules.name)
+        print("\n")
+
+        # print("lengeth of defeasible rules: ", len(defeasibleRules))
+
+
+    print("\n")
+    print("REBUTS:")
+    rebuts = generateRebuts(argumentBase)
+    for key in rebuts:
+        print(f'For {key.isNeg} {key.name} len {len(rebuts[key])} :')
+        for (arg1, arg2) in rebuts[key]:
+            print(f'{arg1.name} -> {arg2.name}')
+        print()
+    
+    print("\n")
+    # rules = {rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9}
+    
+    # preferred = makePreferred(rules)
+    # for key in preferred:   
+    #     print(f"key: {key} value: {preferred[key]}")
+
+    # weightComparison = comparePreferred(preferred)
+    # print("weightComparison: ", weightComparison)
+
+    print("\n")
+    print("DEFEATS:")
+    defeatWeakLink = defaultdict(set)
+
+    for rebut in rebuts:
+        for (arg1, arg2) in rebuts[rebut]:
+            defeatTuple = defeat(arg1, arg2, "democratic", "weakest-link")
+            if defeatTuple is not None:
+                defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
+    
+    for key in defeatWeakLink:
+        print(f'For {key.isNeg} {key.name} len {len(defeatWeakLink[key])} :')
+        # for (arg1, arg2) in defeatWeakLink[key]:
+        #     print(f'{arg1.name} -> {arg2.name}')
+        # print()
+
+    parseAttacks(defeatWeakLink)
+    
+    print()
+    parsedRules = set()
+    readKB(parsedRules)
+    print("nouvelle règle")
+    for rule in parsedRules:
+        print(rule)
+    
+    # bur = addset(argumentBase, rebuts, 5)
+    # for b in bur:
+    #     print(b)
+    # Define rebuts based on your rules and arguments
+    rebutsBr = generateRebuts(argumentBase)
+
+
+    print("ranked arguments")
+    ranked_arguments, ranks = rank_arguments(argumentBase, rebutsBr)
+
+    for arg in ranked_arguments:
+        print(arg)
+    
+    for rank in ranks:
+        print("rank:", rank)
 
 if __name__ == "__main__":
     main()

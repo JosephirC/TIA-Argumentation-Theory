@@ -1,9 +1,7 @@
-# Arguments are objects which are referred by their top rule, the set of direct sub arguments, and its unique name (string). 
-# We give below two examples of arguments
+import Rules
 
 class Arguments:
 
-    setOfArgs_call_count = 0
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -13,6 +11,8 @@ class Arguments:
         self.name = "A" + str(Arguments.nameCount)
 
     def __eq__(self, other):
+        if not isinstance(other, Arguments):
+            return False
         return (self.topRule.conclusion == other.topRule.conclusion
                 and self.subArguments == other.subArguments)
 
@@ -28,26 +28,29 @@ class Arguments:
 
         # Extracting all sub arguments and putting them in a list
         for subArgument in self.subArguments:
-            for argument in subArgument.setOfArguemnts():
-                argumentSubArgumentsList.append(argument)
+            # for argument in subArgument.setOfArguemnts():
+            argumentSubArgumentsList.append(subArgument)
 
         # Extracting unique arguments from the list
-        argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
+        # argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
 
         # Creating the string of unique sub arguments
         for argument in argumentSubArgumentsList:
-            argumentSubArguments = argumentSubArguments + argument + ","
+            argumentSubArguments = argumentSubArguments + argument.name + ","
+
+        argumentSubArguments = argumentSubArguments[:-1] + " "
 
         if(argumentTopRule.isDefeasible):
             argumentImplication = "=> "
         else :
             argumentImplication = "->"
 
-        # Extracting the literals from the conclusion set
-        for conclusion in argumentTopRule.conclusion:
-            argumentTopRuleConclusion = argumentTopRuleConclusion + str(conclusion)
+        if isinstance(argumentTopRule.conclusion, Rules.Rules):
+            argumentTopRuleConclusion = argumentTopRule.conclusion.name
+        else:
+            argumentTopRuleConclusion = argumentTopRule.conclusion
             
-        return argumentName + argumentSubArguments + argumentImplication + argumentTopRuleConclusion
+        return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
     def __hash__(self):
         return hash((self.topRule, tuple(self.subArguments), self.name))
@@ -63,8 +66,6 @@ class Arguments:
         return uniqueArguments
 
     def setOfArguemnts(self):
-        Arguments.setOfArgs_call_count += 1
-
         allArguments = [self.name]
 
         for subArgument in self.subArguments:
@@ -72,4 +73,31 @@ class Arguments:
                 allArguments.append(argument)
 
         return self.extractUniqueArguments(allArguments)
+    
+    def getAllDefeasible(self):
+        rulesDefeasible = set()
 
+        if (self.topRule.isDefeasible):
+            rulesDefeasible.add(self.topRule)
+        for arg in self.subArguments:
+                rulesDefeasible = rulesDefeasible.union(arg.getAllDefeasible())
+                
+        return rulesDefeasible
+
+
+# si la top rule n'est pas 
+    def getLastDefeasible(self):
+        rulesDefeasible = set()
+        if(self.topRule.isDefeasible):
+            rulesDefeasible.add(self.topRule)
+        elif self.topRule.isDefeasible == False: # demander au prof cette partie du last defeasible
+            for arg in self.subArguments:
+                rulesDefeasible = rulesDefeasible.union(arg.getLastDefeasible())
+
+        return rulesDefeasible
+
+    def getAllSubArg(self):
+        rulesDefeasible = set()
+        for arg in self.subArguments:
+            rulesDefeasible.add(arg)
+        return rulesDefeasible
