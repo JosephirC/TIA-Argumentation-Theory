@@ -9,8 +9,8 @@ class Rules:
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        self.weight = weight
         self.name : Literals = literal
+        self.weight = weight
 
     # Handle equality between objects.
     # We dont check equality for names so we can test rules with different names --> duplicate rules
@@ -21,6 +21,7 @@ class Rules:
             return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible
+                and self.name == other.name
                 and self.weight == other.weight))
 
     # handle print of the class
@@ -52,7 +53,7 @@ class Rules:
     
     # handle hash of the class
     def __hash__(self):
-        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.name))
+        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.name, self.weight))
 
     def contraposition(self):
         newRules = set()
