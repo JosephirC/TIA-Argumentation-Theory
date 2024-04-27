@@ -4,13 +4,14 @@ import Arguments
 import time
 from GenerateArguments import generateArgs
 from GenerateAttacks import generateUndercuts, generateRebuts
-from Defeats import makePreferred, comparePreferred, defeat
+from Defeats import makePreferred, comparePreferred, defeat, genHisto
 from collections import defaultdict
 from parseAspartix import parseAttacks, parseRules
 from ExportArguments import exportArguments
 from parseAspartix import parseAttacks, readKB
 from BurdenBasedSemantics import calculate_bur_values, calculate_bur_values1
 from GenerateAttacks import generateRebuts
+import matplotlib.pyplot as plt
 
 def printSorted(argumentBase):
     sortedArgs = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
@@ -217,6 +218,11 @@ def main():
     #     for arg in args:
     #         print(f"Arg: {[arg.name]}, Rank: {bur_value}")
     # print(len(burned_values)) #Pas la même taille que burned_values, car les arguments de même rang sont dans un sous tableau du tableau
+
+    genHisto(defeatWeakLink, len(argumentBase))
+
+    # Construction de l'histogramme avec matplotlib
+
 
 
 if __name__ == "__main__":

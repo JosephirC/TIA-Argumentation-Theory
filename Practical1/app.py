@@ -5,10 +5,11 @@ import Arguments
 from GenerateArguments import generateArgs, resetArgumentsBase
 from GenerateAttacks import generateUndercuts, generateRebuts
 from parseAspartix import readKB
-from Defeats import defeat
+from Defeats import defeat, genHisto
 from BurdenBasedSemantics import calculate_bur_values1
 from collections import defaultdict
 import os
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
@@ -110,6 +111,15 @@ def calcDefeats():
             defeatTuple = defeat(arg1, arg2, method, principal)
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
+
+    histo = genHisto(defeatWeakLink, len(arg))
+
+    plt.bar(histo.keys(), histo.values())
+    plt.xlabel('Nombre de défaites')
+    plt.ylabel('Nombre d\'arguments')
+    plt.title('Histogramme des défaites par argument')
+    plt.savefig('static/histo.png')
+
     return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink)
 
 
