@@ -69,35 +69,35 @@ burden = set()
 #         return 1.0 + sum(1.0 / bur(reb[1], i - 1, rebuts) for reb in attacking_args)
 
 # caluculate the burden value
-def burden(argument_base, arg, i, rebuts):
+def burden(argument_base, arg, i, defeats):
     if i == 0:
         return 1
     else:
-        attacking_args = rebuts.get(arg.topRule.conclusion, [])
+        attacking_args = defeats.get(arg.topRule.conclusion, [])
         burned_values = []
         for reb in attacking_args:
-            burned_value = burden(argument_base, reb[1], i - 1, rebuts)
+            burned_value = burden(argument_base, reb[1], i - 1, defeats)
             burned_values.append(burned_value)
         burned_value = 1 + sum(1 / v for v in burned_values)
 
         return burned_value
 
 # result not sorted
-def calculate_bur_values1(argument_base, rebuts, depth):
+def calculate_bur_values1(argument_base, defeats, depth):
     bur_values = {}
 
     for arg in argument_base:
-        bur_value = burden(argument_base, arg, depth, rebuts)
+        bur_value = burden(argument_base, arg, depth, defeats)
         bur_values[arg] = bur_value
 
     return bur_values
 
 # sort the result
-def calculate_bur_values(argument_base, rebuts, depth):
+def calculate_bur_values(argument_base, defeats, depth):
     bur_values = defaultdict(set)
 
     for arg in argument_base:
-        bur_value = burden(argument_base, arg, depth, rebuts)
+        bur_value = burden(argument_base, arg, depth, defeats)
         bur_values[arg].add(bur_value)
 
     # sort the args according to their burden value
