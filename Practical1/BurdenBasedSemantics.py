@@ -1,3 +1,4 @@
+from collections import defaultdict
 burden = set()
 
 # def bur(arg, i):
@@ -31,7 +32,6 @@ burden = set()
 #         n -= 1
 #     return burden
 
-from collections import defaultdict
 
 # def rank_arguments(argument_base, rebuts):
 #     ranks = defaultdict(int)
@@ -56,17 +56,7 @@ from collections import defaultdict
 #     # Sort arguments by rank
 #     sorted_arguments = sorted(argument_base, key=lambda arg: ranks[arg])
 
-#     return ranks
-
-# def bur(arg, i, rebuts):
-#     if i == 0:
-#         return 1
-#     else:
-#         attacking_args = [reb for reb in rebuts if arg in reb.topRule.conclusion]
-#         print(f"Argument: {arg.name}, Attacking args: {[reb[1].name for reb in attacking_args]}")
-#         # print("attacking_args;", attacking_args)
-#         print(1 + sum(1 / bur(reb, i - 1) for reb in attacking_args))
-#         return 1 + sum(1 / bur(reb, i - 1) for reb in attacking_args)
+#     return sorted_arguments, ranks
 
 # Il me fait boucle infinie
 # def bur(arg, i, rebuts):
@@ -78,41 +68,48 @@ from collections import defaultdict
 #         print(f"Argument: {arg.name}, Attacking args: {[reb[1].name for reb in attacking_args]}")
 #         return 1.0 + sum(1.0 / bur(reb[1], i - 1, rebuts) for reb in attacking_args)
 
-import sys
-
-def bur(arg, i, rebuts, processed_args=None):
-    if processed_args is None:
-        processed_args = set()
-
-    if arg in processed_args:
-        return 0
-
-    processed_args.add(arg)
-
+# caluculate the burden value
+def burden(argument_base, arg, i, rebuts):
     if i == 0:
-        return 1.0
+        return 1
     else:
         attacking_args = rebuts.get(arg.topRule.conclusion, [])
-        attacking_args = [reb for reb in attacking_args if reb[1] != arg]
-        epsilon = sys.float_info.epsilon
-        burden = 1.0 + sum(1.0 / (bur(reb[1], i - 1, rebuts, processed_args) + epsilon) for reb in attacking_args)
+        burned_values = []
+        for reb in attacking_args:
+            burned_value = burden(argument_base, reb[1], i - 1, rebuts)
+            burned_values.append(burned_value)
+        burned_value = 1 + sum(1 / v for v in burned_values)
 
-        processed_args.remove(arg)
-        return burden
+        return burned_value
 
-
-
-def rank_arguments(argument_base, rebuts):
-    ranks = defaultdict(list)
+# result not sorted
+def calculate_bur_values1(argument_base, rebuts, depth):
+    bur_values = {}
 
     for arg in argument_base:
-        ranks[tuple(bur(arg, i, rebuts, set()) for i in range(len(argument_base)))].append(arg)
+        bur_value = burden(argument_base, arg, depth, rebuts)
+        bur_values[arg] = bur_value
 
-    sorted_ranks = sorted(ranks.keys())
+    return bur_values
 
-    sorted_arguments = []
-    for rank in sorted_ranks:
-        for arg in ranks[rank]:
-            sorted_arguments.append(arg)
+# sort the result
+def calculate_bur_values(argument_base, rebuts, depth):
+    bur_values = defaultdict(set)
 
-    return sorted_arguments, ranks
+    for arg in argument_base:
+        bur_value = burden(argument_base, arg, depth, rebuts)
+        bur_values[arg].add(bur_value)
+
+    # sort the args according to their burden value
+    sorted_bur_values = defaultdict(set)
+    for arg, bur_set in bur_values.items():
+        for bur_value in bur_set:
+            sorted_bur_values[bur_value].add(arg)
+
+    sorted_keys = sorted(sorted_bur_values.keys())
+
+    final_bur_values = defaultdict(set)
+    for key in sorted_keys:
+        final_bur_values[key] = sorted_bur_values[key]
+
+    return final_bur_values

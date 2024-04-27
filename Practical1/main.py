@@ -9,7 +9,7 @@ from collections import defaultdict
 from parseAspartix import parseAttacks, parseRules
 from ExportArguments import exportArguments
 from parseAspartix import parseAttacks, readKB
-from BurdenBasedSemantics import bur, rank_arguments
+from BurdenBasedSemantics import calculate_bur_values, calculate_bur_values1
 from GenerateAttacks import generateRebuts
 
 def printSorted(argumentBase):
@@ -194,14 +194,27 @@ def main():
     rebutsBr = generateRebuts(argumentBase)
 
 
-    print("ranked arguments")
-    ranked_arguments, ranks = rank_arguments(argumentBase, rebutsBr)
+    print("RANKED ARGUMENTS")
+    # ranked_arguments, ranks = rank_arguments(argumentBase, rebutsBr)
 
-    for arg in ranked_arguments:
-        print(arg)
+    # for arg in ranked_arguments:
+    #     print(arg)
     
-    for rank in ranks:
-        print("rank:", rank)
+    # for rank in ranks:
+    #     print("rank:", rank)
+
+    burned_values1 = calculate_bur_values1(argumentBase, rebuts, 4)
+    for arg, bur_value in burned_values1.items():
+        print(f"Arg: {arg.name}, Rank: {bur_value}")
+    print(len(burned_values1))
+
+    print("SORTED RANKED ARGUMENTS")
+    burned_values = calculate_bur_values(argumentBase, rebuts, 5)
+    for bur_value, args in burned_values.items():
+        for arg in args:
+            print(f"Arg: {[arg.name]}, Rank: {bur_value}")
+    print(len(burned_values)) #Pas la même taille que burned_values, car les arguments de même rang sont dans un sous tableau du tableau
+
 
 if __name__ == "__main__":
     main()
