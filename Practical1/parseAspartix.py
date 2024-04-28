@@ -4,7 +4,7 @@ from Literals import Literals
 
 def parseAttacks(defeats):
     """
-    Parse the attacks and write in the file aspartix.txt
+    Parse and write in the file aspartix.txt the attacks between arguments.
     """
     if os.path.exists('aspartix.txt'):
         fichier = open('aspartix.txt', 'w')
@@ -17,7 +17,7 @@ def parseAttacks(defeats):
 
 def parseRules(rules):
     """
-    Parse the rules and write in the file KB.txt
+    Parse and write in the file aspartix.txt the rules created.
     """
     if os.path.exists('KB.txt'):
         fichier = open('KB.txt', 'w')
@@ -64,7 +64,7 @@ def parseRules(rules):
 
 def defeasibleRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreLit2, tmpCclLit):
     """
-    Parse the defeasible rules
+    Generate and create the defeasible rules from elements that constitute the rules.
     """
     if len(premises) > 1:
         if '!' in premises[0]:
@@ -132,7 +132,7 @@ def defeasibleRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreL
 
 def strictRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreLit2, tmpCclLit):
     """
-    Parse the strict rules
+    Generate and create the strict rules from elements that constitute the rules.
     """
     if len(premises) > 1:
         if '!' in premises[0]:
@@ -200,7 +200,7 @@ def strictRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreLit2,
 
 def readKB(parsedRules):
     """
-    Read the KB.txt file and parse the rules
+    Read and get each rules from the parsed file to create the Rules objects.
     """
     if os.path.exists('./uploads/KB.txt'):
         fichier = open('./uploads/KB.txt', 'r')
@@ -219,7 +219,7 @@ def readKB(parsedRules):
 
 def element(f):
     """
-    Extract the elements of a rule
+    Split the line of rules and return each element.
     """
     regle = f.strip()
     text = []
