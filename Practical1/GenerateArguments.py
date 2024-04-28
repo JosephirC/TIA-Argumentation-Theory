@@ -1,23 +1,33 @@
-import Arguments
+from Arguments import Arguments
 import time
 
 argumentBase = set()
 
-def resetArgumentsBase():
+def emptyArgumentsBase():
+    """
+    Empties the argument base.
+    """
     global argumentBase
     argumentBase = set()
 
 def generateInitialArguments(rules):
+    """
+    Extracts the rules with no premises and generates the initial arguments. 
+    """
     rulesCopy = rules.copy()
     for rule in rules:
         if len(rule.premises) == 0 :
-            arg = Arguments.Arguments(rule, set())
+            arg = Arguments(rule, set())
             argumentBase.add(arg)
             rulesCopy.remove(rule)
     
     return rulesCopy
 
 def findCombinations(targetValues):
+    """
+    Finds the combinations of arguments that lead to the target values.
+    This function was inspired by the DFS algorithm but it doesnt use a stack.
+    """
     if not targetValues:
         return set([frozenset([])])
     else:
@@ -33,6 +43,9 @@ def findCombinations(targetValues):
         return validCombinations
 
 def generateArgsFromRules(rules):
+    """
+    Generates the arguments from the rules and populates the argument base.
+    """
     argToAdd = set()
     for rule in rules:
         # timeStart = time.time()
@@ -40,7 +53,7 @@ def generateArgsFromRules(rules):
         # timeEnd = time.time()
         # print("time to find combinations : ", timeEnd - timeStart)
         for subArg in combination:
-            arg = Arguments.Arguments(rule, subArg)
+            arg = Arguments(rule, subArg)
             compt = 0
             for elem in argumentBase:
                 if elem.subArguments != arg.subArguments:
@@ -49,7 +62,7 @@ def generateArgsFromRules(rules):
             if len(argumentBase) == compt:
                 argToAdd.add(arg)
             else:
-                Arguments.Arguments.nameCount = Arguments.Arguments.nameCount - 1
+                Arguments.nameCount = Arguments.nameCount - 1
     
     for key in argToAdd:
         argumentBase.add(key)
@@ -58,6 +71,9 @@ def generateArgsFromRules(rules):
         generateArgsFromRules(rules)
 
 def generateContrapositonRules(rules):
+    """
+    Generates the contraposition rules and makes sure there are no duplicates.
+    """
     sortedRules = []
     rulesToAdd = set()
     for rule in rules:
@@ -65,26 +81,24 @@ def generateContrapositonRules(rules):
             ruleContraposition = rule.contraposition()
             rulesToAdd.update(ruleContraposition)
 
-    for r in rulesToAdd:
+    for rule in rulesToAdd:
         exists = False
         for existingRule in rules:
-            if r.premises == existingRule.premises and r.conclusion == existingRule.conclusion:
+            if rule.premises == existingRule.premises and rule.conclusion == existingRule.conclusion:
                 exists = True
                 break
         if not exists:
             rules.update(rulesToAdd)
 
-    sortedRules = sorted(rules, key=lambda rule: int(rule.name.name[1:]))
+    sortedRules = sorted(rules, key=lambda rule: int(rule.literalReference.name[1:]))
     
     return sortedRules
 
 def generateArgs(rules):
+    """
+    Calls all the functions to generate the arguments.
+    """
     rulesWithContraposition = generateContrapositonRules(rules)
-
-    print("Rules with contraposition")
-    for r in rulesWithContraposition:
-        print(r)
-
     rulesWithNoArgs = generateInitialArguments(rulesWithContraposition)
     generateArgsFromRules(rulesWithNoArgs)
     return argumentBase

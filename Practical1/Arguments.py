@@ -1,7 +1,4 @@
-import Rules
-
 class Arguments:
-
     nameCount = 0
 
     def __init__(self, topRule, subArguments):
@@ -16,8 +13,6 @@ class Arguments:
         return (self.topRule.conclusion == other.topRule.conclusion
                 and self.subArguments == other.subArguments)
 
-    # arguemtn example : $A_1: \rightarrow a$ == A1: -> a
-    # argument example : $A_2: A_1 \Rightarrow c$ == A2: A2, A1 => c
     def __str__(self):
         argumentName = self.name + ": "
         argumentSubArgumentsList = []
@@ -26,15 +21,9 @@ class Arguments:
         argumentImplication = ""
         argumentTopRuleConclusion = ""
 
-        # Extracting all sub arguments and putting them in a list
         for subArgument in self.subArguments:
-            # for argument in subArgument.setOfArguemnts():
             argumentSubArgumentsList.append(subArgument)
 
-        # Extracting unique arguments from the list
-        # argumentSubArgumentsList = self.extractUniqueArguments(argumentSubArgumentsList)
-
-        # Creating the string of unique sub arguments
         for argument in argumentSubArgumentsList:
             argumentSubArguments = argumentSubArguments + argument.name + ","
 
@@ -43,38 +32,19 @@ class Arguments:
         if(argumentTopRule.isDefeasible):
             argumentImplication = "=> "
         else :
-            argumentImplication = "->"
+            argumentImplication = "-> "
 
-        if isinstance(argumentTopRule.conclusion, Rules.Rules):
-            argumentTopRuleConclusion = argumentTopRule.conclusion.name
-        else:
-            argumentTopRuleConclusion = argumentTopRule.conclusion
+        argumentTopRuleConclusion = argumentTopRule.conclusion
             
         return argumentName + argumentSubArguments + argumentImplication + str(argumentTopRuleConclusion)
 
     def __hash__(self):
         return hash((self.topRule, tuple(self.subArguments), self.name))
-
-    @staticmethod
-    def extractUniqueArguments(arguments):
-        uniqueArguments = []
-
-        for argument in arguments:
-            if argument not in uniqueArguments:
-                uniqueArguments.append(argument)
-
-        return uniqueArguments
-
-    def setOfArguemnts(self):
-        allArguments = [self.name]
-
-        for subArgument in self.subArguments:
-            for argument in subArgument.setOfArguemnts():
-                allArguments.append(argument)
-
-        return self.extractUniqueArguments(allArguments)
     
     def getAllDefeasible(self):
+        """
+        Return all the defeasible rules of the argument
+        """
         rulesDefeasible = set()
 
         if (self.topRule.isDefeasible):
@@ -84,8 +54,10 @@ class Arguments:
                 
         return rulesDefeasible
 
-
     def getLastDefeasible(self):
+        """
+        Return the last defeasible rule of the argument
+        """
         rulesDefeasible = set()
         if(self.topRule.isDefeasible):
             rulesDefeasible.add(self.topRule)
@@ -94,16 +66,14 @@ class Arguments:
                 rulesDefeasible = rulesDefeasible.union(arg.getLastDefeasible())
 
         return rulesDefeasible
-
-    # def getAllSubArg(self):
-    #     allSubArgs = set()
-    #     for arg in self.subArguments:
-    #         allSubArgs.add(arg)
-    #     return allSubArgs
     
-    def getAllSubArg(self):
+    def getAllSubArgs(self):
+        """
+        Return all the sub arguments of the argument
+        """
         allSubArgs = set()
         for arg in self.subArguments:
             allSubArgs.add(arg)
-            allSubArgs = allSubArgs.union(arg.getAllSubArg())
+            allSubArgs = allSubArgs.union(arg.getAllSubArgs())
         return allSubArgs
+    

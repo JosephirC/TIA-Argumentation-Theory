@@ -1,4 +1,7 @@
 def makePreferred(rules):
+    """
+    Makes a dictionary of rules with their weights as values
+    """
     preferred = {}
     for rule in rules:
         if rule.isDefeasible:
@@ -8,6 +11,9 @@ def makePreferred(rules):
     return preferred
 
 def comparePreferred(preferred):
+    """
+    Compares the weights of the rules and returns a string with the rules sorted by weight
+    """
     sortedRules = set()
     fiilteredRules = set()
 
@@ -22,7 +28,7 @@ def comparePreferred(preferred):
         weight = int(preferred[rule])
         if weight not in groupedWeights:
             groupedWeights[weight] = []
-        groupedWeights[weight].append(rule.name.name)
+        groupedWeights[weight].append(rule.literalReference.name)
 
     result = ""
     for weight in sorted(groupedWeights.keys(), reverse=True):
@@ -34,6 +40,9 @@ def comparePreferred(preferred):
     return result
 
 def findOppositeArgs(arg1, arg2):
+    """
+    Searches and finds recusiveley the opposite argument conclusion from the seocond given argument
+    """
     
     if arg1.topRule.conclusion == arg2.topRule.conclusion.negate():
         return (arg1, arg2)
@@ -45,6 +54,10 @@ def findOppositeArgs(arg1, arg2):
     return None
 
 def findOppositeArgsFromTuple(arg1, arg2):
+    """
+    Searches and finds recusiveley the opposite argument conclusion from the seocond given argument
+    The function is inspired from the BFS algorithm
+    """
     result = findOppositeArgs(arg1, arg2)
     if result:
         return result
@@ -56,6 +69,9 @@ def findOppositeArgsFromTuple(arg1, arg2):
     return None
 
 def democraticWeakestLink(arg1, arg2):
+    """
+    Computes the tuple of arguments with the democratic weakest link principle
+    """
     
     result = findOppositeArgsFromTuple(arg1, arg2)
     arg1AttacerArgs = [ result[0] ]
@@ -90,7 +106,10 @@ def democraticWeakestLink(arg1, arg2):
     return False
 
 def democraticLastLink(arg1, arg2):
-    
+    """
+    Computes the tuple of arguments with the democratic last link principle
+    """
+
     result = findOppositeArgsFromTuple(arg1, arg2)
     arg1AttacerArgs = [ result[0] ]
     arg2AttacerArgs = [ result[1] ]
@@ -124,6 +143,9 @@ def democraticLastLink(arg1, arg2):
     return False
 
 def elitistWeakestLink(arg1, arg2):
+    """
+    Computes the tuple of arguments with the elitist weakest link principle
+    """
 
     result = findOppositeArgsFromTuple(arg1, arg2)
     arg1AttacerArgs = [ result[0] ]
@@ -158,6 +180,9 @@ def elitistWeakestLink(arg1, arg2):
     return False
 
 def elitistLastLink(arg1, arg2):
+    """
+    Computes the tuple of arguments with the elitist last link principle
+    """
 
     result = findOppositeArgsFromTuple(arg1, arg2)
     arg1AttacerArgs = [ result[0] ]
@@ -192,6 +217,9 @@ def elitistLastLink(arg1, arg2):
     return False    
 
 def defeat(arg1, arg2, method, principal):
+    """
+    Computes the tuple of arguments with the given method and principal
+    """
 
     if method == "democratic" and principal == "weakest-link":
         if (democraticWeakestLink(arg1, arg2)):

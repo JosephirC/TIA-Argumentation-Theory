@@ -2,11 +2,11 @@ from flask import Flask, render_template, jsonify, request
 import Literals
 import Rules
 import Arguments
-from GenerateArguments import generateArgs, resetArgumentsBase
+from GenerateArguments import generateArgs, emptyArgumentsBase
 from GenerateAttacks import generateUndercuts, generateRebuts
 from parseAspartix import readKB
 from Defeats import defeat, genHisto
-from BurdenBasedSemantics import calculate_bur_values1
+from BurdenBasedSemantics import computeBurden, compareArgRankings
 from collections import defaultdict
 import os
 import matplotlib.pyplot as plt
@@ -69,13 +69,15 @@ def genReg():
     
     readKB(parsedRules)
 
+    parsedRules = sorted(parsedRules, key=lambda rule: int(rule.literalReference.name[1:]))
+
     return render_template('index.html', parsedRules=parsedRules)
 
 @app.route('/calcArg',  methods=['GET'])
 def calcArg():
     global arguments, arg, parsedRules, undercuts, rebuts
 
-    resetArgumentsBase()
+    emptyArgumentsBase()
     Arguments.Arguments.nameCount = 0
     
     arguments = []
@@ -129,7 +131,8 @@ def calcRanking():
     
     iteration = request.form['rankIteration']
 
-    ranking = calculate_bur_values1(arguments, defeatWeakLink, int(iteration))
+    burdenValues = computeBurden(arguments, defeatWeakLink, int(iteration))
+    ranking = compareArgRankings(burdenValues)
 
     return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink, ranking=ranking)
 

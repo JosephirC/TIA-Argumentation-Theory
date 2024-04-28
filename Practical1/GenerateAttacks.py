@@ -7,14 +7,14 @@ rebuts = defaultdict(set)
 def getRulesNames(rules):
     rulesNames = set()
     for rule in rules:
-        rulesNames.add(rule.name.name)
+        rulesNames.add(rule.literalReference.name)
     return rulesNames
 
 def getAllDefeasibleRulesNames(argument):
     defeasibleRulesNames = set()
     argumentAllDefeasibles = argument.getAllDefeasible()
     for rule in argumentAllDefeasibles:
-        defeasibleRulesNames.add(rule.name.name)
+        defeasibleRulesNames.add(rule.literalReference.name)
 
     return defeasibleRulesNames
 

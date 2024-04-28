@@ -4,16 +4,14 @@ class Rules:
 
     ruleCount = 0
 
-    def __init__(self, premises, conclusion, isDefeasible, literal, weight=0):
+    def __init__(self, premises, conclusion, isDefeasible, literalReference, weight=0):
         self.premises = premises
         self.conclusion = conclusion
         self.isDefeasible = isDefeasible
         Rules.ruleCount += 1
-        self.name : Literals = literal
+        self.literalReference : Literals = literalReference
         self.weight = weight
 
-    # Handle equality between objects.
-    # We dont check equality for names so we can test rules with different names --> duplicate rules
     def __eq__(self, other):
         if not isinstance(other, Rules):
             return False
@@ -21,15 +19,14 @@ class Rules:
             return ((self.premises == other.premises 
                 and self.conclusion == other.conclusion 
                 and self.isDefeasible == other.isDefeasible
-                and self.name == other.name
+                and self.literal == other.literal
                 and self.weight == other.weight))
 
-    # handle print of the class
     def __str__(self):
-        if "[" in str(self.name) and "]" in str(self.name):
-            ruleName = self.name
+        if "[" in str(self.literalReference) and "]" in str(self.literalReference):
+            ruleName = self.literalReference
         else: 
-            ruleName = "[" + str(self.name) + "] "
+            ruleName = "[" + str(self.literalReference) + "] "
         rulePremises = ""
         ruleImplication = ""
         ruleConclusion = ""
@@ -44,16 +41,16 @@ class Rules:
         ruleConclusion = ruleConclusion[:-1] + " "
 
         if self.isDefeasible:
-            ruleImplication = "=>"
+            ruleImplication = "⇒ "
             ruleWeight = str(self.weight)
         else:
-            ruleImplication = "->"
+            ruleImplication = "→ "
 
         return ruleName + rulePremises + ruleImplication + ruleConclusion + ruleWeight
     
     # handle hash of the class
     def __hash__(self):
-        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.name, self.weight))
+        return hash((tuple(self.premises), self.conclusion, self.isDefeasible, self.literalReference, self.weight))
 
     def contraposition(self):
         newRules = set()
@@ -69,15 +66,13 @@ class Rules:
 
             compt = Rules.ruleCount
             compt = compt + 1
-            rX = Literals("r" + str(compt), self.name.isNeg)
+            rX = Literals("r" + str(compt), self.literalReference.isNeg)
             newRules.add(Rules(newPremise, newConclusion, self.isDefeasible, rX))
 
         return newRules
 
     def copy(self):
         """
-        This method is used to create a copy of a rule object without incrementing the ruleCount.
+        This method is used to create a copy of a rule object.
         """
-
-        # Rules.ruleCount -=1 
-        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.name)
+        return Rules(self.premises.copy(), self.conclusion.copy(), self.isDefeasible, self.literalReference)

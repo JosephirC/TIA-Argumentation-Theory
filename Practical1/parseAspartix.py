@@ -1,13 +1,12 @@
 import os
-import Rules
-import Literals
+from Rules import Rules
+from Literals import Literals
 
 """
 parse and write in the file aspartix.txt
 """
 def parseAttacks(defeats):
     if os.path.exists('aspartix.txt'):
-        #open and erase the file content
         fichier = open('aspartix.txt', 'w')
         pass
     fichier = open('aspartix.txt', 'a')
@@ -63,17 +62,17 @@ def parseRules(rules):
 def defeasibleRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreLit2, tmpCclLit):
     if len(premises) > 1:
         if '!' in premises[0]:
-            tmpPreLit1 = Literals.Literals(premises[0][1:], True)
+            tmpPreLit1 = Literals(premises[0][1:], True)
         else:
-            tmpPreLit1 = Literals.Literals(premises[0], True)
+            tmpPreLit1 = Literals(premises[0], True)
         if '!' in premises[1]:
-            tmpPreLit2 = Literals.Literals(premises[1][1:], True)
+            tmpPreLit2 = Literals(premises[1][1:], True)
         else:
-            tmpPreLit2 = Literals.Literals(premises[1], False)
+            tmpPreLit2 = Literals(premises[1], False)
         if '!' in conclusion[0]:
-            tmpCclLit = Literals.Literals(conclusion[0][1:], True)
+            tmpCclLit = Literals(conclusion[0][1:], True)
         else:
-            tmpCclLit = Literals.Literals(conclusion[0], False)
+            tmpCclLit = Literals(conclusion[0], False)
         if len(conclusion) > 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
@@ -84,120 +83,118 @@ def defeasibleRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreL
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, True, name))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, True, name))
     if len(premises) == 1 and premises[0] != '':
         if '!' in premises[0]:
-            tmpPreLit1 = Literals.Literals(premises[0][1:], True)
+            tmpPreLit1 = Literals(premises[0][1:], True)
         else:
-            tmpPreLit1 = Literals.Literals(premises[0], False)
+            tmpPreLit1 = Literals(premises[0], False)
         if '!' in conclusion[0]:
-            tmpCclLit = Literals.Literals(conclusion[0][1:], True)
+            tmpCclLit = Literals(conclusion[0][1:], True)
         else:
-            tmpCclLit = Literals.Literals(conclusion[0], False)
+            tmpCclLit = Literals(conclusion[0], False)
         if len(conclusion) > 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, name, conclusion[1]))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({tmpPreLit1}, tmpCclLit, True, name, conclusion[1]))
         if len(conclusion) == 1 and conclusion[0] != '':
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, True, name))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({tmpPreLit1}, tmpCclLit, True, name))
     if premises[0] == '':
         if '!' in conclusion[0]:
-            tmpCclLit = Literals.Literals(conclusion[0][1:], True)
+            tmpCclLit = Literals(conclusion[0][1:], True)
         else:
-            tmpCclLit = Literals.Literals(conclusion[0], False)
+            tmpCclLit = Literals(conclusion[0], False)
         if len(conclusion) > 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({}, tmpCclLit, True, name, conclusion[1]))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({}, tmpCclLit, True, name, conclusion[1]))
         if len(conclusion) == 1 and conclusion[0] != '':
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({}, tmpCclLit, True, name))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({}, tmpCclLit, True, name))
 
 def strictRules(text, premises, conclusion, parsedRules, tmpPreLit1, tmpPreLit2, tmpCclLit):
     if len(premises) > 1:
         if '!' in premises[0]:
-            tmpPreLit1 = Literals.Literals(premises[0][1:], True)
+            tmpPreLit1 = Literals(premises[0][1:], True)
         else :
-            tmpPreLit1 = Literals.Literals(premises[0], False)
+            tmpPreLit1 = Literals(premises[0], False)
         if '!' in premises[1]:
-            tmpPreLit2 = Literals.Literals(premises[1][1:], True)
+            tmpPreLit2 = Literals(premises[1][1:], True)
         else :
-            tmpPreLit2 = Literals.Literals(premises[1], False)
+            tmpPreLit2 = Literals(premises[1], False)
         if '!' in conclusion[0]:
-            tmpCclLit = Literals.Literals(conclusion[0][1:], True)
+            tmpCclLit = Literals(conclusion[0][1:], True)
         else:
-            tmpCclLit = Literals.Literals(conclusion[0], False)
+            tmpCclLit = Literals(conclusion[0], False)
         if len(conclusion) > 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
+            name = Literals(nameIt, False)
             parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, name, conclusion[1].replace('!', '')))
         if len(conclusion) == 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, name))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({tmpPreLit1, tmpPreLit2}, tmpCclLit, False, name))
     if len(premises) == 1 and premises[0] != '':
         if '!' in premises[0]:
-            tmpPreLit1 = Literals.Literals(premises[0][1:], True)
+            tmpPreLit1 = Literals(premises[0][1:], True)
         else:
-            tmpPreLit1 = Literals.Literals(premises[0], False)
+            tmpPreLit1 = Literals(premises[0], False)
         if '!' in conclusion[0]:
-            tmpCclLit = Literals.Literals(conclusion[0][1:], True)
+            tmpCclLit = Literals(conclusion[0][1:], True)
         else:
-            tmpCclLit = Literals.Literals(conclusion[0], False)
+            tmpCclLit = Literals(conclusion[0], False)
         if len(conclusion) > 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, False, name, conclusion[1]))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({tmpPreLit1}, tmpCclLit, False, name, conclusion[1]))
         if len(conclusion) == 1 and conclusion[0] != '':
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({tmpPreLit1}, tmpCclLit, False, name))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({tmpPreLit1}, tmpCclLit, False, name))
     if premises[0] == '':
         if '!' in conclusion[0]:
-            tmpCclLit = Literals.Literals(conclusion[0][1:], True)
+            tmpCclLit = Literals(conclusion[0][1:], True)
         else:
-            tmpCclLit = Literals.Literals(conclusion[0], False)
+            tmpCclLit = Literals(conclusion[0], False)
         if len(conclusion) > 1:
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({}, tmpCclLit, False, name, conclusion[1]))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({}, tmpCclLit, False, name, conclusion[1]))
         if len(conclusion) == 1 and conclusion[0] != '':
             nameIt = text[0].replace('!', '')
             nameIt = nameIt.replace('[', '')
             nameIt = nameIt.replace(']', '')
-            name = Literals.Literals(nameIt, False)
-            parsedRules.add(Rules.Rules({}, tmpCclLit, False, name))
+            name = Literals(nameIt, False)
+            parsedRules.add(Rules({}, tmpCclLit, False, name))
 
 def readKB(parsedRules):
     if os.path.exists('./uploads/KB.txt'):
         fichier = open('./uploads/KB.txt', 'r')
-        tmpPreLit1 = Literals.Literals("", False)
-        tmpPreLit2 = Literals.Literals("", False)
-        tmpCclLit = Literals.Literals("", False)
-        # for f in fichier:
-        #     [text, premises, conclusion, fleche] = element(f)
+        tmpPreLit1 = Literals("", False)
+        tmpPreLit2 = Literals("", False)
+        tmpCclLit = Literals("", False)
         for f in fichier:
             [text, premises, conclusion, fleche] = element(f)
             if fleche == "=>":

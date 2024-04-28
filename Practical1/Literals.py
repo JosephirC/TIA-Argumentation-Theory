@@ -1,11 +1,15 @@
 class Literals:
+    
     def __init__(self, name, isNeg):
         self.name = name
         self.isNeg = isNeg
 
     def __eq__(self, other):
-        return (self.name == other.name 
-                and self.isNeg == other.isNeg)
+        if not isinstance(other, Literals):
+            return False
+        else:
+            return (self.name == other.name 
+                    and self.isNeg == other.isNeg)
 
     def __str__(self):
         literalName = str(self.name)
@@ -18,7 +22,6 @@ class Literals:
     def __hash__(self):
         return hash((self.name, self.isNeg))
     
-    # negate the class instance through the isNeg attribute
     def negate(self):
         return Literals(self.name, not self.isNeg)
     

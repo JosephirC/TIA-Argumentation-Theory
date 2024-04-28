@@ -16,7 +16,9 @@
         <br/>
         [{ruleName}] {premises}{-> or =>}{conclusion} {ruleWeight}
     </p>
-    <br>
+    <p>
+        Example: [r1] !c,d->!b
+    </p>
 
     {% if parsedRules %}
     <h2>Pour vos règles</h2>
@@ -104,11 +106,9 @@
     
             {% if ranking %}
                 <h2>Voici le classements de vos Arguments:</h2>
-                <ol>
-                    {%for i in ranking%}
-                        <li>{{i[0]}}</li>
-                    {%endfor%}
-                </ol>
+                <p>
+                    {{ranking}}
+                </p>
             {% endif %}
         {% endif %}
     {% endif %}
