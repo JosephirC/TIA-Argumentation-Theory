@@ -235,26 +235,19 @@ def defeat(arg1, arg2, method, principal):
             return (arg1, arg2)
     return None
 
-def genHisto(defeatWeakLink, nbrArg):
+def genHisto(defeatWeakLink, arguments):
     attack = {}
-    for key in defeatWeakLink:
-        for (arg1, arg2) in defeatWeakLink[key]:
-            if arg2 not in attack:
-                attack[arg2] = 1
-            else:
-                attack[arg2] += 1
     
-    histo = {}
-    for attaque in attack.values():
-        if attaque not in histo:
-            histo[attaque] = 1
+    for arg in arguments:
+        count = 0
+        for key in defeatWeakLink:
+            for (arg1, arg2) in defeatWeakLink[key]:
+                if arg2.name == arg.name:
+                    count = count + 1
+
+        if count in attack:
+            attack[count] += 1
         else:
-            histo[attaque] += 1
-    compt = 0
-
-    for key in histo:
-        compt = compt + histo[key]
-
-    histo[0] = nbrArg - compt
-
-    return histo
+            attack[count] = 1
+            
+    return attack

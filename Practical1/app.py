@@ -9,6 +9,8 @@ from Defeats import defeat, genHisto
 from BurdenBasedSemantics import computeBurden, compareArgRankings
 from collections import defaultdict
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 app = Flask(__name__)
@@ -114,13 +116,15 @@ def calcDefeats():
             if defeatTuple is not None:
                 defeatWeakLink[arg1.topRule.conclusion].add(defeatTuple)
 
-    histo = genHisto(defeatWeakLink, len(arg))
+    histo = genHisto(defeatWeakLink, arg)
 
     plt.bar(histo.keys(), histo.values())
     plt.xlabel('Nombre de défaites')
     plt.ylabel('Nombre d\'arguments')
     plt.title('Histogramme des défaites par argument')
-    plt.savefig('static/histo.png')
+    with app.app_context():
+        plt.savefig('static/histo.png')
+        plt.close()
 
     return render_template('index.html', parsedRules=parsedRules, arguments=arg, undercuts=undercuts, rebuts=rebuts, defeatWeakLink=defeatWeakLink)
 
