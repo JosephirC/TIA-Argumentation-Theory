@@ -5,12 +5,18 @@ undercuts = set()
 rebuts = defaultdict(set)
 
 def getRulesNames(rules):
+    """
+    Gets the rules names from the rules.
+    """
     rulesNames = set()
     for rule in rules:
         rulesNames.add(rule.literalReference.name)
     return rulesNames
 
 def getAllDefeasibleRulesNames(argument):
+    """
+    Gets all the defeasible rules names from the argument.
+    """
     defeasibleRulesNames = set()
     argumentAllDefeasibles = argument.getAllDefeasible()
     for rule in argumentAllDefeasibles:
@@ -19,6 +25,9 @@ def getAllDefeasibleRulesNames(argument):
     return defeasibleRulesNames
 
 def generateUndercuts(argumentBase, rules):
+    """
+    Generates the undercuts from the argument base.
+    """
     rulesNames = getRulesNames(rules)
     for arg in argumentBase:
         if arg.topRule.premises:
@@ -34,6 +43,9 @@ def generateUndercuts(argumentBase, rules):
     return undercuts
 
 def generateRebuts(argumentBase):
+    """
+    Generates the rebuts from the argument base.
+    """
 
     sortedArgBase = sorted(argumentBase, key=lambda arg: int(arg.name[1:]))
 
@@ -62,6 +74,9 @@ def generateRebuts(argumentBase):
 
 
 def subArgConclusion(args):
+    """
+    Gets the sub arguments conclusions.
+    """
     subConclusion = set()
     for arg in args:
         subConclusion.add(arg)

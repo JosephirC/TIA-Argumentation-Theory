@@ -3,6 +3,9 @@ from collections import defaultdict
 tempDict = {}
 
 def getAttack(arg, defeats):
+    """
+    Get the attack of an argument
+    """
     attack = set()
     for key in defeats:
         for (arg1, arg2) in defeats[key]:
@@ -12,10 +15,16 @@ def getAttack(arg, defeats):
     return attack
 
 def init(argument_base):
+    """
+    Initialize the dictionary with burden value 1 for each argument
+    """
     for arg in argument_base:
         tempDict[arg.name] = [1]
 
 def burden(argument_base, defeats, i):
+    """
+    Compute the burden of each argument for the i-th iteration
+    """
     if i == 0:
         init(argument_base)
     else:
@@ -27,10 +36,10 @@ def burden(argument_base, defeats, i):
 
             tempDict[arg.name].append(sum + 1)
 
-def custom_compare(entry):
-    return entry[1:]
-
 def computeBurden(argBase, defeats, depth):
+    """
+    Compute the burden of each argument for a given depth
+    """
     tempDict.clear()
 
     for i in range(depth): 
