@@ -121,7 +121,7 @@ def main():
 
     for rebut in rebuts:
         for (arg1, arg2) in rebuts[rebut]:
-            defeatTuple = defeat(arg1, arg2, "democratic", "weakest-link")
+            defeatTuple = defeat(arg1, arg2, "elitist", "weakest-link")
             if defeatTuple is not None:
                 defeatsDict[arg1.topRule.conclusion].append(defeatTuple)
     
@@ -146,7 +146,7 @@ def main():
     print("Ranking: ", argRanking)
 
     # Constuct the histogram with matplotlib
-    genHisto(defeatsDict, len(argumentBase))
+    genHisto(defeatsDict, argumentBase)
 
 
 if __name__ == "__main__":
