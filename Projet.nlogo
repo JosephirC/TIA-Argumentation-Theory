@@ -1,54 +1,67 @@
 breed [sheep a-sheep]
 breed [shepherds shepherd]
-;;breed [square a-square]
-globals
-[
+breed [flower a-flower]
+
+globals [
   sheepless-neighborhoods       ;; how many patches have no sheep in any neighboring patches?
   herding-efficiency            ;; measures how well-herded the sheep are
   zone
+  eating-efficiency             ;; how many flowers were eaten
 ]
-patches-own
-[
+
+patches-own [
   sheep-nearby                  ;; how many sheep in neighboring patches?
 ]
-shepherds-own
-[
-  carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying in)
+
+shepherds-own [
+  carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying one)
   found-herd?           ;; becomes true when I find a herd to drop it in
+]
+
+sheep-own [
+  stop-moving           ;; indicates if the sheep should stop moving
+  hungry                ;; indicate if a sheep is hungry or not
+  hunger-timer          ;; indicates the period of time to get hungry
+]
+
+flower-own [
+  alive
+  hungry-sheep-nearby            ;; how many hungry sheeps are nearby?
 ]
 
 to setup
   clear-all
   set-default-shape sheep "sheep"
   set-default-shape shepherds "person"
-  ;;set-default-shape square "square"
-   set zone patches with [pxcor > 5 and pycor > 5]
-  ask patches
-    [ set pcolor green + (random-float 0.8) - 0.4
-  ]   ;; varying the green just makes it look nicer
+  set-default-shape flower "flower"
+  set zone patches with [pxcor > 5 and pycor > 5]
+  ask patches [
+    set pcolor green + (random-float 0.8) - 0.4
+  ] ;; varying the green just makes it look nicer
 
   ask zone [set pcolor brown]
-  create-sheep num-sheep
-    [ set color white
-      set size 1.5  ;; easier to see
-      setxy random-xcor random-ycor ]
-  create-shepherds num-shepherds
-    [ set color red
-      set size 3  ;; easier to see
-      set carried-sheep nobody
-      set found-herd? false
-      setxy random-xcor random-ycor ]
-  ;;  create-square 1
-   ;;  [ set color brown
-   ;; set size 16
-    ;;setxy 19 19
- ;; ]
+  create-sheep num-sheep [
+    set color white
+    set size 1.5  ;; easier to see
+    set stop-moving false
+    set hungry false
+    set hunger-timer 0
+    setxy random-xcor random-ycor
+  ]
+  create-shepherds num-shepherds [
+    set color red
+    set size 3  ;; easier to see
+    set carried-sheep nobody
+    set found-herd? false
+    setxy random-xcor random-ycor
+  ]
   reset-ticks
 end
 
 to update-sheep-counts
-  ask patches
-    [ set sheep-nearby (sum [count sheep-here] of neighbors) ]
+  ask patches [
+    set sheep-nearby (sum [count sheep-here] of neighbors)
+  ]
   set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
 end
 
@@ -56,72 +69,151 @@ to calculate-herding-efficiency
   set herding-efficiency (sheepless-neighborhoods / (count patches with [not any? sheep-here])) * 100
 end
 
-to go
-  ask shepherds
-  [ ifelse carried-sheep = nobody
-      [ search-for-sheep ]     ;; find a sheep and pick it up
-    [ ifelse found-herd?
-        [ find-empty-spot ]  ;; find an empty spot to drop the sheep
-      [ find-new-herd ] ]  ;; find a herd to drop the sheep in
-    moveR
-    ;;fd 1
-    if carried-sheep != nobody
-     ;;bring my sheep to where I just moved to
-    [ ask carried-sheep [ move-to-zone zone ] ] ]
-  ;;ask shepherds
- ;; [
-   ;;moveR
-   ;; [ ifelse carried-sheep = nobody
- ;; ]
-  ask sheep with [not hidden?]
-  [
-    moveR
+to calculate-eating-efficiency
+  set eating-efficiency count flower
+end
+
+to update-hunger
+  ask sheep [
+    if not stop-moving [
+      if hungry = false [
+        set hunger-timer hunger-timer + 1
+
+        if hunger-timer >= 100 [
+          set hungry true
+          set color red
+        ]
+      ]
+
+      if hungry [
+        set hunger-timer hunger-timer + 1
+        if hunger-timer >= 200 [
+          die
+        ]
+      ]
+    ]
   ]
+end
+
+to go
+  ask shepherds [
+    ifelse carried-sheep = nobody [
+      search-for-sheep
+    ] [
+      move-to-brown-zone
+    ]
+  ]
+  ask sheep [
+    if not stop-moving [
+      ifelse hungry = false [
+        moveR
+      ] [
+        search-for-flower
+      ]
+    ]
+  ]
+  update-hunger
+  spawn-flower
   tick
 end
 
-to moveR        ;; turtle procedure
-    set heading random 360
-    fd 3
-end
-
-to move-to-zone [zoneB]
-  let target one-of zoneB
-  while [pcolor != brown]
-    [
-     face target
-     fd 3
+to spawn-flower
+  if random-float 1 < 0.2 and count flower < num-flowers [ ;; j'ai 20% qu'ils "pleuvent" et donc de faire spawn une fleur
+    let target-patch one-of patches with [pcolor != brown]
+    if target-patch != nobody [
+      ask target-patch [
+        sprout-flower 1 [
+          set color yellow
+          set size 2
+        ]
+      ]
     ]
+  ]
 end
 
-to search-for-sheep ;; shepherds procedure
-  set carried-sheep one-of sheep-here with [not hidden?]
-  if (carried-sheep != nobody)
-    [ ask carried-sheep
-        [ hide-turtle ]  ;; make the sheep invisible to other shepherds
-      set color blue     ;; turn shepherd blue while carrying sheep
-      fd 1 ]
+to moveR
+  rt random 50
+  lt random 50
+  fd 1
+  set color yellow
 end
 
-to find-new-herd ;; shepherds procedure
-  if any? sheep-here with [not hidden?]
-    [ set found-herd? true ]
+to search-for-sheep
+  let target one-of sheep with [not hidden?]
+  if target != nobody [
+    if [stop-moving] of target = false [
+      face target
+      fd 1
+      if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
+        set carried-sheep target
+        ask carried-sheep [
+          set hidden? true ;; pour qu'on voit le berger porte le mouton
+        ]
+        set color blue
+      ]
+    ]
+  ]
 end
 
-to find-empty-spot ;; shepherds procedure
-  if all? sheep-here [hidden?]
-    [ ask carried-sheep
-        [ show-turtle ]       ;; make the sheep visible again
-      set color brown         ;; set my own color back to brown
-      set carried-sheep nobody
-      set found-herd? false
-      rt random 360
-      fd 20 ]
+to search-for-flower
+  let target min-one-of flower with [not hidden?] [distance myself]
+
+  ;; let target one-of flower with [not hidden?]
+  if target != nobody [
+    face target
+    fd 1
+
+    if distance target < 1 [
+      ask target [die]
+      set color white
+      set hungry false
+      set hunger-timer 0
+    ]
+  ]
+end
+
+to search-for-flower2
+  let nearest-flower min-one-of flower with [not hidden?] [distance myself]
+  if nearest-flower != nobody [
+    face nearest-flower
+    ifelse distance nearest-flower > 1 [
+      fd 1 ; Avance vers la fleur sans la déplacer effectivement
+    ] [
+      ask nearest-flower [
+        die
+      ]
+      set color white
+      set hungry false
+      set hunger-timer 0
+    ]
+  ]
 end
 
 
-; Copyright 1998 Uri Wilensky.
-; See Info tab for full copyright and license.
+to move-to-brown-zone
+  if carried-sheep != nobody [
+    ask carried-sheep [
+      move-to one-of zone
+      set hidden? false
+      stay-in-zone ;; pour que les moutons restent dans la zone marron
+    ]
+    set color red
+    set carried-sheep nobody ;; Réinitialiser carried-sheep après avoir déposé le mouton
+    search-for-sheep ;; le berger cherche d'autres moutons
+  ]
+end
+
+to stay-in-zone
+  ifelse [pcolor] of patch-ahead 1 = brown [
+    set stop-moving true    ;; le mouton ne bouge plus
+    set hungry false
+    set hunger-timer 0
+    set color white
+  ]
+  [
+
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 248
@@ -177,7 +269,7 @@ num-sheep
 num-sheep
 0
 500
-3.0
+48.0
 1
 1
 NIL
@@ -239,6 +331,32 @@ MONITOR
 237
 current efficiency
 herding-efficiency
+1
+1
+11
+
+SLIDER
+37
+149
+209
+182
+num-flowers
+num-flowers
+0
+50
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+139
+506
+291
+551
+number of alive flowers
+eating-efficiency
 1
 1
 11
