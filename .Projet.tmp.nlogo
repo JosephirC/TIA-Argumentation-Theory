@@ -88,6 +88,7 @@ to search-for-sheep
 end
 to move-to-brown-zone
   if carried-sheep != nobody [
+;    move-to one-of zone
     ask carried-sheep [
       move-to one-of zone
       set hidden? false
