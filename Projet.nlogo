@@ -1,54 +1,99 @@
 breed [sheep a-sheep]
 breed [shepherds shepherd]
-;;breed [square a-square]
-globals
-[
+breed [flower a-flower]
+breed [bee a-bee]
+breed [hive a-hive]
+
+globals [
   sheepless-neighborhoods       ;; how many patches have no sheep in any neighboring patches?
   herding-efficiency            ;; measures how well-herded the sheep are
   zone
+  eating-efficiency             ;; how many flowers were eaten
 ]
-patches-own
-[
+
+patches-own [
   sheep-nearby                  ;; how many sheep in neighboring patches?
 ]
-shepherds-own
-[
-  carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying in)
+
+shepherds-own [
+  carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying one)
   found-herd?           ;; becomes true when I find a herd to drop it in
+]
+
+sheep-own [
+  stop-moving           ;; indicates if the sheep should stop moving
+  hungry                ;; indicate if a sheep is hungry or not
+  hunger-timer          ;; indicates the period of time to get hungry
+]
+
+flower-own [
+  alive
+  hungry-sheep-nearby            ;; how many hungry sheeps are nearby?
+]
+
+bee-own[
+  on-flower              ;; boolean to indicate if the bee is on a flower or not
+  life-time              ;; indicates life duration for a bee
+  pollen                 ;; indicates the number of pollen it can pick up
+  time-on-flower         ;; indicates the time the bee spends on the flower
+  time-collect-pollen    ;; indicates the time each bee needs to collect a pollen
+]
+
+hive-own[
+  pollen-total          ;; indicates the total number of pollen the hive has
 ]
 
 to setup
   clear-all
   set-default-shape sheep "sheep"
   set-default-shape shepherds "person"
-  ;;set-default-shape square "square"
-   set zone patches with [pxcor > 5 and pycor > 5]
-  ask patches
-    [ set pcolor green + (random-float 0.8) - 0.4
-  ]   ;; varying the green just makes it look nicer
+  set-default-shape flower "flower"
+  set-default-shape bee "bee 2"
+  set-default-shape hive "house"
+  set zone patches with [pxcor > 5 and pycor > 5]
+  ask patches [
+    set pcolor green + (random-float 0.8) - 0.4
+  ] ;; varying the green just makes it look nicer
 
   ask zone [set pcolor brown]
-  create-sheep num-sheep
-    [ set color white
-      set size 1.5  ;; easier to see
-      setxy random-xcor random-ycor ]
-  create-shepherds num-shepherds
-    [ set color red
-      set size 3  ;; easier to see
-      set carried-sheep nobody
-      set found-herd? false
-      setxy random-xcor random-ycor ]
-  ;;  create-square 1
-   ;;  [ set color brown
-   ;; set size 16
-    ;;setxy 19 19
- ;; ]
+  create-sheep num-sheep [
+    set color white
+    set size 1.5  ;; easier to see
+    set stop-moving false
+    set hungry false
+    set hunger-timer 0
+    setxy random-xcor random-ycor
+  ]
+  create-shepherds num-shepherds [
+    set color red
+    set size 3  ;; easier to see
+    set carried-sheep nobody
+    set found-herd? false
+    setxy random-xcor random-ycor
+  ]
+  create-bee num-bee [
+    set color yellow
+    set size 2.5
+    set on-flower false
+    set life-time 0
+    set pollen 0
+    set time-collect-pollen 10
+    ;;set time-collect-pollen random 10
+    ;;set time-collect-pollen time-collect-pollen + 10
+  ]
+  create-hive 1 [
+    set color white
+    set size 5
+    setxy -23 -23
+  ]
+
   reset-ticks
 end
 
 to update-sheep-counts
-  ask patches
-    [ set sheep-nearby (sum [count sheep-here] of neighbors) ]
+  ask patches [
+    set sheep-nearby (sum [count sheep-here] of neighbors)
+  ]
   set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
 end
 
@@ -56,81 +101,210 @@ to calculate-herding-efficiency
   set herding-efficiency (sheepless-neighborhoods / (count patches with [not any? sheep-here])) * 100
 end
 
-to go
-  ask shepherds
-  [ ifelse carried-sheep = nobody
-      [ search-for-sheep ]     ;; find a sheep and pick it up
-    [ ifelse found-herd?
-        [ find-empty-spot ]  ;; find an empty spot to drop the sheep
-      [ find-new-herd ] ]  ;; find a herd to drop the sheep in
-    moveR
-    ;;fd 1
-    if carried-sheep != nobody
-     ;;bring my sheep to where I just moved to
-    [ ask carried-sheep [ move-to-zone zone ] ] ]
-  ;;ask shepherds
- ;; [
-   ;;moveR
-   ;; [ ifelse carried-sheep = nobody
- ;; ]
-  ask sheep with [not hidden?]
-  [
-    moveR
+to calculate-eating-efficiency
+  set eating-efficiency count flower
+end
+
+to update-hunger
+  ask sheep [
+    if not stop-moving [
+      if hungry = false [
+        set hunger-timer hunger-timer + 1
+
+        if hunger-timer >= 100 [
+          set hungry true
+          set color red
+        ]
+      ]
+
+      if hungry [
+        set hunger-timer hunger-timer + 1
+        if hunger-timer >= 200 [
+          die
+        ]
+      ]
+    ]
   ]
+end
+
+to update-life-time
+  ask bee[
+    if not on-flower [
+      set life-time life-time + 1
+      if life-time >= 500 and random-float 1 < 0.1 [
+        die
+      ]
+    ]
+  ]
+end
+
+to update-on-flower
+  ask bee[
+    if on-flower [
+      set time-on-flower time-on-flower
+
+      if time-on-flower >= time-collect-pollen [
+        set on-flower false
+        set color blue
+        ;;set pollen random 5
+        set pollen 5
+      ]
+    ]
+  ]
+end
+
+to go
+  ask shepherds [
+    ifelse carried-sheep = nobody [
+      search-for-sheep
+    ] [
+      move-to-brown-zone
+    ]
+  ]
+  ask sheep [
+    if not stop-moving [
+      ifelse hungry = false [
+        moveR
+      ] [
+        sheep-search-for-flower
+      ]
+    ]
+  ]
+  ask bee [
+    if not on-flower and pollen = 0 [
+      let target min-one-of flower with [not hidden?] [distance myself]
+      if target != nobody [
+        ifelse distance target < 2 [
+          bee-go-to-flower target
+        ] [
+          moveR
+        ]
+      ]
+    ]
+    if pollen > 0 [
+      go-to-hive
+    ]
+  ]
+
+  update-hunger
+  update-on-flower
+  update-life-time
+  spawn-flower
   tick
 end
 
-to moveR        ;; turtle procedure
-    set heading random 360
-    fd 3
-end
-
-to move-to-zone [zoneB]
-  let target one-of zoneB
-  while [pcolor != brown]
-    [
-     face target
-     fd 3
+to spawn-flower
+  if random-float 1 < 0.2 and count flower < num-flowers [ ;; j'ai 20% qu'ils "pleuvent" et donc de faire spawn une fleur
+    let target-patch one-of patches with [pcolor != brown]
+    if target-patch != nobody [
+      ask target-patch [
+        sprout-flower 1 [
+          set color yellow
+          set size 2
+        ]
+      ]
     ]
+  ]
 end
 
-to search-for-sheep ;; shepherds procedure
-  set carried-sheep one-of sheep-here with [not hidden?]
-  if (carried-sheep != nobody)
-    [ ask carried-sheep
-        [ hide-turtle ]  ;; make the sheep invisible to other shepherds
-      set color blue     ;; turn shepherd blue while carrying sheep
-      fd 1 ]
+to moveR
+  rt random 50
+  lt random 50
+  fd 1
+  set color yellow
 end
 
-to find-new-herd ;; shepherds procedure
-  if any? sheep-here with [not hidden?]
-    [ set found-herd? true ]
+to go-to-hive
+  let target one-of hive with [not hidden?]
+  if target != nobody [
+    face target
+    fd 1
+
+    if distance target < 1 [
+      set pollen-total pollen-total + pollen
+      set pollen 0
+    ]
+  ]
 end
 
-to find-empty-spot ;; shepherds procedure
-  if all? sheep-here [hidden?]
-    [ ask carried-sheep
-        [ show-turtle ]       ;; make the sheep visible again
-      set color brown         ;; set my own color back to brown
-      set carried-sheep nobody
-      set found-herd? false
-      rt random 360
-      fd 20 ]
+to search-for-sheep
+  let target one-of sheep with [not hidden?]
+  if target != nobody [
+    if [stop-moving] of target = false [
+      face target
+      fd 1
+      if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
+        set carried-sheep target
+        ask carried-sheep [
+          set hidden? true ;; pour qu'on voit le berger porte le mouton
+        ]
+        set color blue
+      ]
+    ]
+  ]
 end
 
+to sheep-search-for-flower
+  let target min-one-of flower with [not hidden?] [distance myself]
 
-; Copyright 1998 Uri Wilensky.
-; See Info tab for full copyright and license.
+  ;; let target one-of flower with [not hidden?]
+  if target != nobody [
+    face target
+    fd 1
+
+    if distance target < 1 [
+      ask target [
+        die
+      ]
+      set color white
+      set hungry false
+      set hunger-timer 0
+    ]
+  ]
+end
+
+to bee-go-to-flower [target]
+  face target
+  fd 1
+  if distance target < 1 [ ;; the bee is on the flower
+    set on-flower true
+    set color red
+  ]
+end
+
+to move-to-brown-zone
+  if carried-sheep != nobody [
+    ask carried-sheep [
+      ;;move-to one-of zone
+      set hidden? false
+      stay-in-zone ;; pour que les moutons restent dans la zone marron
+    ]
+    set color red
+    set carried-sheep nobody ;; Réinitialiser carried-sheep après avoir déposé le mouton
+    search-for-sheep ;; le berger cherche d'autres moutons
+  ]
+end
+
+to stay-in-zone
+  ifelse [pcolor] of patch-ahead 1 = brown [
+    set stop-moving true    ;; le mouton ne bouge plus
+    set hungry false
+    set hunger-timer 0
+    set color white
+  ]
+  [
+
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-248
-10
-664
-427
+258
+43
+658
+444
 -1
 -1
-8.0
+7.7
 1
 10
 1
@@ -151,10 +325,10 @@ ticks
 30.0
 
 PLOT
-7
+11
+307
 241
-237
-414
+480
 Herding Efficiency
 Time
 Percent
@@ -177,7 +351,7 @@ num-sheep
 num-sheep
 0
 500
-3.0
+6.0
 1
 1
 NIL
@@ -233,15 +407,56 @@ NIL
 0
 
 MONITOR
-63
-192
-176
-237
+67
+258
+180
+303
 current efficiency
 herding-efficiency
 1
 1
 11
+
+SLIDER
+37
+149
+209
+182
+num-flowers
+num-flowers
+0
+50
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+139
+506
+291
+551
+number of alive flowers
+eating-efficiency
+1
+1
+11
+
+SLIDER
+43
+192
+215
+225
+num-bee
+num-bee
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -369,6 +584,27 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+bee 2
+true
+0
+Polygon -1184463 true false 195 150 105 150 90 165 90 225 105 270 135 300 165 300 195 270 210 225 210 165 195 150
+Rectangle -16777216 true false 90 165 212 185
+Polygon -16777216 true false 90 207 90 226 210 226 210 207
+Polygon -16777216 true false 103 266 198 266 203 246 96 246
+Polygon -6459832 true false 120 150 105 135 105 75 120 60 180 60 195 75 195 135 180 150
+Polygon -6459832 true false 150 15 120 30 120 60 180 60 180 30
+Circle -16777216 true false 105 30 30
+Circle -16777216 true false 165 30 30
+Polygon -7500403 true true 120 90 75 105 15 90 30 75 120 75
+Polygon -16777216 false false 120 75 30 75 15 90 75 105 120 90
+Polygon -7500403 true true 180 75 180 90 225 105 285 90 270 75
+Polygon -16777216 false false 180 75 270 75 285 90 225 105 180 90
+Polygon -7500403 true true 180 75 180 90 195 105 240 195 270 210 285 210 285 150 255 105
+Polygon -16777216 false false 180 75 255 105 285 150 285 210 270 210 240 195 195 105 180 90
+Polygon -7500403 true true 120 75 45 105 15 150 15 210 30 210 60 195 105 105 120 90
+Polygon -16777216 false false 120 75 45 105 15 150 15 210 30 210 60 195 105 105 120 90
+Polygon -16777216 true false 135 300 165 300 180 285 120 285
 
 box
 false
