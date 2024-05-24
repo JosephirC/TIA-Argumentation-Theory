@@ -9,7 +9,7 @@ globals [
   herding-efficiency            ;; measures how well-herded the sheep are
   zone
   eating-efficiency             ;; how many flowers were eaten
-
+  number-pollen
 ]
 
 patches-own [
@@ -168,7 +168,8 @@ to update-hive
           set time-collect-pollen time-collect-pollen + 30
         ]
       ]
-          set pollen-total 0
+      set number-pollen number-pollen + pollen-total
+      set pollen-total 0
     ]
   ]
 end
@@ -348,24 +349,6 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-PLOT
-1121
-49
-1351
-222
-Herding Efficiency
-Time
-Percent
-0.0
-300.0
-0.0
-100.0
-true
-false
-"" ""
-PENS
-"efficiency" 1.0 0 -13345367 true "" "if ticks mod 50 = 0  ;; since the calculations are expensive\n[\n  update-sheep-counts\n  calculate-herding-efficiency\n  plotxy ticks herding-efficiency\n]"
-
 SLIDER
 38
 115
@@ -375,7 +358,7 @@ num-sheep
 num-sheep
 0
 500
-20.0
+10.0
 1
 1
 NIL
@@ -430,17 +413,6 @@ NIL
 NIL
 0
 
-MONITOR
-1117
-10
-1230
-55
-current efficiency
-herding-efficiency
-1
-1
-11
-
 SLIDER
 37
 149
@@ -455,17 +427,6 @@ num-flowers
 1
 NIL
 HORIZONTAL
-
-MONITOR
-1122
-232
-1274
-277
-number of alive flowers
-eating-efficiency
-1
-1
-11
 
 SLIDER
 37
@@ -516,26 +477,44 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count bee"
 
 MONITOR
-714
-242
-819
-287
+918
+51
+1023
+96
 number of pollen
-[pollen-total] of hive
+number-pollen
 17
 1
 11
 
 MONITOR
-715
-302
-815
-347
+919
+111
+1019
+156
 number of bees
 count bee
 17
 1
 11
+
+PLOT
+701
+205
+901
+355
+évolution nbr mouton
+Time
+Nbr moutons
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count sheep"
 
 @#$#@#$#@
 ## WHAT IS IT?
