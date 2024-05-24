@@ -9,6 +9,7 @@ globals [
   herding-efficiency            ;; measures how well-herded the sheep are
   zone
   eating-efficiency             ;; how many flowers were eaten
+
 ]
 
 patches-own [
@@ -154,7 +155,8 @@ end
 
 to update-hive
   ask hive[
-    if pollen-total mod 50 = 0 [
+    ;;pollen-total mod pollen-to-spawn-bee = 0 and
+    if pollen-total >= pollen-to-spawn-bee [
       ask patch-here [
         sprout-bee 1 [
           set color yellow
@@ -163,9 +165,10 @@ to update-hive
           set life-time 0
           set pollen 0
           set time-collect-pollen random 10
-          set time-collect-pollen time-collect-pollen + 10
+          set time-collect-pollen time-collect-pollen + 30
         ]
       ]
+          set pollen-total 0
     ]
   ]
 end
@@ -206,7 +209,9 @@ to go
   update-hunger
   update-on-flower
   update-life-time
+  update-hive
   spawn-flower
+
   tick
 end
 
@@ -344,10 +349,10 @@ ticks
 30.0
 
 PLOT
-11
-307
-241
-480
+1121
+49
+1351
+222
 Herding Efficiency
 Time
 Percent
@@ -426,10 +431,10 @@ NIL
 0
 
 MONITOR
-67
-258
-180
-303
+1117
+10
+1230
+55
 current efficiency
 herding-efficiency
 1
@@ -452,10 +457,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-139
-506
-291
-551
+1122
+232
+1274
+277
 number of alive flowers
 eating-efficiency
 1
@@ -463,10 +468,10 @@ eating-efficiency
 11
 
 SLIDER
-43
-192
-215
-225
+37
+184
+209
+217
 num-bee
 num-bee
 0
@@ -476,6 +481,61 @@ num-bee
 1
 NIL
 HORIZONTAL
+
+SLIDER
+35
+242
+207
+275
+pollen-to-spawn-bee
+pollen-to-spawn-bee
+20
+200
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+702
+45
+902
+195
+évolution du nombre d'abeille
+Time
+Nombre d'abeille
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count bee"
+
+MONITOR
+714
+242
+819
+287
+number of pollen
+[pollen-total] of hive
+17
+1
+11
+
+MONITOR
+715
+302
+815
+347
+number of bees
+count bee
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
