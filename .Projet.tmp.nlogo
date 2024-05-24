@@ -279,16 +279,33 @@ to bee-go-to-flower [target]
   ]
 end
 
+;to move-to-brown-zone
+;  if carried-sheep != nobody [
+;    ask carried-sheep [
+;;      move-to one-of zone
+;      set hidden? false
+;      stay-in-zone ;; pour que les moutons restent dans la zone marron
+;    ]
+;    set color red
+;    set carried-sheep nobody ;; Réinitialiser carried-sheep après avoir déposé le mouton
+;    search-for-sheep ;; le berger cherche d'autres moutons
+;  ]
+;end
+
 to move-to-brown-zone
   if carried-sheep != nobody [
     let target-patch one-of patches with [pcolor = brown]
+
     move-to target-patch
     if target-patch != nobody [
       ask carried-sheep [
         set hidden? false
         move-to target-patch
+;        face target-patch
+;        fd 1
         stay-in-zone
       ]
+;      move-to target-patch
       set color red
       set carried-sheep nobody
       search-for-sheep
