@@ -1,4 +1,4 @@
-breed [sheep a-sheep]
+ breed [sheep a-sheep]
 breed [shepherds shepherd]
 breed [flower a-flower]
 breed [bee a-bee]
@@ -18,6 +18,7 @@ patches-own [
 
 shepherds-own [
   carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying one)
+  carrying-sheep
   found-herd?           ;; becomes true when I find a herd to drop it in
 ]
 
@@ -69,6 +70,7 @@ to setup
     set color red
     set size 3  ;; easier to see
     set carried-sheep nobody
+    set carrying-sheep false
     set found-herd? false
     setxy random-xcor random-ycor
   ]
@@ -176,7 +178,7 @@ end
 
 to go
   ask shepherds [
-    ifelse carried-sheep = nobody [
+    ifelse carrying-sheep = false [
       search-for-sheep
     ] [
       move-to-brown-zone
@@ -253,15 +255,19 @@ to go-to-hive
 end
 
 to search-for-sheep
-  let target one-of sheep with [not hidden?]
+  let target min-one-of sheep with [not stop-moving] [distance myself]
+
   if target != nobody [
     if [stop-moving] of target = false [
       face target
       fd 1
       if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
         set carried-sheep target
+        set carrying-sheep true
         ask carried-sheep [
-          set hidden? true ;; pour qu'on voit le berger porte le mouton
+          ;;set hidden? true ;; pour qu'on voit le berger porte le mouton
+          set stop-moving true
+          set color white
         ]
         set color blue
       ]
@@ -298,27 +304,20 @@ to bee-go-to-flower [target]
 end
 
 to move-to-brown-zone
-  if carried-sheep != nobody [
-    ask carried-sheep [
-      ;;move-to one-of zone
-      set hidden? false
-      stay-in-zone ;; pour que les moutons restent dans la zone marron
+  if carried-sheep != nobody and carrying-sheep = true [
+    let temp-sheep carried-sheep
+    ifelse [pcolor] of patch-ahead 0.001 = brown [
+      set carrying-sheep false
+      set carried-sheep nobody
+      set color red
+    ][
+      let target-patch one-of patches with [pcolor = brown]
+      face target-patch
+      fd 1
     ]
-    set color red
-    set carried-sheep nobody ;; Réinitialiser carried-sheep après avoir déposé le mouton
-    search-for-sheep ;; le berger cherche d'autres moutons
-  ]
-end
-
-to stay-in-zone
-  ifelse [pcolor] of patch-ahead 1 = brown [
-    set stop-moving true    ;; le mouton ne bouge plus
-    set hungry false
-    set hunger-timer 0
-    set color white
-  ]
-  [
-
+    ask temp-sheep [
+      setxy [xcor] of myself [ycor] of myself
+    ]
   ]
 end
 @#$#@#$#@
@@ -358,7 +357,7 @@ num-sheep
 num-sheep
 0
 500
-10.0
+19.0
 1
 1
 NIL
@@ -373,7 +372,7 @@ num-shepherds
 num-shepherds
 0
 3
-3.0
+1.0
 1
 1
 NIL
@@ -422,7 +421,7 @@ num-flowers
 num-flowers
 0
 50
-10.0
+5.0
 1
 1
 NIL
@@ -437,7 +436,7 @@ num-bee
 num-bee
 0
 100
-11.0
+14.0
 1
 1
 NIL
@@ -452,7 +451,7 @@ pollen-to-spawn-bee
 pollen-to-spawn-bee
 20
 200
-30.0
+20.0
 1
 1
 NIL
