@@ -1,108 +1,75 @@
-breed [sheep a-sheep]
-breed [shepherds shepherd]
-
+; Setup de l'environnement
 globals [
-  sheepless-neighborhoods       ;; how many patches have no sheep in any neighboring patches?
-  herding-efficiency            ;; measures how well-herded the sheep are
-  zone
+  brown-zone-corner
 ]
 
-patches-own [
-  sheep-nearby                  ;; how many sheep in neighboring patches?
-]
+breed [sheep a-sheep]
+breed [shepherds a-shepherd]
 
-shepherds-own [
-  carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying one)
-  found-herd?           ;; becomes true when I find a herd to drop it in
-]
+sheep-own [caught?]
 
 to setup
   clear-all
-  set-default-shape sheep "sheep"
-  set-default-shape shepherds "person"
-  set zone patches with [pxcor > 5 and pycor > 5]
-  ask patches [
-    set pcolor green + (random-float 0.8) - 0.4
-  ] ;; varying the green just makes it look nicer
-
-  ask zone [set pcolor brown]
-  create-sheep num-sheep [
+  setup-patches
+  create-sheep 20 [
     set color white
-    set size 1.5  ;; easier to see
+    set size 1.5
     setxy random-xcor random-ycor
+    set caught? false
   ]
-  create-shepherds num-shepherds [
+  create-shepherds 5 [
     set color red
-    set size 3  ;; easier to see
-    set carried-sheep nobody
-    set found-herd? false
+    set size 2
     setxy random-xcor random-ycor
   ]
   reset-ticks
 end
 
-to update-sheep-counts
-  ask patches [
-    set sheep-nearby (sum [count sheep-here] of neighbors)
-  ]
-  set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
+to setup-patches
+  ask patches [ set pcolor green ]
+  set brown-zone-corner one-of patches with [pxcor < 5 and pycor < 5]
+  ask patches with [pxcor < 5 and pycor < 5] [ set pcolor brown ]
 end
 
-to calculate-herding-efficiency
-  set herding-efficiency (sheepless-neighborhoods / (count patches with [not any? sheep-here])) * 100
-end
-
+; Le comportement des moutons et des bergers
 to go
-  ask shepherds [
-    ifelse carried-sheep = nobody [
-      search-for-sheep
-    ] [
-      move-to-brown-zone
-    ]
-  ]
   ask sheep [
-    moveR
+    move-sheep
+  ]
+  ask shepherds [
+    catch-sheep
   ]
   tick
 end
 
-to moveR
-  rt random 50
-  lt random 50
-  fd 1
+to move-sheep
+  if not caught? [
+    rt random 50
+    lt random 50
+    fd 1
+  ]
 end
 
-to search-for-sheep
-  let target one-of sheep with [not hidden?]
+to catch-sheep
+  let target one-of sheep with [not caught?]
   if target != nobody [
     face target
-    fd 1
-    if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux
-      set carried-sheep target
-      ask carried-sheep [
-        set hidden? false ;;pour qu'on voit le berger porte le mouton
+    fd 0.5
+    if distance target < 1 [
+      ask target [
+        set color blue
+        set caught? true
       ]
-      set color blue
+      move-to-brown-zone target
     ]
-  ]
-end
-to move-to-brown-zone
-  if carried-sheep != nobody [
-    ask carried-sheep [
-      move-to one-of zone
-      set hidden? false
-    ]
-    ask carried-sheep [ stay-in-zone ] ;; pour que les moutons restent dans la zone marron
-    set color red
-    ask shepherds [ search-for-sheep ] ;; le berger cherche d'autres moutons
-;    set carried-sheep nobody ;; Réinitialiser carried-sheep après avoir déposé le mouton
   ]
 end
 
-to stay-in-zone
-  ifelse[pcolor] of patch-ahead 1 = brown
-      [ fd 0.5 ]
-      [ rt random 180 ]
+to move-to-brown-zone [prey]
+  move-to brown-zone-corner
+  ask prey [
+    move-to brown-zone-corner
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
