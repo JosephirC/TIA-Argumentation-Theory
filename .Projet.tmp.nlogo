@@ -192,6 +192,8 @@ to spawn-flower
     ]
   ]
 end
+;to spawn-flower
+
 
 to update-on-flower
   ask bee[
