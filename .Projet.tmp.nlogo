@@ -196,7 +196,7 @@ to go
         fd 0.05
       ][]
     ]
-    if random-float 1 < 0.1 [
+    if random-float 1 < 0.09 [
       sheep-reproduce
     ]
   ]
