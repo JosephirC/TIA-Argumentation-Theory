@@ -77,14 +77,14 @@ to setup
     set on-flower false
     set life-time 0
     set pollen 0
-    set time-collect-pollen 10
-    ;;set time-collect-pollen random 10
-    ;;set time-collect-pollen time-collect-pollen + 10
+    set time-collect-pollen random 10
+    set time-collect-pollen time-collect-pollen + 10
   ]
   create-hive 1 [
     set color white
-    set size 5
+    set size 1.25
     setxy -23 -23
+    set pollen-total 0
   ]
 
   reset-ticks
@@ -141,13 +141,30 @@ end
 to update-on-flower
   ask bee[
     if on-flower [
-      set time-on-flower time-on-flower
+      set time-on-flower time-on-flower + 1
 
       if time-on-flower >= time-collect-pollen [
         set on-flower false
         set color blue
-        ;;set pollen random 5
-        set pollen 5
+        set pollen random 5
+      ]
+    ]
+  ]
+end
+
+to update-hive
+  ask hive[
+    if pollen-total mod 50 = 0 [
+      ask patch-here [
+        sprout-bee 1 [
+          set color yellow
+          set size 2.5
+          set on-flower false
+          set life-time 0
+          set pollen 0
+          set time-collect-pollen random 10
+          set time-collect-pollen time-collect-pollen + 10
+        ]
       ]
     ]
   ]
@@ -182,7 +199,7 @@ to go
         ]
       ]
     ]
-    if pollen > 0 [
+    if not on-flower and pollen > 0 [
       go-to-hive
     ]
   ]
@@ -228,7 +245,9 @@ to go-to-hive
     fd 1
 
     if distance target < 1 [
-      set pollen-total pollen-total + pollen
+      ask target [
+        set pollen-total pollen-total + [pollen] of myself
+      ]
       set pollen 0
     ]
   ]
@@ -362,7 +381,7 @@ num-sheep
 num-sheep
 0
 500
-6.0
+20.0
 1
 1
 NIL
@@ -437,7 +456,7 @@ num-flowers
 num-flowers
 0
 50
-50.0
+10.0
 1
 1
 NIL
@@ -463,7 +482,7 @@ num-bee
 num-bee
 0
 100
-2.0
+11.0
 1
 1
 NIL
