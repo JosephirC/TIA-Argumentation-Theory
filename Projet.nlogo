@@ -22,6 +22,15 @@ shepherds-own [
   carrying-sheep
   found-herd?           ;; becomes true when I find a herd to drop it in
 ]
+; Setup de l'environnement
+globals [
+  brown-zone-corner
+]
+
+breed [sheep a-sheep]
+breed [shepherds a-shepherd]
+
+sheep-own [caught?]
 
 sheep-own [
   stop-moving           ;; indicates if the sheep should stop moving
@@ -54,6 +63,7 @@ weathers-own [
 
 to setup
   clear-all
+
   set-default-shape sheep "sheep"
   set-default-shape shepherds "person"
   set-default-shape flower "flower"
@@ -87,12 +97,6 @@ to setup
     set on-flower false
     set life-time 0
     set pollen 0
-<<<<<<< HEAD
-    set time-collect-pollen 10
-=======
-    set time-collect-pollen random 10
-    set time-collect-pollen time-collect-pollen + 10
->>>>>>> adcca85571dda3c3f2966060ae20a8e62e363749
   ]
   create-hive 1 [
     set color white
@@ -172,6 +176,34 @@ to update-hunger
         ]
       ]
     ]
+  setup-patches
+  create-sheep 20 [
+    set color white
+    set size 1.5
+    setxy random-xcor random-ycor
+    set caught? false
+  ]
+  create-shepherds 5 [
+    set color red
+    set size 2
+    setxy random-xcor random-ycor
+  ]
+  reset-ticks
+end
+
+to setup-patches
+  ask patches [ set pcolor green ]
+  set brown-zone-corner one-of patches with [pxcor < 5 and pycor < 5]
+  ask patches with [pxcor < 5 and pycor < 5] [ set pcolor brown ]
+end
+
+; Le comportement des moutons et des bergers
+to go
+  ask sheep [
+    move-sheep
+  ]
+  ask shepherds [
+    catch-sheep
   ]
 end
 
@@ -216,8 +248,6 @@ to update-on-flower
   ]
 end
 
-<<<<<<< HEAD
-=======
 to update-hive
   ask hive[
     ;;pollen-total mod pollen-to-spawn-bee = 0 and
@@ -238,7 +268,6 @@ to update-hive
     ]
   ]
 end
->>>>>>> adcca85571dda3c3f2966060ae20a8e62e363749
 
 to go
   ask shepherds [
@@ -276,103 +305,39 @@ to go
   update-hunger
   update-on-flower
   update-life-time
-<<<<<<< HEAD
-  update-rain
-=======
   update-hive
->>>>>>> adcca85571dda3c3f2966060ae20a8e62e363749
   spawn-flower
 
   tick
 end
 
-
-to moveR
-  rt random 50
-  lt random 50
-  fd 1
-  set color yellow
-end
-
-to go-to-hive
-  let target one-of hive with [not hidden?]
-  if target != nobody [
-    face target
+to move-sheep
+  if not caught? [
+    rt random 50
+    lt random 50
     fd 1
-
-    if distance target < 1 [
-      ask target [
-        set pollen-total pollen-total + [pollen] of myself
-      ]
-      set pollen 0
-    ]
   ]
 end
 
-to search-for-sheep
-  let target min-one-of sheep with [not stop-moving] [distance myself]
-
+to catch-sheep
+  let target one-of sheep with [not caught?]
   if target != nobody [
-    if [stop-moving] of target = false [
-      face target
-      fd 1
-      if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
-        set carried-sheep target
-        set carrying-sheep true
-        ask carried-sheep [
-          ;;set hidden? true ;; pour qu'on voit le berger porte le mouton
-          set stop-moving true
-          set color white
-        ]
+    face target
+    fd 0.5
+    if distance target < 1 [
+      ask target [
         set color blue
+        set caught? true
       ]
+      move-to-brown-zone target
     ]
   ]
 end
 
-to sheep-search-for-flower
-  let target min-one-of flower with [not hidden?] [distance myself]
-
-  ;; let target one-of flower with [not hidden?]
-  if target != nobody [
-    face target
-    fd 1
-
-    if distance target < 1 [
-      ask target [
-        die
-      ]
-      set color white
-      set hungry false
-      set hunger-timer 0
-    ]
-  ]
-end
-
-to bee-go-to-flower [target]
-  face target
-  fd 1
-  if distance target < 1 [ ;; the bee is on the flower
-    set on-flower true
-    set color red
-  ]
-end
-
-to move-to-brown-zone
-  if carried-sheep != nobody and carrying-sheep = true [
-    let temp-sheep carried-sheep
-    ifelse [pcolor] of patch-ahead 0.001 = brown [
-      set carrying-sheep false
-      set carried-sheep nobody
-      set color red
-    ][
-      let target-patch one-of patches with [pcolor = brown]
-      face target-patch
-      fd 1
-    ]
-    ask temp-sheep [
-      setxy [xcor] of myself [ycor] of myself
-    ]
+to move-to-brown-zone [prey]
+  move-to brown-zone-corner
+  ask prey [
+    move-to brown-zone-corner
   ]
 end
 @#$#@#$#@
@@ -412,7 +377,7 @@ num-sheep
 num-sheep
 0
 500
-19.0
+6.0
 1
 1
 NIL
