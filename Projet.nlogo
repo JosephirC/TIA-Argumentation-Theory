@@ -1,4 +1,4 @@
- breed [sheep a-sheep]
+breed [sheep a-sheep]
 breed [shepherds shepherd]
 breed [flower a-flower]
 breed [bee a-bee]
@@ -357,7 +357,7 @@ num-sheep
 num-sheep
 0
 500
-19.0
+6.0
 1
 1
 NIL

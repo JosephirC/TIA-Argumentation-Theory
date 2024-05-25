@@ -10,6 +10,13 @@ globals [
   herding-efficiency            ;; measures how well-herded the sheep are
   zone
   eating-efficiency             ;; how many flowers were eaten
+  number-pollen
+]
+
+weathers-own [
+  raining               ;; indicates if it's raining
+  rain-duration         ;; how long the rain lasts
+  rain-timer            ;; counts the ticks while it's raining
 ]
 
 patches-own [
@@ -18,6 +25,7 @@ patches-own [
 
 shepherds-own [
   carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying one)
+  carrying-sheep
   found-herd?           ;; becomes true when I find a herd to drop it in
 ]
 
@@ -42,12 +50,6 @@ bee-own[
 
 hive-own[
   pollen-total          ;; indicates the total number of pollen the hive has
-]
-
-weathers-own [
-  raining               ;; indicates if it's raining
-  rain-duration         ;; how long the rain lasts
-  rain-timer            ;; counts the ticks while it's raining
 ]
 
 to setup
@@ -75,6 +77,7 @@ to setup
     set color red
     set size 3  ;; easier to see
     set carried-sheep nobody
+    set carrying-sheep false
     set found-herd? false
     setxy random-xcor random-ycor
   ]
@@ -84,12 +87,14 @@ to setup
     set on-flower false
     set life-time 0
     set pollen 0
-    set time-collect-pollen 10
+    set time-collect-pollen random 10
+    set time-collect-pollen time-collect-pollen + 10
   ]
   create-hive 1 [
     set color white
-    set size 5
+    set size 1.25
     setxy -23 -23
+    set pollen-total 0
   ]
   create-weathers 1 [
     set shape "circle" ;; au lieu de cloud, j'ai utlisé circle
@@ -102,10 +107,16 @@ to setup
     setxy max-pxcor max-pycor ;; placer l'agent météo hors de la vue
   ]
 
+
   reset-ticks
 end
 
-
+to update-sheep-counts
+  ask patches [
+    set sheep-nearby (sum [count sheep-here] of neighbors)
+  ]
+  set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
+end
 
 to update-rain
   ask one-of weathers [
@@ -127,13 +138,6 @@ to update-rain
       ]
     ]
   ]
-end
-
-to update-sheep-counts
-  ask patches [
-    set sheep-nearby (sum [count sheep-here] of neighbors)
-  ]
-  set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
 end
 
 to calculate-herding-efficiency
@@ -177,43 +181,44 @@ to update-life-time
   ]
 end
 
-to spawn-flower
-  if [raining] of one-of weathers [  ;; Vérifier si l'agent météo indique qu'il pleut
-    if random-float 1 < 0.2 and count flower < num-flowers [ ;; j'ai 20% qu'ils "pleuvent" et donc de faire spawn une fleur
-      let target-patch one-of patches with [pcolor != brown]
-      if target-patch != nobody [
-        ask target-patch [
-          sprout-flower 1 [
-            set color yellow
-            set size 2
-          ]
-        ]
-      ]
-    ]
-  ]
-end
-;to spawn-flower
-
-
 to update-on-flower
   ask bee[
     if on-flower [
-      set time-on-flower time-on-flower
+      set time-on-flower time-on-flower + 1
 
       if time-on-flower >= time-collect-pollen [
         set on-flower false
         set color blue
-        ;;set pollen random 5
-        set pollen 5
+        set pollen random 5
       ]
     ]
   ]
 end
 
+to update-hive
+  ask hive[
+    ;;pollen-total mod pollen-to-spawn-bee = 0 and
+    if pollen-total >= pollen-to-spawn-bee [
+      ask patch-here [
+        sprout-bee 1 [
+          set color yellow
+          set size 2.5
+          set on-flower false
+          set life-time 0
+          set pollen 0
+          set time-collect-pollen random 10
+          set time-collect-pollen time-collect-pollen + 30
+        ]
+      ]
+      set number-pollen number-pollen + pollen-total
+      set pollen-total 0
+    ]
+  ]
+end
 
 to go
   ask shepherds [
-    ifelse carried-sheep = nobody [
+    ifelse carrying-sheep = false [
       search-for-sheep
     ] [
       move-to-brown-zone
@@ -239,7 +244,7 @@ to go
         ]
       ]
     ]
-    if pollen > 0 [
+    if not on-flower and pollen > 0 [
       go-to-hive
     ]
   ]
@@ -247,11 +252,25 @@ to go
   update-hunger
   update-on-flower
   update-life-time
-  update-rain
+  update-hive
   spawn-flower
+
   tick
 end
 
+;to spawn-flower
+  if random-float 1 < 0.2 and count flower < num-flowers [ ;; j'ai 20% qu'ils "pleuvent" et donc de faire spawn une fleur
+    let target-patch one-of patches with [pcolor != brown]
+    if target-patch != nobody [
+      ask target-patch [
+        sprout-flower 1 [
+          set color yellow
+          set size 2
+        ]
+      ]
+    ]
+  ]
+end
 
 to moveR
   rt random 50
@@ -267,22 +286,28 @@ to go-to-hive
     fd 1
 
     if distance target < 1 [
-      set pollen-total pollen-total + pollen
+      ask target [
+        set pollen-total pollen-total + [pollen] of myself
+      ]
       set pollen 0
     ]
   ]
 end
 
 to search-for-sheep
-  let target one-of sheep with [not hidden?]
+  let target min-one-of sheep with [not stop-moving] [distance myself]
+
   if target != nobody [
     if [stop-moving] of target = false [
       face target
       fd 1
       if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
         set carried-sheep target
+        set carrying-sheep true
         ask carried-sheep [
-          set hidden? true ;; pour qu'on voit le berger porte le mouton
+          ;;set hidden? true ;; pour qu'on voit le berger porte le mouton
+          set stop-moving true
+          set color white
         ]
         set color blue
       ]
@@ -319,27 +344,20 @@ to bee-go-to-flower [target]
 end
 
 to move-to-brown-zone
-  if carried-sheep != nobody [
-    ask carried-sheep [
-      ;;move-to one-of zone
-      set hidden? false
-      stay-in-zone ;; pour que les moutons restent dans la zone marron
+  if carried-sheep != nobody and carrying-sheep = true [
+    let temp-sheep carried-sheep
+    ifelse [pcolor] of patch-ahead 0.001 = brown [
+      set carrying-sheep false
+      set carried-sheep nobody
+      set color red
+    ][
+      let target-patch one-of patches with [pcolor = brown]
+      face target-patch
+      fd 1
     ]
-    set color red
-    set carried-sheep nobody ;; Réinitialiser carried-sheep après avoir déposé le mouton
-    search-for-sheep ;; le berger cherche d'autres moutons
-  ]
-end
-
-to stay-in-zone
-  ifelse [pcolor] of patch-ahead 1 = brown [
-    set stop-moving true    ;; le mouton ne bouge plus
-    set hungry false
-    set hunger-timer 0
-    set color white
-  ]
-  [
-
+    ask temp-sheep [
+      setxy [xcor] of myself [ycor] of myself
+    ]
   ]
 end
 @#$#@#$#@
@@ -370,24 +388,6 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-PLOT
-11
-307
-241
-480
-Herding Efficiency
-Time
-Percent
-0.0
-300.0
-0.0
-100.0
-true
-false
-"" ""
-PENS
-"efficiency" 1.0 0 -13345367 true "" "if ticks mod 50 = 0  ;; since the calculations are expensive\n[\n  update-sheep-counts\n  calculate-herding-efficiency\n  plotxy ticks herding-efficiency\n]"
-
 SLIDER
 38
 115
@@ -412,7 +412,7 @@ num-shepherds
 num-shepherds
 0
 3
-3.0
+1.0
 1
 1
 NIL
@@ -452,17 +452,6 @@ NIL
 NIL
 0
 
-MONITOR
-67
-258
-180
-303
-current efficiency
-herding-efficiency
-1
-1
-11
-
 SLIDER
 37
 149
@@ -472,37 +461,99 @@ num-flowers
 num-flowers
 0
 50
-50.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
-MONITOR
-139
-506
-291
-551
-number of alive flowers
-eating-efficiency
-1
-1
-11
-
 SLIDER
-43
-192
-215
-225
+37
+184
+209
+217
 num-bee
 num-bee
 0
 100
-0.0
+14.0
 1
 1
 NIL
 HORIZONTAL
+
+SLIDER
+35
+242
+207
+275
+pollen-to-spawn-bee
+pollen-to-spawn-bee
+20
+200
+20.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+702
+45
+902
+195
+évolution du nombre d'abeille
+Time
+Nombre d'abeille
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count bee"
+
+MONITOR
+918
+51
+1023
+96
+number of pollen
+number-pollen
+17
+1
+11
+
+MONITOR
+919
+111
+1019
+156
+number of bees
+count bee
+17
+1
+11
+
+PLOT
+701
+205
+901
+355
+évolution nbr mouton
+Time
+Nbr moutons
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count sheep"
 
 @#$#@#$#@
 ## WHAT IS IT?
