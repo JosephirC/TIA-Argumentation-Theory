@@ -1,0 +1,4 @@
+.vscode/
+__pycache__/
+./Practical1/static/histo.png
+./static/histo.png

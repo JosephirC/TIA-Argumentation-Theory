@@ -183,6 +183,7 @@ to go
     ] [
       move-to-brown-zone
     ]
+    moveS
   ]
   ask sheep [
     if not stop-moving [
@@ -191,6 +192,18 @@ to go
       ] [
         sheep-search-for-flower
       ]
+    ]
+    if [pcolor] of patch-ahead 1 = brown [
+      ifelse stop-moving [
+        let target-patch one-of patches with [pcolor = brown]
+        face target-patch
+        rt random 180
+        lt random 360
+        fd 0.05
+      ][]
+    ]
+    if random-float 1 < 0.1 [
+      sheep-reproduce
     ]
   ]
   ask bee [
@@ -237,6 +250,12 @@ to moveR
   lt random 50
   fd 1
   set color yellow
+end
+
+to moveS
+  rt random 50
+  lt random 50
+  fd 1
 end
 
 to go-to-hive
