@@ -3,7 +3,10 @@ breed [shepherds shepherd]
 breed [flower a-flower]
 breed [bee a-bee]
 breed [hive a-hive]
-breed [weathers a-weather]
+breed [rainings a-raining] ;; gouttes de pluie dans l'air, pas encore sur la terre
+breed [raindrops a-raindrop]  ;; gouttes de pluie sur la terre
+breed [waters a-water] ;; gouttes de pluie qui deviennent de l'eau et ne coulent plus
+
 
 globals [
   sheepless-neighborhoods       ;; how many patches have no sheep in any neighboring patches?
@@ -11,16 +14,16 @@ globals [
   zone
   eating-efficiency             ;; how many flowers were eaten
   number-pollen
-]
-
-weathers-own [
-  raining               ;; indicates if it's raining
-  rain-duration         ;; how long the rain lasts
-  rain-timer            ;; counts the ticks while it's raining
+  count-dead          ;; compter les gouttes de pluie qui ont quitté la carte sur le bord
+  rain-count          ;; Variable pour suivre le nombre de fleurs (pluie)
+  raining?            ;; Variable pour indiquer si c'est en train de pleuvoir ou non
+  rain-duration       ;; Durée de la pluie
+  current-rain-ticks  ;; Nombre de ticks écoulés pendant la pluie actuelle
 ]
 
 patches-own [
-  sheep-nearby                  ;; how many sheep in neighboring patches?
+  sheep-nearby         ;; how many sheep in neighboring patches?
+  top
 ]
 
 shepherds-own [
@@ -50,6 +53,10 @@ bee-own[
 
 hive-own[
   pollen-total          ;; indicates the total number of pollen the hive has
+]
+
+raindrops-own [
+  targetR
 ]
 
 to setup
@@ -96,17 +103,9 @@ to setup
     setxy -23 -23
     set pollen-total 0
   ]
-  create-weathers 1 [
-    set shape "circle" ;; au lieu de cloud, j'ai utlisé circle
-    set color gray
-    set heading 0
-    set size 5
-    set raining false
-    set rain-duration 60 ;; la durée de la pluie
-    set rain-timer 0
-    setxy max-pxcor max-pycor ;; placer l'agent météo hors de la vue
-  ]
 
+  set rain-count 0
+  set raining? false
 
   reset-ticks
 end
@@ -118,27 +117,6 @@ to update-sheep-counts
   set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
 end
 
-to update-rain
-  ask one-of weathers [
-    ifelse raining [
-      ;; Si la pluie est en train de tomber
-      set rain-timer rain-timer + 1
-
-      if rain-timer >= rain-duration [
-        ;; Si la pluie a duré suffisamment longtemps
-        set raining false
-        set rain-timer 0
-      ]
-    ] [
-      ;; Si la pluie n'est pas en train de tomber
-      if random-float 1 < 0.05 [
-        ;; Il y a 5% de chance qu'il se mette à pleuvoir
-        set raining true
-        set rain-timer 0
-      ]
-    ]
-  ]
-end
 
 to calculate-herding-efficiency
   set herding-efficiency (sheepless-neighborhoods / (count patches with [not any? sheep-here])) * 100
@@ -216,6 +194,10 @@ to update-hive
   ]
 end
 
+;****************************************************************
+;********************** to go ***********************************
+;****************************************************************
+
 to go
   ask shepherds [
     ifelse carrying-sheep = false [
@@ -223,6 +205,7 @@ to go
     ] [
       move-to-brown-zone
     ]
+    moveS
   ]
   ask sheep [
     if not stop-moving [
@@ -230,8 +213,9 @@ to go
         moveR
       ] [
         sheep-search-for-flower
-      ]
+      ]u
     ]
+    sheep-reproduce
   ]
   ask bee [
     if not on-flower and pollen = 0 [
@@ -254,11 +238,53 @@ to go
   update-life-time
   update-hive
   spawn-flower
+  rain
+  plot-rain-count
 
   tick
 end
 
-;to spawn-flower
+;****************************************************************
+;********************** LA PLUIE ********************************
+;****************************************************************
+to rain
+  if not raining? [
+    ;; Commencer à pleuvoir
+    if random-float 1 < 0.1 [  ;; Probabilité que la pluie tombe lors de chaque tick (ici, 10%)
+      let target-patch one-of patches with [pcolor != brown]  ;; Sélectionner un patch non-marron
+      if target-patch != nobody [
+        ask target-patch [
+          sprout-flower 1 [  ;; Créer une nouvelle fleur sur ce patch
+            set color yellow
+            set size 2
+          ]
+        ]
+        set rain-count rain-count + 1
+        set raining? true
+        set rain-duration 3  ;; Pluie pendant 3 ticks
+        set current-rain-ticks 0
+      ]
+    ]
+  ]
+  if raining? [
+    ;; Arrêter la pluie après la durée spécifiée
+    if current-rain-ticks >= rain-duration [
+      set raining? false
+    ]
+    ;; Pendant la pluie, incrémenter le compteur de ticks de pluie
+    if current-rain-ticks < rain-duration [
+      set current-rain-ticks current-rain-ticks + 1
+    ]
+  ]
+end
+
+
+to plot-rain-count
+  ;; Ajouter un point sur le plot pour afficher l'évolution du nombre de fleurs (pluie)
+  plotxy ticks rain-count
+end
+
+to spawn-flower
   if random-float 1 < 0.2 and count flower < num-flowers [ ;; j'ai 20% qu'ils "pleuvent" et donc de faire spawn une fleur
     let target-patch one-of patches with [pcolor != brown]
     if target-patch != nobody [
@@ -272,11 +298,18 @@ end
   ]
 end
 
+
 to moveR
   rt random 50
   lt random 50
   fd 1
   set color yellow
+end
+
+to moveS
+  rt random 50
+  lt random 50
+  fd 1
 end
 
 to go-to-hive
@@ -357,6 +390,18 @@ to move-to-brown-zone
     ]
     ask temp-sheep [
       setxy [xcor] of myself [ycor] of myself
+    ]
+  ]
+end
+
+to sheep-reproduce
+  if not stop-moving and random-float 1 < 0.009 [
+    hatch 1 [
+      set color yellow
+      set size 1.5
+      set stop-moving false
+      set hungry false
+      set hunger-timer 0
     ]
   ]
 end
@@ -461,7 +506,7 @@ num-flowers
 num-flowers
 0
 50
-5.0
+1.0
 1
 1
 NIL
@@ -476,7 +521,7 @@ num-bee
 num-bee
 0
 100
-14.0
+1.0
 1
 1
 NIL
@@ -554,6 +599,24 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count sheep"
+
+PLOT
+702
+389
+902
+539
+évolution pluie
+time
+rain evolution
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count rain"
 
 @#$#@#$#@
 ## WHAT IS IT?
