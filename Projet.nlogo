@@ -11,7 +11,9 @@ globals [
   zone
   eating-efficiency             ;; how many flowers were eaten
   number-pollen
-
+  captured-sheep                ;; how many sheep have been captured
+  dead-sheep                    ;; how many sheep have died
+  born-sheep                    ;; how many sheep have been born
   count-dead          ;; compter les gouttes de pluie qui ont quitté la carte sur le bord
   rain-count          ;; Variable pour suivre le nombre de fleurs (pluie)
   raining?            ;; Variable pour indiquer si c'est en train de pleuvoir ou non
@@ -100,7 +102,9 @@ to setup
 
   set rain-count 0
   set raining? false
-
+  set dead-sheep 0
+  set captured-sheep 0
+  set born-sheep 0
   reset-ticks
 end
 
@@ -135,6 +139,7 @@ to update-hunger
       if hungry [
         set hunger-timer hunger-timer + 1
         if hunger-timer >= 200 [
+          set dead-sheep dead-sheep + 1
           die
         ]
       ]
@@ -339,9 +344,9 @@ to search-for-sheep
   let target min-one-of sheep with [not stop-moving] [distance myself]
 
   if target != nobody [
-    if [stop-moving] of target = false [
+    if [stop-moving] of target = false and [hungry] of target = false [
       face target
-      fd 1
+      fd 0.5
       if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
         set carried-sheep target
         set carrying-sheep true
@@ -350,6 +355,7 @@ to search-for-sheep
           set stop-moving true
           set color white
         ]
+        set captured-sheep captured-sheep + 1
         set color blue
       ]
     ]
@@ -403,7 +409,8 @@ to move-to-brown-zone
 end
 
 to sheep-reproduce
-  if stop-moving and random-float 1 < 0.009 [
+  if not stop-moving and not hungry and random-float 1 < 0.001 [
+    set born-sheep born-sheep + 1
     hatch 1 [
       set color black
       set size 1.5
@@ -450,7 +457,7 @@ num-sheep
 num-sheep
 0
 500
-32.0
+100.0
 1
 1
 NIL
@@ -514,7 +521,7 @@ num-flowers
 num-flowers
 0
 50
-25.0
+15.0
 1
 1
 NIL
@@ -643,7 +650,29 @@ MONITOR
 1091
 259
 Nombre de mouton capturé
-count sheep
+captured-sheep
+17
+1
+11
+
+MONITOR
+927
+265
+1074
+310
+Nombre de mouton mort
+dead-sheep
+17
+1
+11
+
+MONITOR
+927
+318
+1058
+363
+Nombre de naissance
+born-sheep
 17
 1
 11
