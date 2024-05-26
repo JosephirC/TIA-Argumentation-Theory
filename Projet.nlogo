@@ -3,9 +3,6 @@ breed [shepherds shepherd]
 breed [flower a-flower]
 breed [bee a-bee]
 breed [hive a-hive]
-breed [rainings a-raining] ;; gouttes de pluie dans l'air, pas encore sur la terre
-breed [raindrops a-raindrop]  ;; gouttes de pluie sur la terre
-breed [waters a-water] ;; gouttes de pluie qui deviennent de l'eau et ne coulent plus
 
 
 globals [
@@ -14,6 +11,7 @@ globals [
   zone
   eating-efficiency             ;; how many flowers were eaten
   number-pollen
+
   count-dead          ;; compter les gouttes de pluie qui ont quitté la carte sur le bord
   rain-count          ;; Variable pour suivre le nombre de fleurs (pluie)
   raining?            ;; Variable pour indiquer si c'est en train de pleuvoir ou non
@@ -53,10 +51,6 @@ bee-own[
 
 hive-own[
   pollen-total          ;; indicates the total number of pollen the hive has
-]
-
-raindrops-own [
-  targetR
 ]
 
 to setup
@@ -251,7 +245,7 @@ end
 to rain
   if not raining? [
     ;; Commencer à pleuvoir
-    if random-float 1 < 0.4 [  ;; Probabilité que la pluie tombe lors de chaque tick (ici, 50%)
+    if random-float 1 < 0.05 [  ;; Probabilité que la pluie tombe lors de chaque tick (ici, 5%)
         set rain-count rain-count + 1
         set raining? true
         set rain-duration random 50 ;; Pluie pendant x ticks entre 0 et 50
@@ -275,15 +269,14 @@ to see-rain
   ifelse raining? [
     create-turtles 1 [
       set shape "drop"
-      set size 0.5
+      set size 1.0
       set color blue
-      setxy 50 50
+      setxy random-xcor 23
     ]
 
-
     ask turtles with [shape = "drop"] [
-      set ycor ycor - 10
-      if ycor <= min-pxcor [
+      set ycor ycor - 5
+      if ycor <= -23 [
         die
       ]
     ]
@@ -410,9 +403,9 @@ to move-to-brown-zone
 end
 
 to sheep-reproduce
-  if not stop-moving and random-float 1 < 0.009 [
+  if stop-moving and random-float 1 < 0.009 [
     hatch 1 [
-      set color yellow
+      set color black
       set size 1.5
       set stop-moving false
       set hungry false
@@ -457,7 +450,7 @@ num-sheep
 num-sheep
 0
 500
-6.0
+32.0
 1
 1
 NIL
@@ -472,7 +465,7 @@ num-shepherds
 num-shepherds
 0
 3
-1.0
+2.0
 1
 1
 NIL
@@ -640,6 +633,17 @@ MONITOR
 436
 Pluie en ce moment ?
 raining?
+17
+1
+11
+
+MONITOR
+927
+214
+1091
+259
+Nombre de mouton capturé
+count sheep
 17
 1
 11
