@@ -237,8 +237,9 @@ to go
   update-on-flower
   update-life-time
   update-hive
-  spawn-flower
+  ;;spawn-flower
   rain
+  see-rain
   plot-rain-count
 
   tick
@@ -250,23 +251,15 @@ end
 to rain
   if not raining? [
     ;; Commencer à pleuvoir
-    if random-float 1 < 0.1 [  ;; Probabilité que la pluie tombe lors de chaque tick (ici, 10%)
-      let target-patch one-of patches with [pcolor != brown]  ;; Sélectionner un patch non-marron
-      if target-patch != nobody [
-        ask target-patch [
-          sprout-flower 1 [  ;; Créer une nouvelle fleur sur ce patch
-            set color yellow
-            set size 2
-          ]
-        ]
+    if random-float 1 < 0.4 [  ;; Probabilité que la pluie tombe lors de chaque tick (ici, 50%)
         set rain-count rain-count + 1
         set raining? true
-        set rain-duration 3  ;; Pluie pendant 3 ticks
+        set rain-duration random 50 ;; Pluie pendant x ticks entre 0 et 50
         set current-rain-ticks 0
-      ]
     ]
   ]
   if raining? [
+    spawn-flower
     ;; Arrêter la pluie après la durée spécifiée
     if current-rain-ticks >= rain-duration [
       set raining? false
@@ -278,6 +271,28 @@ to rain
   ]
 end
 
+to see-rain
+  ifelse raining? [
+    create-turtles 1 [
+      set shape "drop"
+      set size 0.5
+      set color blue
+      setxy 50 50
+    ]
+
+
+    ask turtles with [shape = "drop"] [
+      set ycor ycor - 10
+      if ycor <= min-pxcor [
+        die
+      ]
+    ]
+  ] [
+    ask turtles with [shape = "drop"] [
+      die
+    ]
+  ]
+end
 
 to plot-rain-count
   ;; Ajouter un point sur le plot pour afficher l'évolution du nombre de fleurs (pluie)
@@ -506,7 +521,7 @@ num-flowers
 num-flowers
 0
 50
-1.0
+25.0
 1
 1
 NIL
@@ -617,6 +632,17 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count rain"
+
+MONITOR
+921
+391
+1049
+436
+Pluie en ce moment ?
+raining?
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -834,6 +860,13 @@ dot
 false
 0
 Circle -7500403 true true 90 90 120
+
+drop
+false
+0
+Circle -7500403 true true 73 133 152
+Polygon -7500403 true true 219 181 205 152 185 120 174 95 163 64 156 37 149 7 147 166
+Polygon -7500403 true true 79 182 95 152 115 120 126 95 137 64 144 37 150 6 154 165
 
 face happy
 false
