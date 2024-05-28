@@ -30,6 +30,7 @@ sheep-own [
   stop-moving                   ;; indicates if the sheep should stop moving
   hungry                        ;; indicate if a sheep is hungry or not
   hunger-timer                  ;; indicates the period of time to get hungry
+  hunger-random-value           ;; represents a bonus random value for the sheep to get hungry
 ]
 
 flower-own [
@@ -69,6 +70,7 @@ to setup
     set stop-moving false
     set hungry false
     set hunger-timer 0
+    set hunger-random-value random 21
     setxy random-xcor random-ycor
   ]
   create-shepherds num-shepherds [
@@ -80,12 +82,11 @@ to setup
   ]
   create-bee num-bee [
     set color yellow
-    set size 2.5
+    set size 2
     set on-flower false
     set life-time 0
     set pollen 0
-    set time-collect-pollen random 30
-    set time-collect-pollen time-collect-pollen + 10
+    set time-collect-pollen 30 + random 11
   ]
   create-hive 1 [
     set color white
@@ -157,8 +158,7 @@ to update-hunger
     if not stop-moving [
       if hungry = false [
         set hunger-timer hunger-timer + 1
-
-        if hunger-timer >= 100 [
+        if hunger-timer >= 100 + hunger-random-value [
           set hungry true
           set color red
         ]
@@ -166,7 +166,7 @@ to update-hunger
 
       if hungry [
         set hunger-timer hunger-timer + 1
-        if hunger-timer >= 200 [
+        if hunger-timer >= 200 + hunger-random-value [
           set dead-sheep dead-sheep + 1
           die
         ]
@@ -228,7 +228,7 @@ to update-hive
 end
 
 ;****************************************************************
-;********************** shepherd ********************************
+;********************** SHEPHERD ********************************
 ;****************************************************************
 
 to search-for-sheep
@@ -314,6 +314,7 @@ to sheep-reproduce
       set stop-moving false
       set hungry false
       set hunger-timer 0
+      set hunger-random-value random 21
     ]
   ]
 end
@@ -472,7 +473,7 @@ num-sheep
 num-sheep
 0
 200
-55.0
+77.0
 1
 1
 NIL
