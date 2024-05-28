@@ -102,7 +102,7 @@ to setup
 end
 
 ;****************************************************************
-;********************** to go ***********************************
+;************************* GO ***********************************
 ;****************************************************************
 
 to go
@@ -112,13 +112,12 @@ to go
     ] [
       move-to-brown-zone
     ]
-    moveS
+    moveR
   ]
   ask sheep [
     if not stop-moving [
-      ifelse hungry = false [
-        moveR
-      ] [
+      moveR
+      if hungry [
         sheep-search-for-flower
       ]
     ]
@@ -127,11 +126,10 @@ to go
   ask bee [
     if not on-flower and pollen = 0 [
       let target min-one-of flower with [nbr-bees < max-bees and not hidden?] [distance myself]
+      moveR
       if target != nobody [
-        ifelse distance target < 2 [
+        if distance target < 2 [
           bee-go-to-flower target
-        ] [
-          moveR
         ]
       ]
     ]
@@ -270,6 +268,10 @@ to move-to-brown-zone
       setxy [xcor] of myself [ycor] of myself
     ]
   ]
+end
+
+to move-sheep-in-zone
+
 end
 
 ;****************************************************************
@@ -431,13 +433,6 @@ to moveR
   rt random 50
   lt random 50
   fd 1
-  set color yellow
-end
-
-to moveS
-  rt random 50
-  lt random 50
-  fd 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -476,7 +471,7 @@ num-sheep
 num-sheep
 0
 500
-77.0
+55.0
 1
 1
 NIL
@@ -491,7 +486,7 @@ num-shepherds
 num-shepherds
 0
 3
-2.0
+1.0
 1
 1
 NIL
@@ -540,7 +535,7 @@ num-flowers
 num-flowers
 0
 50
-25.0
+1.0
 1
 1
 NIL
@@ -555,7 +550,7 @@ num-bee
 num-bee
 0
 100
-10.0
+0.0
 1
 1
 NIL
@@ -595,10 +590,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count bee"
 
 MONITOR
-918
-51
-1028
-96
+910
+61
+1020
+106
 Number of pollen
 number-pollen
 17
@@ -606,10 +601,10 @@ number-pollen
 11
 
 MONITOR
-917
-99
-1020
-144
+910
+109
+1013
+154
 Number of bees
 count bee
 17
@@ -635,10 +630,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count sheep"
 
 MONITOR
-701
-372
-841
-417
+34
+293
+174
+338
 is it currently raining ?
 raining?
 17
@@ -646,10 +641,10 @@ raining?
 11
 
 MONITOR
-927
-214
-1091
-259
+915
+207
+1079
+252
 Number of captured sheep
 captured-sheep
 17
@@ -657,10 +652,10 @@ captured-sheep
 11
 
 MONITOR
-927
-265
-1074
-310
+915
+258
+1062
+303
 Number of dead sheep
 dead-sheep
 17
@@ -668,10 +663,10 @@ dead-sheep
 11
 
 MONITOR
-927
-318
-1093
-363
+915
+311
+1081
+356
 Number of new born sheep
 born-sheep
 17
@@ -679,10 +674,10 @@ born-sheep
 11
 
 PLOT
-696
-444
-896
-594
+700
+368
+900
+518
 Number of flowers over time
 Time
 Number of flowers
