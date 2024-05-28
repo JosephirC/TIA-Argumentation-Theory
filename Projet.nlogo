@@ -349,6 +349,7 @@ to go-to-hive
         set pollen-total pollen-total + [pollen] of myself
       ]
       set pollen 0
+      set color yellow
     ]
   ]
 end
@@ -385,7 +386,7 @@ end
 to rain
   if not raining? [
     ;; start raining
-    if random-float 1 < 0.1 [  ;; Probability of having rain for every tick (10 %)
+    if random-float 1 < rain-chance [  ;; Probability of having rain for every tick (10 %)
         set raining? true
         set rain-duration random 50 ;; Rain will last for a random number between 0 and 50 ticks
         set current-rain-ticks 0
@@ -436,10 +437,10 @@ to moveR
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-258
-43
-658
-444
+223
+99
+623
+500
 -1
 -1
 7.7
@@ -463,14 +464,14 @@ ticks
 30.0
 
 SLIDER
-38
-115
-208
-148
+31
+181
+201
+214
 num-sheep
 num-sheep
 0
-500
+200
 55.0
 1
 1
@@ -478,10 +479,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-38
-79
-208
-112
+32
+121
+202
+154
 num-shepherds
 num-shepherds
 0
@@ -493,10 +494,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-55
-38
-112
-71
+47
+24
+104
+57
 NIL
 setup
 NIL
@@ -510,10 +511,10 @@ NIL
 1
 
 BUTTON
-133
-38
-190
-71
+140
+26
+197
+59
 NIL
 go
 T
@@ -527,55 +528,55 @@ NIL
 0
 
 SLIDER
-37
-149
-209
-182
+29
+252
+201
+285
 num-flowers
 num-flowers
 0
 50
-1.0
+25.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-37
-184
-209
-217
+29
+315
+201
+348
 num-bee
 num-bee
 0
-100
-0.0
+75
+8.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-36
-228
-208
-261
+32
+386
+204
+419
 pollen-to-spawn-bee
 pollen-to-spawn-bee
 20
-200
-51.0
+150
+48.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-702
-45
-902
-195
+658
+17
+858
+167
 Number of bees over time
 Time
 Number of bees
@@ -590,10 +591,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count bee"
 
 MONITOR
-910
-61
-1020
-106
+872
+45
+982
+90
 Number of pollen
 number-pollen
 17
@@ -601,10 +602,10 @@ number-pollen
 11
 
 MONITOR
-910
-109
-1013
-154
+872
+93
+975
+138
 Number of bees
 count bee
 17
@@ -612,10 +613,10 @@ count bee
 11
 
 PLOT
-701
-205
-901
-355
+659
+183
+859
+333
 Number of sheep over time
 Time
 Number sheep
@@ -630,10 +631,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count sheep"
 
 MONITOR
-34
-293
-174
-338
+345
+33
+485
+78
 is it currently raining ?
 raining?
 17
@@ -641,10 +642,10 @@ raining?
 11
 
 MONITOR
-915
-207
-1079
-252
+869
+185
+1033
+230
 Number of captured sheep
 captured-sheep
 17
@@ -652,10 +653,10 @@ captured-sheep
 11
 
 MONITOR
-915
-258
-1062
-303
+869
+236
+1016
+281
 Number of dead sheep
 dead-sheep
 17
@@ -663,10 +664,10 @@ dead-sheep
 11
 
 MONITOR
-915
-311
-1081
-356
+869
+289
+1035
+334
 Number of new born sheep
 born-sheep
 17
@@ -674,10 +675,10 @@ born-sheep
 11
 
 PLOT
-700
-368
-900
-518
+658
+350
+858
+500
 Number of flowers over time
 Time
 Number of flowers
@@ -690,6 +691,81 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count flower"
+
+SLIDER
+32
+461
+204
+494
+rain-chance
+rain-chance
+0
+0.3
+0.1
+0.01
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+38
+431
+188
+459
+Chance to have rain for one tick
+11
+0.0
+1
+
+TEXTBOX
+42
+355
+192
+383
+The max number of pollen to spawn a been
+11
+0.0
+1
+
+TEXTBOX
+40
+296
+190
+314
+The max number of bees
+11
+0.0
+1
+
+TEXTBOX
+41
+234
+191
+252
+The max number of flowers
+11
+0.0
+1
+
+TEXTBOX
+45
+163
+195
+181
+The max number of sheep
+11
+0.0
+1
+
+TEXTBOX
+50
+93
+200
+121
+The max number of shepherds
+11
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
