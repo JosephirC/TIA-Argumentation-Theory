@@ -51,6 +51,7 @@ bee-own[
   pollen                 ;; indicates the number of pollen it can pick up
   time-on-flower         ;; indicates the time the bee spends on the flower
   time-collect-pollen    ;; indicates the time each bee needs to collect a pollen
+  at-flower            ;; indicates the target flower for the bee to collect pollen
 ]
 
 hive-own[
@@ -166,13 +167,15 @@ to update-on-flower
       set time-on-flower time-on-flower + 1
 
       if time-on-flower >= time-collect-pollen [
-        let flower-patch one-of turtles in-radius 1 with [breed = flower]
-        if flower-patch != nobody [
-          ask flower-patch [
+        ;; Utiliser la référence stockée de la fleur
+        if at-flower != nobody [
+          ask at-flower [
             set nbr-bees nbr-bees - 1
           ]
+          set at-flower nobody  ;; Réinitialiser la référence après avoir quitté la fleur
         ]
 
+        ;; Définir que l'abeille n'est plus sur la fleur et a collecté le pollen
         set on-flower false
         set color blue
         set pollen random 5
@@ -180,6 +183,7 @@ to update-on-flower
     ]
   ]
 end
+
 
 to update-hive
   ask hive[
@@ -399,6 +403,7 @@ to bee-go-to-flower [target]
     set on-flower true
     set color red
     set time-on-flower 0
+    set at-flower target
     ask target [
       set nbr-bees nbr-bees + 1
     ]
@@ -472,7 +477,7 @@ num-sheep
 num-sheep
 0
 500
-10.0
+0.0
 1
 1
 NIL
@@ -536,7 +541,7 @@ num-flowers
 num-flowers
 0
 50
-15.0
+1.0
 1
 1
 NIL
@@ -551,7 +556,7 @@ num-bee
 num-bee
 0
 100
-42.0
+17.0
 1
 1
 NIL
