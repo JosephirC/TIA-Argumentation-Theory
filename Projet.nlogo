@@ -84,7 +84,7 @@ to setup
     set on-flower false
     set life-time 0
     set pollen 0
-    set time-collect-pollen random 10
+    set time-collect-pollen random 30
     set time-collect-pollen time-collect-pollen + 10
   ]
   create-hive 1 [
