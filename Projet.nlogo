@@ -29,6 +29,8 @@ sheep-own [
 flower-own [
   alive
   hungry-sheep-nearby            ;; how many hungry sheeps are nearby?
+  max-bees                       ;; indicates the max number of bees on the flower
+  nbr-bees                       ;; indicates the number of bees currently on the flower
 ]
 
 bee-own[
@@ -58,7 +60,7 @@ to setup
   ask zone [set pcolor brown]
   create-sheep num-sheep [
     set color white
-    set size 1.5  ;; easier to see
+    set size 2  ;; easier to see
     set stop-moving false
     set hungry false
     set hunger-timer 0
@@ -66,14 +68,14 @@ to setup
   ]
   create-shepherds num-shepherds [
     set color red
-    set size 3  ;; easier to see
+    set size 4  ;; easier to see
     set carried-sheep nobody
     set found-herd? false
     setxy random-xcor random-ycor
   ]
   create-bee num-bee [
     set color yellow
-    set size 2.5
+    set size 1.5
     set on-flower false
     set life-time 0
     set pollen 0
@@ -144,6 +146,26 @@ to update-on-flower
       set time-on-flower time-on-flower + 1
 
       if time-on-flower >= time-collect-pollen [
+
+        let flower-patch one-of turtles-here with [breed = flower]
+        if flower-patch != nobody [
+          ask flower-patch [
+            set nbr-bees nbr-bees - 1
+          ]
+        ]
+        if flower-patch = flower[
+          let target-patch one-of patches with [pcolor != brown]
+          if target-patch != nobody [
+            ask target-patch [
+              sprout-shepherds 1 [
+                set color yellow
+                set size 2
+                setxy random-xcor random-ycor
+              ]
+            ]
+          ]
+        ]
+
         set on-flower false
         set color blue
         set pollen random 5
@@ -163,7 +185,7 @@ to update-hive
           set life-time 0
           set pollen 0
           set time-collect-pollen random 10
-          set time-collect-pollen time-collect-pollen + 10
+          set time-collect-pollen time-collect-pollen + 30
         ]
       ]
     ]
@@ -189,7 +211,8 @@ to go
   ]
   ask bee [
     if not on-flower and pollen = 0 [
-      let target min-one-of flower with [not hidden?] [distance myself]
+      ;; let target min-one-of flower with [not hidden?] [distance myself]
+      let target min-one-of flower with [nbr-bees < max-bees and not hidden?] [distance myself]
       if target != nobody [
         ifelse distance target < 2 [
           bee-go-to-flower target
@@ -216,6 +239,8 @@ to spawn-flower
     if target-patch != nobody [
       ask target-patch [
         sprout-flower 1 [
+          set max-bees 3
+          set nbr-bees 0
           set color yellow
           set size 2
         ]
@@ -288,6 +313,10 @@ to bee-go-to-flower [target]
   if distance target < 1 [ ;; the bee is on the flower
     set on-flower true
     set color red
+    set time-on-flower 0
+    ask target [
+      set nbr-bees nbr-bees + 1
+    ]
   ]
 end
 
@@ -317,13 +346,13 @@ to stay-in-zone
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-258
-43
-658
-444
+479
+14
+1054
+590
 -1
 -1
-7.7
+11.12
 1
 10
 1
@@ -370,7 +399,7 @@ num-sheep
 num-sheep
 0
 500
-20.0
+0.0
 1
 1
 NIL
@@ -445,7 +474,7 @@ num-flowers
 num-flowers
 0
 50
-10.0
+1.0
 1
 1
 NIL
@@ -471,7 +500,7 @@ num-bee
 num-bee
 0
 100
-11.0
+29.0
 1
 1
 NIL
