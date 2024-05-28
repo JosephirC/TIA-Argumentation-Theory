@@ -6,56 +6,48 @@ breed [hive a-hive]
 
 
 globals [
-  sheepless-neighborhoods       ;; how many patches have no sheep in any neighboring patches?
-  herding-efficiency            ;; measures how well-herded the sheep are
-  zone
-  eating-efficiency             ;; how many flowers were eaten
-  number-pollen
-  captured-sheep                ;; how many sheep have been captured
-  dead-sheep                    ;; how many sheep have died
-  born-sheep                    ;; how many sheep have been born
-  count-dead          ;; compter les gouttes de pluie qui ont quitté la carte sur le bord
-  rain-count          ;; Variable pour suivre le nombre de fleurs (pluie)
-  raining?            ;; Variable pour indiquer si c'est en train de pleuvoir ou non
-  rain-duration       ;; Durée de la pluie
-  current-rain-ticks  ;; Nombre de ticks écoulés pendant la pluie actuelle
+  zone                          ;; represents the zone in which the sheep are kept
+  eating-efficiency             ;; indicates the number of flowers that were eaten
+  number-pollen                 ;; indicates the number of pollen
+  captured-sheep                ;; indicates the number of sheep that have been captured
+  dead-sheep                    ;; indicates the number of sheep that have died
+  born-sheep                    ;; indicates the number of seep that are born
+  raining?                      ;; indicates if it is raining or not
+  rain-duration                 ;; indicates the duration of rain
+  current-rain-ticks            ;; indicates the number of ticks during the rain time
 ]
 
 patches-own [
-  sheep-nearby         ;; how many sheep in neighboring patches?
-  top
+  sheep-nearby                  ;; indicates the number of sheep in neighboring patches?
 ]
 
 shepherds-own [
-  carried-sheep         ;; the sheep I'm carrying (or nobody if I'm not carrying one)
-  carrying-sheep
-  found-herd?           ;; becomes true when I find a herd to drop it in
+  carried-sheep                 ;; represents the target sheep that I'm carrying (or nobody if I'm not carrying one)
+  carrying-sheep                ;; indicates if i am carrying a sheep or not (boolean variable)
 ]
 
 sheep-own [
-  stop-moving           ;; indicates if the sheep should stop moving
-  hungry                ;; indicate if a sheep is hungry or not
-  hunger-timer          ;; indicates the period of time to get hungry
+  stop-moving                   ;; indicates if the sheep should stop moving
+  hungry                        ;; indicate if a sheep is hungry or not
+  hunger-timer                  ;; indicates the period of time to get hungry
 ]
 
 flower-own [
-  alive
-  hungry-sheep-nearby            ;; how many hungry sheeps are nearby?
-  max-bees                       ;; indicates the max number of bees on the flower
-  nbr-bees                       ;; indicates the number of bees currently on the flower
+  max-bees                      ;; indicates the max number of bees on the flower
+  nbr-bees                      ;; indicates the number of bees currently on the flower
 ]
 
 bee-own[
-  on-flower              ;; boolean to indicate if the bee is on a flower or not
-  life-time              ;; indicates life duration for a bee
-  pollen                 ;; indicates the number of pollen it can pick up
-  time-on-flower         ;; indicates the time the bee spends on the flower
-  time-collect-pollen    ;; indicates the time each bee needs to collect a pollen
-  at-flower            ;; indicates the target flower for the bee to collect pollen
+  on-flower                     ;; boolean to indicate if the bee is on a flower or not
+  life-time                     ;; indicates life duration for a bee
+  pollen                        ;; indicates the number of pollen it can pick up
+  time-on-flower                ;; indicates the time the bee spends on the flower
+  time-collect-pollen           ;; indicates the time each bee needs to collect a pollen
+  at-flower                     ;; indicates the target flower for the bee to collect pollen
 ]
 
 hive-own[
-  pollen-total          ;; indicates the total number of pollen the hive has
+  pollen-total                  ;; indicates the total number of pollen the hive has before sprouting a new bee
 ]
 
 to setup
@@ -73,7 +65,7 @@ to setup
   ask zone [set pcolor brown]
   create-sheep num-sheep [
     set color white
-    set size 1.5  ;; easier to see
+    set size 1.5
     set stop-moving false
     set hungry false
     set hunger-timer 0
@@ -81,10 +73,9 @@ to setup
   ]
   create-shepherds num-shepherds [
     set color red
-    set size 3  ;; easier to see
+    set size 3
     set carried-sheep nobody
     set carrying-sheep false
-    set found-herd? false
     setxy random-xcor random-ycor
   ]
   create-bee num-bee [
@@ -103,107 +94,11 @@ to setup
     set pollen-total 0
   ]
 
-  set rain-count 0
   set raining? false
   set dead-sheep 0
   set captured-sheep 0
   set born-sheep 0
   reset-ticks
-end
-
-to update-sheep-counts
-  ask patches [
-    set sheep-nearby (sum [count sheep-here] of neighbors)
-  ]
-  set sheepless-neighborhoods (count patches with [sheep-nearby = 0])
-end
-
-
-to calculate-herding-efficiency
-  set herding-efficiency (sheepless-neighborhoods / (count patches with [not any? sheep-here])) * 100
-end
-
-to calculate-eating-efficiency
-  set eating-efficiency count flower
-end
-
-to update-hunger
-  ask sheep [
-    if not stop-moving [
-      if hungry = false [
-        set hunger-timer hunger-timer + 1
-
-        if hunger-timer >= 100 [
-          set hungry true
-          set color red
-        ]
-      ]
-
-      if hungry [
-        set hunger-timer hunger-timer + 1
-        if hunger-timer >= 200 [
-          set dead-sheep dead-sheep + 1
-          die
-        ]
-      ]
-    ]
-  ]
-end
-
-to update-life-time
-  ask bee[
-    if not on-flower [
-      set life-time life-time + 1
-      if life-time >= 500 and random-float 1 < 0.1 [
-        die
-      ]
-    ]
-  ]
-end
-
-to update-on-flower
-  ask bee [
-    if on-flower [
-      set time-on-flower time-on-flower + 1
-
-      if time-on-flower >= time-collect-pollen [
-        ;; Utiliser la référence stockée de la fleur
-        if at-flower != nobody [
-          ask at-flower [
-            set nbr-bees nbr-bees - 1
-          ]
-          set at-flower nobody  ;; Réinitialiser la référence après avoir quitté la fleur
-        ]
-
-        ;; Définir que l'abeille n'est plus sur la fleur et a collecté le pollen
-        set on-flower false
-        set color blue
-        set pollen random 5
-      ]
-    ]
-  ]
-end
-
-
-to update-hive
-  ask hive[
-    ;;pollen-total mod pollen-to-spawn-bee = 0 and
-    if pollen-total >= pollen-to-spawn-bee [
-      ask patch-here [
-        sprout-bee 1 [
-          set color yellow
-          set size 2.5
-          set on-flower false
-          set life-time 0
-          set pollen 0
-          set time-collect-pollen random 10
-          set time-collect-pollen time-collect-pollen + 30
-        ]
-      ]
-      set number-pollen number-pollen + pollen-total
-      set pollen-total 0
-    ]
-  ]
 end
 
 ;****************************************************************
@@ -249,34 +144,257 @@ to go
   update-on-flower
   update-life-time
   update-hive
-  ;;spawn-flower
   rain
   see-rain
-  plot-rain-count
 
   tick
 end
 
 ;****************************************************************
-;********************** LA PLUIE ********************************
+;************************* UPDATES ******************************
+;****************************************************************
+
+to update-hunger
+  ask sheep [
+    if not stop-moving [
+      if hungry = false [
+        set hunger-timer hunger-timer + 1
+
+        if hunger-timer >= 100 [
+          set hungry true
+          set color red
+        ]
+      ]
+
+      if hungry [
+        set hunger-timer hunger-timer + 1
+        if hunger-timer >= 200 [
+          set dead-sheep dead-sheep + 1
+          die
+        ]
+      ]
+    ]
+  ]
+end
+
+to update-life-time
+  ask bee[
+    if not on-flower [
+      set life-time life-time + 1
+      if life-time >= 500 and random-float 1 < 0.1 [
+        die
+      ]
+    ]
+  ]
+end
+
+to update-on-flower
+  ask bee [
+    if on-flower [
+      set time-on-flower time-on-flower + 1
+
+      if time-on-flower >= time-collect-pollen [
+        if at-flower != nobody [
+          ask at-flower [
+            set nbr-bees nbr-bees - 1
+          ]
+          set at-flower nobody
+        ]
+
+        set on-flower false
+        set color blue
+        set pollen random 5
+      ]
+    ]
+  ]
+end
+
+to update-hive
+  ask hive[
+    if pollen-total >= pollen-to-spawn-bee [
+      ask patch-here [
+        sprout-bee 1 [
+          set color yellow
+          set size 2.5
+          set on-flower false
+          set life-time 0
+          set pollen 0
+          set time-collect-pollen random 10
+          set time-collect-pollen time-collect-pollen + 30
+        ]
+      ]
+      set number-pollen number-pollen + pollen-total
+      set pollen-total 0
+    ]
+  ]
+end
+
+;****************************************************************
+;********************** shepherd ********************************
+;****************************************************************
+
+to search-for-sheep
+  let target min-one-of sheep with [not stop-moving] [distance myself]
+
+  if target != nobody [
+    if [stop-moving] of target = false and [hungry] of target = false [ ;; search for sheep that move and that are hungry
+      face target
+      fd 0.5
+      if distance target < 1 [
+        set carried-sheep target
+        set carrying-sheep true
+        ask carried-sheep [
+          set stop-moving true
+          set color white
+        ]
+        set captured-sheep captured-sheep + 1
+        set color blue
+      ]
+    ]
+  ]
+end
+
+to move-to-brown-zone
+  if carried-sheep != nobody and carrying-sheep = true [
+    let temp-sheep carried-sheep
+    ifelse [pcolor] of patch-ahead 0.001 = brown [
+      set carrying-sheep false
+      set carried-sheep nobody
+      set color red
+    ][
+      let target-patch one-of patches with [pcolor = brown]
+      face target-patch
+      fd 1
+    ]
+    ask temp-sheep [
+      setxy [xcor] of myself [ycor] of myself
+    ]
+  ]
+end
+
+;****************************************************************
+;************************* SHEEP ********************************
+;****************************************************************
+
+to sheep-search-for-flower
+  let target min-one-of flower with [not hidden?] [distance myself]
+  if target != nobody [
+    face target
+    fd 1
+    if distance target < 1 [
+      let bees-on-flower count bee-on target
+      if bees-on-flower > 1 [
+        set color pink
+        moveR
+      ]
+      if bees-on-flower = 1 [
+        ask one-of bee-on target [ bee-flee target ]
+        ask target [ die ]
+        set color white
+        set hungry false
+        set hunger-timer 0
+      ]
+      if bees-on-flower = 0[
+        ask target [ die ]
+        set color white
+        set hungry false
+        set hunger-timer 0
+      ]
+    ]
+  ]
+end
+
+to sheep-reproduce
+  if not stop-moving and not hungry and random-float 1 < 0.001 [
+    set born-sheep born-sheep + 1
+    hatch 1 [
+      set size 1.5
+      set stop-moving false
+      set hungry false
+      set hunger-timer 0
+    ]
+  ]
+end
+
+;****************************************************************
+;*********************** BEE & FLOWER ***************************
+;****************************************************************
+
+to spawn-flower
+  if random-float 1 < 0.4 and count flower < num-flowers [ ;; theres a 40% chance that a flower spawns for every tick during rain time
+    let target-patch one-of patches with [pcolor != brown]
+    if target-patch != nobody [
+      ask target-patch [
+        sprout-flower 1 [
+          set max-bees 3
+          set nbr-bees 0
+          set color yellow
+          set size 2
+        ]
+      ]
+    ]
+  ]
+end
+
+to go-to-hive
+  let target one-of hive with [not hidden?]
+  if target != nobody [
+    face target
+    fd 1
+
+    if distance target < 1 [
+      ask target [
+        set pollen-total pollen-total + [pollen] of myself
+      ]
+      set pollen 0
+    ]
+  ]
+end
+
+to bee-go-to-flower [target]
+  face target
+  fd 1
+  if distance target < 1 [ ;; the bee is on the flower
+    set on-flower true
+    set color red
+    set time-on-flower 0
+    set at-flower target
+    ask target [
+      set nbr-bees nbr-bees + 1
+    ]
+  ]
+end
+
+to bee-flee [flower-target]
+  let target-bee one-of bee with [at-flower = flower-target and on-flower = true]
+  if target-bee != nobody [
+    ask target-bee [
+      set on-flower false
+      moveR
+      set color pink
+      set at-flower nobody
+    ]
+  ]
+end
+
+;****************************************************************
+;************************** RAIN ********************************
 ;****************************************************************
 to rain
   if not raining? [
-    ;; Commencer à pleuvoir
-    if random-float 1 < 0.05 [  ;; Probabilité que la pluie tombe lors de chaque tick (ici, 5%)
-        set rain-count rain-count + 1
+    ;; start raining
+    if random-float 1 < 0.1 [  ;; Probability of having rain for every tick (10 %)
         set raining? true
-        set rain-duration random 50 ;; Pluie pendant x ticks entre 0 et 50
+        set rain-duration random 50 ;; Rain will last for a random number between 0 and 50 ticks
         set current-rain-ticks 0
     ]
   ]
   if raining? [
     spawn-flower
-    ;; Arrêter la pluie après la durée spécifiée
+    ;; Stop rain after the rain-duration
     if current-rain-ticks >= rain-duration [
       set raining? false
     ]
-    ;; Pendant la pluie, incrémenter le compteur de ticks de pluie
     if current-rain-ticks < rain-duration [
       set current-rain-ticks current-rain-ticks + 1
     ]
@@ -305,27 +423,9 @@ to see-rain
   ]
 end
 
-to plot-rain-count
-  ;; Ajouter un point sur le plot pour afficher l'évolution du nombre de fleurs (pluie)
-  plotxy ticks rain-count
-end
-
-to spawn-flower
-  if random-float 1 < 0.2 and count flower < num-flowers [ ;; j'ai 20% qu'ils "pleuvent" et donc de faire spawn une fleur
-    let target-patch one-of patches with [pcolor != brown]
-    if target-patch != nobody [
-      ask target-patch [
-        sprout-flower 1 [
-          set max-bees 3
-          set nbr-bees 0
-          set color yellow
-          set size 2
-        ]
-      ]
-    ]
-  ]
-end
-
+;****************************************************************
+;********************** MOVEMENT ********************************
+;****************************************************************
 
 to moveR
   rt random 50
@@ -338,107 +438,6 @@ to moveS
   rt random 50
   lt random 50
   fd 1
-end
-
-to go-to-hive
-  let target one-of hive with [not hidden?]
-  if target != nobody [
-    face target
-    fd 1
-
-    if distance target < 1 [
-      ask target [
-        set pollen-total pollen-total + [pollen] of myself
-      ]
-      set pollen 0
-    ]
-  ]
-end
-
-to search-for-sheep
-  let target min-one-of sheep with [not stop-moving] [distance myself]
-
-  if target != nobody [
-    if [stop-moving] of target = false and [hungry] of target = false [
-      face target
-      fd 0.5
-      if distance target < 1 [ ;; suit les moutons quand ils sont proche d'eux et si le moutonton peut bouger ou pas
-        set carried-sheep target
-        set carrying-sheep true
-        ask carried-sheep [
-          ;;set hidden? true ;; pour qu'on voit le berger porte le mouton
-          set stop-moving true
-          set color white
-        ]
-        set captured-sheep captured-sheep + 1
-        set color blue
-      ]
-    ]
-  ]
-end
-
-to sheep-search-for-flower
-  let target min-one-of flower with [not hidden?] [distance myself]
-
-  ;; let target one-of flower with [not hidden?]
-  if target != nobody [
-    face target
-    fd 1
-
-    if distance target < 1 [
-      ask target [
-        die
-      ]
-      set color white
-      set hungry false
-      set hunger-timer 0
-    ]
-  ]
-end
-
-to bee-go-to-flower [target]
-  face target
-  fd 1
-  if distance target < 1 [ ;; the bee is on the flower
-    set on-flower true
-    set color red
-    set time-on-flower 0
-    set at-flower target
-    ask target [
-      set nbr-bees nbr-bees + 1
-    ]
-  ]
-end
-
-to move-to-brown-zone
-  if carried-sheep != nobody and carrying-sheep = true [
-    let temp-sheep carried-sheep
-    ifelse [pcolor] of patch-ahead 0.001 = brown [
-      set carrying-sheep false
-      set carried-sheep nobody
-      set color red
-    ][
-      let target-patch one-of patches with [pcolor = brown]
-      face target-patch
-      fd 1
-    ]
-    ask temp-sheep [
-      setxy [xcor] of myself [ycor] of myself
-    ]
-  ]
-end
-
-to sheep-reproduce
-  if not stop-moving and not hungry and random-float 1 < 0.001 [
-    set born-sheep born-sheep + 1
-    hatch 1 [
-      set color black
-      set size 1.5
-      set stop-moving false
-      set hungry false
-      set hunger-timer 0
-    ]
-  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -477,7 +476,7 @@ num-sheep
 num-sheep
 0
 500
-0.0
+77.0
 1
 1
 NIL
@@ -541,7 +540,7 @@ num-flowers
 num-flowers
 0
 50
-1.0
+25.0
 1
 1
 NIL
@@ -556,22 +555,22 @@ num-bee
 num-bee
 0
 100
-17.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-35
-242
-207
-275
+36
+228
+208
+261
 pollen-to-spawn-bee
 pollen-to-spawn-bee
 20
 200
-20.0
+51.0
 1
 1
 NIL
@@ -582,9 +581,9 @@ PLOT
 45
 902
 195
-évolution du nombre d'abeille
+Number of bees over time
 Time
-Nombre d'abeille
+Number of bees
 0.0
 10.0
 0.0
@@ -598,20 +597,20 @@ PENS
 MONITOR
 918
 51
-1023
+1028
 96
-number of pollen
+Number of pollen
 number-pollen
 17
 1
 11
 
 MONITOR
-919
-111
-1019
-156
-number of bees
+917
+99
+1020
+144
+Number of bees
 count bee
 17
 1
@@ -622,9 +621,9 @@ PLOT
 205
 901
 355
-évolution nbr mouton
+Number of sheep over time
 Time
-Nbr moutons
+Number sheep
 0.0
 10.0
 0.0
@@ -635,30 +634,12 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot count sheep"
 
-PLOT
-702
-389
-902
-539
-évolution pluie
-time
-rain evolution
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot count rain"
-
 MONITOR
-921
-391
-1049
-436
-Pluie en ce moment ?
+701
+372
+841
+417
+is it currently raining ?
 raining?
 17
 1
@@ -669,7 +650,7 @@ MONITOR
 214
 1091
 259
-Nombre de mouton capturé
+Number of captured sheep
 captured-sheep
 17
 1
@@ -680,7 +661,7 @@ MONITOR
 265
 1074
 310
-Nombre de mouton mort
+Number of dead sheep
 dead-sheep
 17
 1
@@ -689,13 +670,31 @@ dead-sheep
 MONITOR
 927
 318
-1058
+1093
 363
-Nombre de naissance
+Number of new born sheep
 born-sheep
 17
 1
 11
+
+PLOT
+696
+444
+896
+594
+Number of flowers over time
+Time
+Number of flowers
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count flower"
 
 @#$#@#$#@
 ## WHAT IS IT?
